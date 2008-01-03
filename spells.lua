@@ -77,7 +77,13 @@ AfflictedSpells = {
 		seconds = 20,
 		icon = "Interface\\Icons\\INV_Spear_08",
 		type = "spell",
-		
+	},
+
+	[L["Silence"]] = {
+		id = "silence",
+		seconds = 45,
+		icon = "Interface\\Icons\\Spell_Shadow_ImpPhaseShift",
+		type = "spell",
 	},
 
 	[L["Feral Charge"]] = {
@@ -85,7 +91,6 @@ AfflictedSpells = {
 		seconds = 15,
 		icon = "Interface\\Icons\\Ability_Hunter_Pet_Bear",
 		type = "spell",
-		
 	},
 
 	[L["Spell Lock"]] = {

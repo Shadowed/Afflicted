@@ -1,8 +1,9 @@
 AfflictedLocals = {
-	["%s GAINED %s"] = "%s GAINED %s",
-	["%s FADED %s"] = "%s FADED %s",
-	["%s USED %s"] = "%s USED %s",
-	["%s READY %s"] = "%s READY %s",
+	["GAINED %s (%s)"] = "GAINED %s (%s)",
+	["FADED %s (%s)"] = "FADED %s (%s)",
+
+	["USED %s"] = "USED %s",
+	["READY %s"] = "READY %s",
 
 	["Interrupted %s's %s."] = "Interrupted %s's %s.",
 	["Removed %s's %s."] = "Removed %s's %s.",
@@ -25,6 +26,7 @@ AfflictedLocals = {
 	["Spell Lock"] = "Spell Lock",
 	["Counterspell - Silenced"] = "Counterspell - Silenced",
 	["Counterspell"] = "Counterspell",
+	["Silence"] = "Silence",
 	
 	-- Slash command
 	["Afflicted slash commands"] = "Afflicted slash commands",
@@ -38,6 +40,18 @@ AfflictedLocals = {
 	["Alerts"] = "Alerts",
 	
 	["Test Timers"] = "Test Timers",
+	
+	["Raid Warning"] = "Raid Warning",
+	["Party"] = "Party",
+	
+	["Chat frame #%d"] = "Chat frame #%d",
+	["Combat Text"] = "Combat Text",
+	["Output"] = "Output",
+	["Timer Chat"] = "Timer Chat",
+	["Alert Chat"] = "Alert Chat",
+
+	["Combat text color"] = "Combat text color",
+	["Color to show the event in the combat text mod. Supports Blizzard CT, SCT and MSBT."] = "Color to show the event in the combat text mod. Supports Blizzard CT, SCT and MSBT.",
 	
 	["Show buff timers"] = "Show buff timers",
 	["Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade."] = "Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade.",

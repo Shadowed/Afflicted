@@ -26,19 +26,19 @@ function Afflicted:OnInitialize()
 			showPurge = false,
 			showInterrupt = false,
 			
-			alertChat = 1,
-			timerChat = 1,
+			alertOutput = 1,
+			timerOutput = 1,
 			
 			announce = {
 				buff = true,
 				spell = true,
 			},
-
 			growup = {
 				buff = false,
 				spell = false,
 			},
-			
+			alertColor = { r = 1.0, g = 0.0, b = 0.0 },
+			timerColor = { r = 1.0, g = 0.0, b = 0.0 },
 			positions = {},
 		},
 	}
@@ -175,71 +175,70 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 end
 
 function Afflicted:CHAT_MSG_SPELL_SELF_DAMAGE(event, msg)
-	if( string.match(msg, selfInterruptOther) ) then
-		local target, spell = string.match(msg, selfInterruptOther)
-		self:Print(string.format(L["Interrupted %s's %s."], target, spell))
+	local target, spell = string.match(msg, selfInterruptOther)
+	if( spell and target ) then
+		self:SendMessage(string.format(L["Interrupted %s's %s."], target, spell), "alert")
 	end
 end
 
 function Afflicted:CHAT_MSG_SPELL_SELF_BUFF(event, msg)
-	if( string.match(msg, selfFailDispel) ) then
-		local target, spell = string.match(msg, selfFailDispel)
-		self:Print(string.format(L["FAILED %s's %s."], target, spell))
+	local target, spell = string.match(msg, selfFailDispel)
+	if( spell and target ) then
+		self:SendMessage(string.format(L["FAILED %s's %s."], target, spell), "alert")
 	end
 end
 
 function Afflicted:CHAT_MSG_SPELL_BREAK_AURA(event, msg)
-	if( string.match(msg, selfSuccessDispel) ) then
-		local target, spell, caster = string.match(msg, selfSuccessDispel)
-		if( caster == playerName ) then
-			self:Print(string.format(L["Removed %s's %s."], target, spell))
-		end
+	local target, spell, caster = string.match(msg, selfSuccessDispel)
+	if( caster == playerName ) then
+		self:SendMessage(string.format(L["Removed %s's %s."], target, spell), "alert")
 	end
 end
 
 function Afflicted:CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE(event, msg)
 	-- Friendly player resisted a spell
-	if( string.match(msg, friendlyResistSpell) ) then
-		local _, spell, target = string.match(msg, friendlyResistSpell)
-		self:ProcessAbility(spell, spell, target)
-	
+	local _, spell, target = string.match(msg, friendlyResistSpell)
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
+		return
+	end
 
 	-- We resisted a spell
-	elseif( string.match(msg, selfResistSpell) ) then
-		local spell, target = string.match(msg, selfResistSpell)
-		self:ProcessAbility(spell, spell, target)
+	local spell, target = string.match(msg, selfResistSpell)
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
 	end
 end
 
 function Afflicted:CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE(event, msg)
 	-- Player afflicted by a spell
-	if( string.match(msg, selfGetAfflicted) ) then
-		local spell = string.match(msg, selfGetAfflicted)
-		self:ProcessAbility(spell, spell, nil)
+	local spell = string.match(msg, selfGetAfflicted)
+	if( spell ) then
+		self:ProcessAbility(spell)
 	end
 end
 
 function Afflicted:CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE(event, msg)
 	-- Friendly player afflicted
-	if( string.match(msg, friendlyGetAfflicted) ) then
-		local target, spell = string.match(msg, friendlyGetAfflicted)
-		self:ProcessAbility(spell, spell, nil)
+	local target, spell = string.match(msg, friendlyGetAfflicted)
+	if( spell ) then
+		self:ProcessAbility(spell)
 	end
 end
 
 function Afflicted:CHECK_BUFF_GAINS(event, msg)
 	-- Enemy player, OR pet gained a buff
-	if( string.match(msg, enemyGainBuff) ) then
-		local target, spell = string.match(msg, enemyGainBuff)
-		self:ProcessAbility(target .. spell, spell, target)
+	local target, spell = string.match(msg, enemyGainBuff)
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
 	end
 end
 
 function Afflicted:CHAT_MSG_SPELL_AURA_GONE_OTHER(event, msg)
 	-- Enemy lost a buff
-	if( string.match(msg, enemyLoseBuff) ) then
-		local spell, target = string.match(msg, enemyLoseBuff)
-		self:ProcessAbility(target .. spell, spell, target)
+	local spell, target = string.match(msg, enemyLoseBuff)
+	if( spell and target ) then
+		self:AbilityEnded(nil, spell, target)
 	end
 end
 
@@ -321,7 +320,7 @@ local function onUpdate(self, elapsed)
 	self.lastUpdate = time
 	
 	if( self.timeLeft <= 0 ) then
-		Afflicted:AbilityEnded(self.id, self.spellName, self.target, self.type, self.suppress)
+		Afflicted:AbilityEnded(self.id, self.spellName, self.target, self.suppress)
 		return
 	end
 	
@@ -346,7 +345,7 @@ function Afflicted:CreateRow(parent)
 	frame.icon:SetHeight(ICON_SIZE)
 	frame.icon:SetPoint("LEFT")
 	
-	frame.text = frame:CreateFontString(nil, "OVERLAY")
+	frame.text = frame:CreateFontString(nil, "BACKGROUND")
 	frame.text:SetFontObject(GameFontHighlight)
 	frame.text:SetPoint("LEFT", ICON_SIZE + 2, 0)
 	
@@ -386,113 +385,154 @@ local function sortTimers(a, b)
 end
 
 -- New ability found
-function Afflicted:ProcessAbility(id, spellName, target, type, suppress)
+function Afflicted:ProcessAbility(spellName, target, suppress)
 	-- We're not monitoring this spell
 	if( not self.spellList[spellName] ) then
 		return
 	end	
 
 	local spellData = self.spellList[spellName]
-
-	-- Use spell data type if the one we gave is unavailable
-	type = type or spellData.type
+	local id = spellData.id .. tostring(target)
+	local parent = self[spellData.type]
 	
 	-- Unknown spell, or we don't have it enabled
-	if( not self.db.profile[type] ) then
+	if( not self.db.profile[spellData.type] ) then
 		return
 	end
-	
-	-- Announce it
-	if( not suppress ) then
-		if( type == "buff" ) then
-			self:Announce(string.format(L["%s GAINED %s"], target, spellName), type)
-		--elseif( target ) then
-		--	self:Announce(string.format(L["%s USED %s"], spellName, target), type)
-		else
-			self:Announce(string.format(L["%s USED %s"], spellName, "" ), type)
-		end
+		
+	local frame = table.remove(unusedFrames, 1)
+	if( not frame ) then
+		frame = self:CreateRow(parent)
 	end
-	
-	local frame
-	-- Check if we can recycle a frame
-	if( #(unusedFrames) > 0 ) then
-		frame = table.remove(unusedFrames, 1)
-	else
-		frame = self:CreateRow(self[type])
-	end
-	
-	-- Show base frame
-	table.insert(self[type].active, frame)
-	self[type]:Show()
 	
 	-- Setup
 	frame.timeLeft = spellData.seconds
 	frame.lastUpdate = GetTime()
+
+	-- Spell info
 	frame.id = id
 	frame.spellName = spellName
-
 	frame.target = target
-	frame.type = type
 	frame.suppress = suppress
+
 	frame.icon:SetTexture(spellData.icon)
 	frame:Show()
 	
-	table.sort(self[type].active, sortTimers)
-	self:RepositionTimers(self[type])
+	-- Show base frame + resort/reposition
+	parent:Show()
+
+	table.insert(parent.active, frame)
+	table.sort(parent.active, sortTimers)
+	
+
+	self:RepositionTimers(parent)
+
+	-- Announce it
+	if( not suppress and self.db.profile.announce[spellData.type] ) then
+		if( spellData.type == "buff" ) then
+			self:SendMessage(string.format(L["GAINED %s (%s)"], spellName, target), "timer")
+		else
+			self:SendMessage(string.format(L["USED %s"], spellName), "timer")
+		end
+	end
 end
 
-function Afflicted:AbilityEnded(id, spellName, target, type, suppress)
+function Afflicted:AbilityEnded(id, spellName, target, suppress)
+	if( not self.spellList[spellName] ) then
+		return
+	end
+	
+	local spellData = self.spellList[spellName]
+	local parent = self[spellData.type]
+	
+	id = id or (spellData.id .. tostring(target))
+	local removed
+	
 	-- Remove it from our in use list
-	for i=#(self[type].active), 1, -1 do
-		if( self[type].active[i].id == id ) then
-			local frame = table.remove(self[type].active, i)
+	for i=#(parent.active), 1, -1 do
+		if( parent.active[i].id == id ) then
+			local frame = table.remove(parent.active, i)
 			frame:Hide()
 			
 			-- Make it available for use again
 			table.insert(unusedFrames, frame)
+			removed = true
 			break
 		end
 	end
-		
+	
+	-- If we didn't remove anything, then it means we never had a timer
+	-- OR, it means the timer already ran out
+	if( not removed ) then
+		return
+	end
+	
 	-- No more icons, hide the base frame
-	if( #(self[type].active) <= 0 ) then
-		self[type]:Hide()
+	if( #(parent.active) <= 0 ) then
+		parent:Hide()
 	end
 	
 	-- Reposition everything
-	self:RepositionTimers(self[type])
+	self:RepositionTimers(parent)
 	
 	-- Announce it
-	if( not suppress ) then
-		if( type == "buff" ) then
-			self:Announce(string.format(L["%s FADED %s"], target, spellName), type)
-		--elseif( target ) then
-		--	self:Announce(string.format(L["%s READY %s"], spellName, target), type)
+	if( not suppress and self.db.profile.announce[spellData.type] ) then
+		if( spellData.type == "buff" ) then
+			self:SendMessage(string.format(L["FADED %s (%s)"], spellName, target), "timer")
 		else
-			self:Announce(string.format(L["%s READY %s"], spellName, "" ), type)
+			self:SendMessage(string.format(L["READY %s"], spellName), "timer")
 		end
 	end
 end
 
-function Afflicted:Announce(msg, type)
-	if( self.db.profile.announce[type] ) then
-		local frame = getglobal("ChatFrame" .. self.db.profile.timerChat)
+function Afflicted:SendMessage(msg, var)
+	-- Specific chat frame
+	if( type(self.db.profile[var .. "Output"]) == "number" ) then
+		local frame = getglobal("ChatFrame" .. self.db.profile[var .. "Output"])
 		if( not frame ) then
 			frame = DEFAULT_CHAT_FRAME
 		end
-		
+
 		frame:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
+
+	-- Raid warning
+	elseif( self.db.profile[var] == "rw" ) then
+		SendChatMessage(msg, "RAID_WARNING")
+
+	-- Party chat
+	elseif( self.db.profile[var] == "party" ) then
+		SendChatMessage(msg, "PARTY")
+	
+	-- Combat text
+	elseif( self.db.profile[var] == "ct" ) then
+		self:CombatText(msg, var)
+
+	-- Default to default!
+	else
+		DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
 	end
 end
 
-function Afflicted:Print(msg)
-	local frame = getglobal("ChatFrame" .. self.db.profile.alertChat)
-	if( not frame ) then
-		frame = DEFAULT_CHAT_FRAME
+function Afflicted:CombatText(text, var)	
+	-- SCT
+	if( IsAddOnLoaded("sct") ) then
+		SCT:DisplayText(text, self.db.profile[var .. "Color"], nil, "event", 1)
+	
+	-- MSBT
+	elseif( IsAddOnLoaded("MikScrollingBattleText") ) then
+		MikSBT.DisplayMessage(text, MikSBT.DISPLAYTYPE_NOTIFICATION, false, self.db.profile[var .. "Color"].r * 255, self.db.profile[var .. "Color"].g * 255, self.db.profile[var .. "Color"].b * 255)		
+	
+	-- Blizzard Combat Text
+	elseif( IsAddOnLoaded("Blizzard_CombatText") ) then
+		-- Haven't cached the movement function yet
+		if( not COMBAT_TEXT_SCROLL_FUNCTION ) then
+			CombatText_UpdateDisplayedMessages()
+		end
+		
+		CombatText_AddMessage(text, COMBAT_TEXT_SCROLL_FUNCTION, self.db.profile[var .. "Color"].r, self.db.profile[var .. "Color"].g, self.db.profile[var .. "Color"].b)
 	end
-
-	frame:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
 end
+
 
 function Afflicted:Format(text)
 	text = string.gsub(text, "([%^%(%)%.%[%]%*%+%-%?])", "%%%1")

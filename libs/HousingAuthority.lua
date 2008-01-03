@@ -1,5 +1,5 @@
 local major = "HousingAuthority-1.2"
-local minor = tonumber(string.match("$Revision: 480 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 482 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 local HAInstance, oldRevision = LibStub:NewLibrary(major, minor)
@@ -91,7 +91,7 @@ local function positionWidgets(columns, parent, widgets, positionGroup, isGroup)
 				-- Shift the info button slightly down for anything besides input
 				-- so it appears centered on the widget
 				local pad = 0
-				if( widget.data.type ~= "input" ) then
+				if( widget.data.type ~= "input" and widget.data.type ~= "color" ) then
 					pad = -3
 				end
 
@@ -159,7 +159,7 @@ local function positionWidgets(columns, parent, widgets, positionGroup, isGroup)
 				-- Shift the info button slightly down for anything besides input
 				-- so it appears centered on the widget
 				local pad = 0
-				if( widget.data.type ~= "input" ) then
+				if( widget.data.type ~= "input" and widget.data.type ~= "color" ) then
 					pad = -3
 				end
 				
@@ -879,14 +879,14 @@ function HouseAuthority.CreateButton(config, data)
 	argcheck(data.onSet, "onSet", type, "nil")
 	
 	local button = CreateFrame("Button", nil, config.frame, data.template or "GameMenuButtonTemplate")
-	button.xPos = 10
-	--button.yPos = 0
+	button.xPos = 5
+	button.yPos = 0
 	
 	button.parent = config
 	button.data = data
 	button:SetScript("OnClick", buttonClicked)
 	button:SetText(data.text)
-	button:SetHeight(20)
+	button:SetHeight(data.width or (button:GetFontString():GetStringHeight() + 5))
 	button:SetWidth(data.width or (button:GetFontString():GetStringWidth() + 25))
 	
 	table.insert(config.widgets, button)

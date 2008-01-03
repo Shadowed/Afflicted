@@ -48,8 +48,13 @@ function Config:TestTimers()
 	Afflicted:ClearTimers(Afflicted.buff)
 	
 	local playerName = UnitName("player")
+	local addedTypes = {buff = 0, spell = 0}
+
 	for spell, data in pairs(AfflictedSpells) do
-		Afflicted:ProcessAbility(data.id .. playerName, spell, playerName, nil, true)
+		if( addedTypes[data.type] < 5 ) then
+			addedTypes[data.type] = addedTypes[data.type] + 1
+			Afflicted:ProcessAbility(spell, playerName, true)
+		end
 	end
 end
 
@@ -74,21 +79,49 @@ function Config:CreateUI()
 		{ group = L["Alerts"], type = "groupOrder", order = 2 },
 		{ order = 1, group = L["Alerts"], text = L["Show interrupt alerts"], help = L["Shows player name, and the spell you interrupted to chat."], type = "check", var = "showInterrupt"},
 		{ order = 2, group = L["Alerts"], text = L["Show spell removal alerts"], help = L["Shows spells that you remove from enemies to chat, or failed attempts at removing something."], type = "check", var = "showPurge"},
-		{ order = 3, group = L["Alerts"], text = L["Chat frame"], help = L["Frame to show alerts in."], type = "dropdown", list = {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}, {8, 8}, {9, 9}}, var = "alertChat"},
 		
-		{ group = L["Timers"], type = "groupOrder", order = 3 },
+		{ group = L["Alert Chat"], type = "groupOrder", order = 3 },
+		{ order = 1, group = L["Alert Chat"], text = L["Output"], help = L["Frame to show alerts in."], type = "dropdown", list = {{"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = "alertOutput"},
+		{ order = 2, group = L["Alert Chat"], text = L["Combat text color"], help = L["Color to show the event in the combat text mod. Supports Blizzard CT, SCT and MSBT."], type = "color", var = "alertColor"},
+
+		{ group = L["Timers"], type = "groupOrder", order = 4 },
 		{ order = 1, group = L["Timers"], text = L["Show buff timers"], help = L["Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade."], type = "check", var = "buff"},
 		{ order = 2, group = L["Timers"], text = L["Show silence and interrupt timers"], help = L["Show timers on silence and interrupt spells like Spell Lock or Silencing Shot, for how long until they're ready again."], type = "check", var = "spell"},
 		{ order = 3, group = L["Timers"], text = L["Announce Timers"], help = L["Announces when the selected types of abilities are used, and are over."], type = "dropdown", list = {{"buff", L["Buffs"]}, {"spell", L["Interrupts & Silences"]}}, multi = true, var = "announce"},
-		{ order = 4, group = L["Timers"], text = L["Chat frame"], help = L["Frame to show alerts in."], type = "dropdown", list = {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}, {8, 8}, {9, 9}}, var = "timerChat"},
-		{ order = 5, group = L["Timers"], text = L["Test Timers"], type = "button", onSet = "TestTimers"},
-
-		{ group = L["Frame"], type = "groupOrder", order = 4 },
+		{ order = 6, group = L["Timers"], text = L["Test Timers"], type = "button", onSet = "TestTimers"},
+				
+		{ group = L["Timer Chat"], type = "groupOrder", order = 5 },
+		{ order = 1, group = L["Timer Chat"], text = L["Output"], help = L["Frame to show alerts in."], type = "dropdown", list = {{"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = "timerOutput"},
+		{ order = 5, group = L["Timer Chat"], text = L["Combat text color"], help = L["Color to show the event in the combat text mod. Supports Blizzard CT, SCT and MSBT."], type = "color", var = "timerColor"},
+		
+		{ group = L["Frame"], type = "groupOrder", order = 6 },
 		{ order = 1, group = L["Frame"], text = L["Show timers anchor"], help = L["ALT + Drag the anchors to move the frames."], type = "check", var = "locked"},
 		{ order = 2, group = L["Frame"], text = L["Grow Up"], help = L["Timers that should grow up instead of down."], type = "dropdown", list = {{"buff", L["Buffs"]}, {"spell", L["Interrupts & Silences"]}}, multi = true, var = "growup"},
 		{ order = 3, group = L["Frame"], format = L["Scale: %d%%"], min = 0.0, max = 2.0, type = "slider", var = "scale"},
 	}
 
-	-- Update the dropdown incase any new textures were added
-	return HouseAuthority:CreateConfiguration(config, {set = "Set", get = "Get", onSet = "Reload", handler = self})
+	local frame = HouseAuthority:CreateConfiguration(config, {set = "Set", get = "Get", onSet = "Reload", handler = self})
+	
+	-- Show the anchors when the GUI is open
+	frame:SetScript("OnShow", function()
+		if( Afflicted.db.profile.anchor ) then
+			Afflicted.spell:Show()
+			Afflicted.buff:Show()
+		end
+	end)
+
+	-- Hide them if the anchors are suppose to be open still, and no timers up
+	frame:SetScript("OnHide", function()
+		if( Afflicted.db.profile.anchor ) then
+			if( #(Afflicted.spell.active) == 0 ) then
+				Afflicted.spell:Hide()
+			end
+			
+			if( #(Afflicted.buff.active) == 0 ) then
+				Afflicted.buff:Hide()
+			end
+		end
+	end)
+	
+	return frame
 end
