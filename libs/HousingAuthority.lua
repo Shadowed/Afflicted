@@ -1,5 +1,5 @@
 local major = "HousingAuthority-1.2"
-local minor = tonumber(string.match("$Revision: 555 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 480 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 local HAInstance, oldRevision = LibStub:NewLibrary(major, minor)
@@ -159,7 +159,7 @@ local function positionWidgets(columns, parent, widgets, positionGroup, isGroup)
 				-- Shift the info button slightly down for anything besides input
 				-- so it appears centered on the widget
 				local pad = 0
-				if( widgets.data.type ~= "input" ) then
+				if( widget.data.type ~= "input" ) then
 					pad = -3
 				end
 				
@@ -544,14 +544,15 @@ local function dropdownRowClicked(self)
 	if( not parent.data.multi ) then
 		setValue(parent.parent, parent.data, self.key)
 		showDropdown(parent)
-
 		self:GetParent():Hide()
 	else
 		local selectedKeys = getValue(parent.parent, parent.data)
 		if( selectedKeys[self.key] ) then
-			selectedKeys[self.key] = nil	
+			selectedKeys[self.key] = nil
+			self.check:Hide()
 		else
 			selectedKeys[self.key] = true
+			self.check:Show()
 		end
 	
 		setValue(parent.parent, parent.data, selectedKeys)
@@ -675,12 +676,12 @@ local function openDropdown(self)
 	PlaySound("igMainMenuOptionCheckBoxOn")
 	
 	if( not self.listFrame ) then
-		self.listFrame = CreateFrame("Frame", nil, self.parent.frame)
+		self.listFrame = CreateFrame("Frame", nil, OptionHouse:GetFrame("addon"))
 		self.listFrame.rows = {}
 		self.listFrame.timeElapsed = 0
-		self.listFrame:SetBackdrop(dropdownBackdrop)
 		self.listFrame:SetToplevel(true)
 		self.listFrame:SetFrameStrata("FULLSCREEN")
+		self.listFrame:SetBackdrop(dropdownBackdrop)
 		self.listFrame:SetScript("OnShow", dropdownListShown)
 		self.listFrame:SetScript("OnUpdate", dropdownCounter)
 		self.listFrame:Hide()
@@ -715,7 +716,7 @@ local function openDropdown(self)
 		self.listFrame:SetPoint("TOPLEFT", self.leftTexture, "BOTTOMLEFT", 8, 22)
 
 		self.listFrame:Show()
-
+		
 		-- Renachor the frame if need be because it's at the bottom of the screen
 		if( self.listFrame:GetBottom() and self.listFrame:GetBottom() <= 300 ) then
 			self.listFrame:ClearAllPoints()

@@ -25,4 +25,50 @@ AfflictedLocals = {
 	["Spell Lock"] = "Spell Lock",
 	["Counterspell - Silenced"] = "Counterspell - Silenced",
 	["Counterspell"] = "Counterspell",
+	
+	-- Slash command
+	["Afflicted slash commands"] = "Afflicted slash commands",
+	["- test - Show 5 buff and 5 silence/interrupt test timers."] = "- test - Show 5 buff and 5 silence/interrupt test timers.",
+	["- ui - Opens the OptionHouse configuration for Afflicted."] = "- ui - Opens the OptionHouse configuration for Afflicted.",
+	["- toggle - Toggles the anchors shown/hidden."] = "- toggle - Toggles the anchors shown/hidden.",
+	
+	-- GUI
+	["General"] = "General",
+	["Timers"] = "Timers",
+	["Alerts"] = "Alerts",
+	
+	["Test Timers"] = "Test Timers",
+	
+	["Show buff timers"] = "Show buff timers",
+	["Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade."] = "Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade.",
+	
+	["Show silence and interrupt timers"] = "Show silence and interrupt timers",
+	["Show timers on silence and interrupt spells like Spell Lock or Silencing Shot, for how long until they're ready again."] = "Show timers on silence and interrupt spells like Spell Lock or Silencing Shot, for how long until they're ready again.",
+	
+	["ALT + Drag the anchors to move the frames."] = "ALT + Drag the anchors to move the frames.",
+	["Show timers anchor"] = "Show timers anchor",
+	
+	["Only enable inside arenas"] = "Only enable inside arenas",
+	["No timers, interrupt or removal alerts will be shown outside of arenas."] = "No timers, interrupt or removal alerts will be shown outside of arenas.",
+	
+	["Show interrupt alerts"] = "Show interrupt alerts",
+	["Shows player name, and the spell you interrupted to chat."] = "Shows player name, and the spell you interrupted to chat.",
+		
+	["Chat frame"] = "Chat frame",
+	["Frame to show alerts in."] = "Frame to show alerts in.",
+	
+	["Show spell removal alerts"] = "Show spell removal alerts",
+	["Shows spells that you remove from enemies to chat, or failed attempts at removing something."] = "Shows spells that you remove from enemies to chat, or failed attempts at removing something.",
+	
+	["Scale: %d%%"] = "Scale: %d%%",
+	
+	["Frame"] = "Frame",
+	
+	["Announce Timers"] = "Announce Timers",
+	["Announces when the selected types of abilities are used, and are over."] = "Announces when the selected types of abilities are used, and are over.",
+	["Interrupts & Silences"] = "Interrupts & Silences",
+	["Buffs"] = "Buffs",
+	
+	["Grow Up"] = "Grow Up",
+	["Timers that should grow up instead of down."] = "Timers that should grow up instead of down.",
 }

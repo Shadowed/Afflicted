@@ -1,4 +1,3 @@
-
 --[[
 	["CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF"] = {
 		"366055.734:Drama casts Windfury Totem.", -- [1]
@@ -17,6 +16,7 @@
 		"415307.703:Frobozz interrupts your Holy Light.", -- [3]
 	},
 ]]
+
 local L = AfflictedLocals
 AfflictedSpells = { 
 	-- Shields
