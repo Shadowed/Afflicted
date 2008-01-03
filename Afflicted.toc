@@ -1,0 +1,19 @@
+## Interface: 20300
+## Title: Afflicted
+## Notes: Basic PvP skill tracking mod
+## Author: Mayen
+## Version: $Revision$
+## SavedVariables: AfflictedDB
+
+libs\LibStub-1.0\LibStub-1.0.xml
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\OptionHouse.lua
+libs\HousingAuthority.lua
+
+localization.enUS.lua
+localization.deDE.lua
+localization.frFR.lua
+
+spells.lua
+Afflicted.lua
