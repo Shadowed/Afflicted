@@ -496,15 +496,15 @@ function Afflicted:SendMessage(msg, var)
 		frame:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
 
 	-- Raid warning
-	elseif( self.db.profile[var] == "rw" ) then
+	elseif( self.db.profile[var .. "Output"] == "rw" ) then
 		SendChatMessage(msg, "RAID_WARNING")
 
 	-- Party chat
-	elseif( self.db.profile[var] == "party" ) then
+	elseif( self.db.profile[var .. "Output"] == "party" ) then
 		SendChatMessage(msg, "PARTY")
 	
 	-- Combat text
-	elseif( self.db.profile[var] == "ct" ) then
+	elseif( self.db.profile[var .. "Output"] == "ct" ) then
 		self:CombatText(msg, var)
 
 	-- Default to default!
