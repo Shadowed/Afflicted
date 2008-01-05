@@ -78,12 +78,12 @@ end
 
 function Afflicted:OnEnable()
 	-- Not inside an arena, so don't register anything
-	if( self.db.profile.arenaOnly and not IsActiveBattlefieldArena() ) then
+	if( self.db.profile.arenaOnly and select(2, IsInInstance()) ~= "arena" ) then
 		self.spell:Hide()
 		self.buff:Hide()
 		return
 	end
-	
+		
 	-- We interrupted a spell of theirs
 	if( self.db.profile.showInterrupt ) then
 		self:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
