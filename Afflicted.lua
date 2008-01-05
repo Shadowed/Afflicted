@@ -207,6 +207,42 @@ function Afflicted:CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE(event, msg)
 	local spell, target = string.match(msg, selfResistSpell)
 	if( spell and target ) then
 		self:ProcessAbility(spell, target)
+		return
+	end
+	
+	-- Dodged/Parried/Blocked an ability
+	local target, spell = string.match(msg, L["(.+)'s (.+) was"])
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
+		return
+	end
+	
+	-- Hit
+	local target, spell = string.match(msg, L["(.+)'s (.+) hit"])
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
+		return
+	end
+	
+	-- Crit
+	local target, spell = string.match(msg, L["(.+)'s (.+) crit"])
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
+		return
+	end
+	
+	-- Absorbed
+	local target, spell = string.match(msg, L["(.+)'s (.+) is"])
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
+		return
+	end
+	
+	-- Missed
+	local target, spell = string.match(msg, L["(.+)'s (.+) miss"])
+	if( spell and target ) then
+		self:ProcessAbility(spell, target)
+		return
 	end
 end
 
@@ -431,6 +467,8 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	if( not suppress and self.db.profile.announce[spellData.type] ) then
 		if( spellData.type == "buff" ) then
 			self:SendMessage(string.format(L["GAINED %s (%s)"], spellName, target), "timer")
+		elseif( target ) then
+			self:SendMessage(string.format(L["USED %s (%s)"], spellName, target), "timer")
 		else
 			self:SendMessage(string.format(L["USED %s"], spellName), "timer")
 		end
@@ -479,6 +517,9 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	if( not suppress and self.db.profile.announce[spellData.type] ) then
 		if( spellData.type == "buff" ) then
 			self:SendMessage(string.format(L["FADED %s (%s)"], spellName, target), "timer")
+
+		elseif( target ) then
+			self:SendMessage(string.format(L["READY %s (%s)"], spellName, target), "timer")
 		else
 			self:SendMessage(string.format(L["READY %s"], spellName), "timer")
 		end

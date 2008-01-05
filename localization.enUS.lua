@@ -3,7 +3,9 @@ AfflictedLocals = {
 	["FADED %s (%s)"] = "FADED %s (%s)",
 
 	["USED %s"] = "USED %s",
+	["USED %s (%s)"] = "USED %s (%s)",	
 	["READY %s"] = "READY %s",
+	["READY %s (%s)"] = "READY %s (%s)",
 
 	["Interrupted %s's %s."] = "Interrupted %s's %s.",
 	["Removed %s's %s."] = "Removed %s's %s.",
@@ -26,7 +28,18 @@ AfflictedLocals = {
 	["Spell Lock"] = "Spell Lock",
 	["Counterspell - Silenced"] = "Counterspell - Silenced",
 	["Counterspell"] = "Counterspell",
+	["Shield Bash"] = "Shield Bash",
 	["Silence"] = "Silence",
+	["Earth Shock"] = "Earth Shock",
+	["Pummel"] = "Pummel",
+	["Kick"] = "Kick",
+	
+	-- Simplified localization for damaging abilities
+	["(.+)'s (.+) was"] = "(.+)'s (.+) was",
+	["(.+)'s (.+) is"] = "(.+)'s (.+) is",
+	["(.+)'s (.+) crit"] = "(.+)'s (.+) crit",
+	["(.+)'s (.+) hit"] = "(.+)'s (.+) hit",
+	["(.+)'s (.+) miss"] = "(.+)'s (.+) miss",
 	
 	-- Slash command
 	["Afflicted slash commands"] = "Afflicted slash commands",

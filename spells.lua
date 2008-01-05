@@ -15,6 +15,15 @@
 		"415288.406:Frobozz begins to perform Shoot.", -- [2]
 		"415307.703:Frobozz interrupts your Holy Light.", -- [3]
 	},
+
+	["CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE"] = {
+		"537968.171:Deusmortis's Pummel crits Gulem for 59.", -- [1]
+		"538426.187:Thenoose's Pummel crits you for 52.", -- [2]
+		"538979.156:Akelda's Pummel hits you for 40.", -- [3]
+		"538994.609:Akelda's Pummel hits you for 41.", -- [4]
+		"539005.093:Akelda's Pummel was dodged.", -- [5]
+		"539016.046:Akelda's Pummel crits you for 77.", -- [6]
+	},
 ]]
 
 local L = AfflictedLocals
@@ -44,7 +53,7 @@ AfflictedSpells = {
 	
 	[L["Blessing of Freedom"]] = {
 		id = "blessingofreedom",
-		seconds = 16,
+		seconds = 14,
 		icon = "Interface\\Icons\\Spell_Holy_SealOfValor",
 		type = "buff",
 	},
@@ -106,12 +115,32 @@ AfflictedSpells = {
 		icon = "Interface\\Icons\\Spell_Frost_IceShock",
 		type = "spell",
 	},
-	--[[
-	[L["Counterspell"] ] = {
-		id = "counterspell",
-		seconds = 24,
-		icon = "Interface\\Icons\\Spell_Frost_IceShock",
+
+	[L["Kick"]] = {
+		id = "kick",
+		seconds = 10,
+		icon = "Interface\\Icons\\Ability_Kick",
 		type = "spell",
 	},
-	]]
+
+	[L["Pummel"]] = {
+		id = "pummel",
+		seconds = 10,
+		icon = "Interface\\Icons\\INV_Gauntlets_04",
+		type = "spell",
+	},
+
+	[L["Shield Bash"]] = {
+		id = "shieldbash",
+		seconds = 12,
+		icon = "Interface\\Icons\\Ability_Warrior_ShieldBash",
+		type = "spell",
+	},
+	
+	[L["Earth Shock"]] = {
+		id = "earthshock",
+		seconds = 12,
+		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
+		type = "spell",
+	},
 }
