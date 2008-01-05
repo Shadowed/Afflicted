@@ -114,6 +114,7 @@ AfflictedSpells = {
 		seconds = 24,
 		icon = "Interface\\Icons\\Spell_Frost_IceShock",
 		type = "spell",
+		afflicted = true,
 	},
 
 	[L["Kick"]] = {

@@ -3,11 +3,12 @@ Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
 local L = AfflictedLocals
 
 local selfFailDispel, selfSuccessDispel, selfInterruptOther, selfGetAfflicted, friendlyGetAfflicted, friendlyResistSpell, selfResistSpell, enemyGainBuff, enemyLoseBuff
+local selfInterrupted, friendlyInterrupted
 
 local instanceType
 local playerName
 
-local unusedFrames = {}
+local blockSpells = {}
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
@@ -59,7 +60,9 @@ function Afflicted:OnInitialize()
 	selfResistSpell = self:Format(SPELLRESISTOTHERSELF)
 	selfFailDispel = self:Format(DISPELFAILEDSELFOTHER)
 	selfSuccessDispel = self:Format(AURADISPELOTHER3)
+	selfInterrupted = self:Format(SPELLINTERRUPTOTHERSELF)
 	
+	friendlyInterrupted = self:Format(SPELLINTERRUPTOTHEROTHER)
 	friendlyGetAfflicted = self:Format(AURAADDEDOTHERHARMFUL)
 	friendlyResistSpell = self:Format(SPELLRESISTOTHEROTHER)
 	
@@ -249,7 +252,7 @@ end
 function Afflicted:CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE(event, msg)
 	-- Player afflicted by a spell
 	local spell = string.match(msg, selfGetAfflicted)
-	if( spell ) then
+	if( spell and self.spellList[spell] and self.spellList[spell].afflicted ) then
 		self:ProcessAbility(spell)
 	end
 end
@@ -257,7 +260,7 @@ end
 function Afflicted:CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE(event, msg)
 	-- Friendly player afflicted
 	local target, spell = string.match(msg, friendlyGetAfflicted)
-	if( spell ) then
+	if( spell and self.spellList[spell] and self.spellList[spell].afflicted ) then
 		self:ProcessAbility(spell)
 	end
 end
@@ -323,6 +326,7 @@ function Afflicted:CreateDisplay(type)
 	frame:Hide()
 	
 	frame.active = {}
+	frame.inactive = {}
 	frame.type = type	
 
 	-- Display name
@@ -374,6 +378,7 @@ function Afflicted:CreateRow(parent)
 	frame:SetHeight(ICON_SIZE)
 	frame:SetScript("OnUpdate", onUpdate)
 	frame:SetScale(self.db.profile.scale)
+	frame:SetClampedToScreen(true)
 	frame:Hide()
 	
 	frame.icon = frame:CreateTexture(nil, "BACKGROUND")
@@ -406,10 +411,10 @@ end
 -- Remove every timer
 function Afflicted:ClearTimers(parent)
 	for i=#(parent.active), 1, -1 do
-		local frame = table.remove(parent.active, i)
-		frame:Hide()
-
-		table.insert(unusedFrames, frame)
+		parent.active[i]:Hide()
+		
+		table.insert(parent.inactive, parent.active[i])
+		table.remove(parent.active, i)
 	end
 	
 	parent:Hide()
@@ -436,7 +441,7 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 		return
 	end
 		
-	local frame = table.remove(unusedFrames, 1)
+	local frame = table.remove(parent.inactive, 1)
 	if( not frame ) then
 		frame = self:CreateRow(parent)
 	end
@@ -459,7 +464,6 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 
 	table.insert(parent.active, frame)
 	table.sort(parent.active, sortTimers)
-	
 
 	self:RepositionTimers(parent)
 
@@ -484,16 +488,17 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	local parent = self[spellData.type]
 	
 	id = id or (spellData.id .. tostring(target))
-	local removed
 	
-	-- Remove it from our in use list
+
+	-- Remove it from display
+	local removed
 	for i=#(parent.active), 1, -1 do
 		if( parent.active[i].id == id ) then
-			local frame = table.remove(parent.active, i)
-			frame:Hide()
+			parent.active[i]:Hide()
 			
-			-- Make it available for use again
-			table.insert(unusedFrames, frame)
+			table.insert(parent.inactive, parent.active[i])
+			table.remove(parent.active, i)
+			
 			removed = true
 			break
 		end
