@@ -16,6 +16,11 @@ AfflictedLocals = setmetatable({
 	["Spell Lock"] = "Zaubersperre",
 	["Counterspell - Silenced"] = "Gegenzauber - zum Schweigen gebracht",
 	["Counterspell"] = "Gegenzauber",
+	["Shield Bash"] = "Schildhieb",
+	["Silence"] = "Stille",
+	["Earth Shock"] = "Erdschock",
+	["Pummel"] = "Zuschlagen",
+	["Kick"] = "Tritt",
 	
 	-- Slash command
 	["Afflicted slash commands"] = "Afflicted Slashkommandos",

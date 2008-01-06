@@ -93,6 +93,7 @@ AfflictedSpells = {
 		seconds = 45,
 		icon = "Interface\\Icons\\Spell_Shadow_ImpPhaseShift",
 		type = "spell",
+		afflicted = true,
 	},
 
 	[L["Feral Charge"]] = {
@@ -100,6 +101,7 @@ AfflictedSpells = {
 		seconds = 15,
 		icon = "Interface\\Icons\\Ability_Hunter_Pet_Bear",
 		type = "spell",
+		afflicted = true,
 	},
 
 	[L["Spell Lock"]] = {
@@ -107,6 +109,7 @@ AfflictedSpells = {
 		seconds = 24,
 		icon = "Interface\\Icons\\Spell_Shadow_MindRot",
 		type = "spell",
+		afflicted = true,
 	},
 	
 	[L["Counterspell - Silenced"]] = {

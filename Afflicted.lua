@@ -455,6 +455,7 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	frame.spellName = spellName
 	frame.target = target
 	frame.suppress = suppress
+	frame.type = spellData.type
 
 	frame.icon:SetTexture(spellData.icon)
 	frame:Show()
@@ -493,7 +494,7 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	-- Remove it from display
 	local removed
 	for i=#(parent.active), 1, -1 do
-		if( parent.active[i].id == id ) then
+		if( parent.active[i].id == id and parent.active[i].type == spellData.type ) then
 			parent.active[i]:Hide()
 			
 			table.insert(parent.inactive, parent.active[i])
