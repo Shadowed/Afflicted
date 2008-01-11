@@ -143,7 +143,7 @@ AfflictedSpells = {
 	
 	[L["Earth Shock"]] = {
 		id = "earthshock",
-		seconds = 12,
+		seconds = 5,
 		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
 		type = "spell",
 	},

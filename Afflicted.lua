@@ -127,6 +127,22 @@ function Afflicted:Reload()
 	self.buff:SetScale(self.db.profile.scale)
 	self.spell:SetScale(self.db.profile.scale)
 	
+	for _, frame in pairs(self.buff.active) do
+		frame:SetScale(self.db.profile.scale)
+	end
+	
+	for _, frame in pairs(self.buff.inactive) do
+		frame:SetScale(self.db.profile.scale)
+	end
+	
+	for _, frame in pairs(self.spell.active) do
+		frame:SetScale(self.db.profile.scale)
+	end
+	
+	for _, frame in pairs(self.spell.inactive) do
+		frame:SetScale(self.db.profile.scale)
+	end
+	
 	-- Anchor visibility
 	if( not self.db.profile.anchor ) then
 		self.spell:EnableMouse(false)
@@ -461,7 +477,9 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	frame:Show()
 	
 	-- Show base frame + resort/reposition
-	parent:Show()
+	if( self.db.profile.anchor ) then
+		parent:Show()
+	end
 
 	table.insert(parent.active, frame)
 	table.sort(parent.active, sortTimers)
