@@ -1,5 +1,5 @@
 local major = "HousingAuthority-1.2"
-local minor = tonumber(string.match("$Revision: 482 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 500 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 local HAInstance, oldRevision = LibStub:NewLibrary(major, minor)
@@ -178,6 +178,8 @@ local function positionWidgets(columns, parent, widgets, positionGroup, isGroup)
 			local extraPad = 0
 			if( widget.data.type == "slider" and i > columns ) then
 				extraPad = 10
+			elseif( widget.data.type == "button" ) then
+				extraPad = 2
 			end
 
 			-- Position
@@ -864,7 +866,11 @@ function HouseAuthority.CreateButton(config, data)
 	argcheck(data.var, "var", "string", "number", "table", "nil")
 	argcheck(data.template, "template", "string", "nil")
 	argcheck(data.width, "width", "number", "nil")
-	argcheck(data.text, "text", "string", "nil")
+	argcheck(data.height, "height", "number", "nil")
+	argcheck(data.text, "text", "string", "number", "nil")
+	argcheck(data.texture, "texture", "string", "nil")
+	argcheck(data.xPos, "xPos", "number", "nil")
+	argcheck(data.yPos, "yPos", "number", "nil")
 	assert(3, config and configs[config.id], string.format(L["MUST_CALL"], "CreateButton"))
 
 	-- Make sure the function stuff passed is good
@@ -879,15 +885,20 @@ function HouseAuthority.CreateButton(config, data)
 	argcheck(data.onSet, "onSet", type, "nil")
 	
 	local button = CreateFrame("Button", nil, config.frame, data.template or "GameMenuButtonTemplate")
-	button.xPos = 5
-	button.yPos = 0
+	button.xPos = data.xPos or 5
+	button.yPos = data.yPos or 0
 	
 	button.parent = config
 	button.data = data
 	button:SetScript("OnClick", buttonClicked)
 	button:SetText(data.text)
-	button:SetHeight(data.width or (button:GetFontString():GetStringHeight() + 5))
+	button:SetHeight(data.height or (button:GetFontString():GetStringHeight() + 5))
 	button:SetWidth(data.width or (button:GetFontString():GetStringWidth() + 25))
+	
+
+	if( data.texture ) then
+		button:SetNormalTexture(data.texture)
+	end
 	
 	table.insert(config.widgets, button)
 	return button
@@ -906,7 +917,7 @@ end
 
 function HouseAuthority.CreateLabel(config, data)
 	argcheck(data, 2, "table")
-	argcheck(data.text, "text", "string")
+	argcheck(data.text, "text", "string", "number")
 	argcheck(data.color, "color", "table", "nil")
 	argcheck(data.fontPath, "fontPath", "string", "nil")
 	argcheck(data.fontSize, "fontSize", "number", "nil")
@@ -945,7 +956,7 @@ end
 
 function HouseAuthority.CreateColorPicker(config, data)
 	argcheck(data, 2, "table")
-	argcheck(data.text, "text", "string", "nil")
+	argcheck(data.text, "text", "string", "number", "nil")
 	argcheck(data.help, "help", "string", "nil")
 	argcheck(data.var, "var", "string", "number", "table")
 	argcheck(data.default, "default", "table", "nil")
@@ -994,7 +1005,7 @@ end
 
 function HouseAuthority.CreateInput(config, data)
 	argcheck(data, 2, "table")
-	argcheck(data.text, "text", "string", "nil")
+	argcheck(data.text, "text", "string", "number", "nil")
 	argcheck(data.var, "var", "string", "number", "table")
 	argcheck(data.default, "default", "number", "string", "nil")
 	argcheck(data.realTime, "realTime", "boolean", "nil")
@@ -1084,7 +1095,7 @@ function HouseAuthority.CreateSlider(config, data)
 	argcheck(data.default, "default", "number", "nil")
 	argcheck(data.help, "help", "string", "nil")
 	argcheck(data.var, "var", "string", "number", "table")
-	argcheck(data.text, "text", "string", "nil")
+	argcheck(data.text, "text", "string", "number", "nil")
 	argcheck(data.format, "format", "string", "nil")
 	argcheck(data.min, "min", "number", "nil")
 	argcheck(data.minText, "minText", "string", "nil")
@@ -1253,7 +1264,7 @@ end
 function HouseAuthority.CreateDropdown(config, data)
 	argcheck(data, 2, "table")
 	argcheck(data.list, "list", "table")
-	argcheck(data.text, "text", "string", "nil")
+	argcheck(data.text, "text", "string", "number", "nil")
 	argcheck(data.default, "default", "string", "number", "nil")
 	argcheck(data.help, "help", "string", "nil")
 	argcheck(data.var, "var", "string", "number", "table")
@@ -1367,7 +1378,7 @@ local editBackdrop = {
 
 function HouseAuthority.CreateEditBox(config, data)
 	argcheck(data, 2, "table")
-	argcheck(data.text, "text", "string", "nil")
+	argcheck(data.text, "text", "string", "number", "nil")
 	argcheck(data.var, "var", "string", "number", "table")
 	argcheck(data.default, "default", "number", "string", "nil")
 	argcheck(data.numeric, "numeric", "boolean", "nil")

@@ -46,15 +46,25 @@ AfflictedLocals = {
 	["Afflicted slash commands"] = "Afflicted slash commands",
 	["- test - Show 5 buff and 5 silence/interrupt test timers."] = "- test - Show 5 buff and 5 silence/interrupt test timers.",
 	["- ui - Opens the OptionHouse configuration for Afflicted."] = "- ui - Opens the OptionHouse configuration for Afflicted.",
-	["- toggle - Toggles the anchors shown/hidden."] = "- toggle - Toggles the anchors shown/hidden.",
+	["- clear - Clears all running timers."] = "- clear - Clears all running timers.",
 	
 	-- GUI
 	["General"] = "General",
 	["Timers"] = "Timers",
 	["Alerts"] = "Alerts",
+	["Spell List"] = "Spell List",
+	["No"] = "No",
+	["Yes"] = "Yes",
+	["Edit"] = "Edit",
+	["Afflicted: %s%s%s"] = "Afflicted: %s%s%s",
+	["Cooldown: %s%d%s"] = "Cooldown: %s%d%s",
+	["Type: %s%s%s"] = "Type: %s%s%s",
+
+	["Buff"] = "Buff",
+	["Delete"] = "Delete",
+	["Spell"] = "Spell",
 	
 	["Test Timers"] = "Test Timers",
-	
 	["Raid Warning"] = "Raid Warning",
 	["Party"] = "Party",
 	
@@ -63,9 +73,14 @@ AfflictedLocals = {
 	["Output"] = "Output",
 	["Timer Chat"] = "Timer Chat",
 	["Alert Chat"] = "Alert Chat",
+	["Middle of screen"] = "Middle of screen",
+	["Add New"] = "Add New",
+	["New"] = "New",
+	["Save"] = "Save",
+	["Update"] = "Update",
 
-	["Combat text color"] = "Combat text color",
-	["Color to show the event in the combat text mod. Supports Blizzard CT, SCT and MSBT."] = "Color to show the event in the combat text mod. Supports Blizzard CT, SCT and MSBT.",
+	["Output color"] = "Output color",
+	["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."] = "Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\".",
 	
 	["Show buff timers"] = "Show buff timers",
 	["Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade."] = "Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade.",

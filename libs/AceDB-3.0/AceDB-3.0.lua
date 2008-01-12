@@ -1,4 +1,4 @@
---[[ $Id: AceDB-3.0.lua 57841 2008-01-03 11:15:42Z nevcairiel $ ]]
+--[[ $Id: AceDB-3.0.lua 58237 2008-01-11 10:46:00Z nevcairiel $ ]]
 local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 1
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
@@ -12,7 +12,8 @@ local setmetatable = setmetatable
 AceDB.db_registry = setmetatable(AceDB.db_registry or {}, {__mode = "k"})
 AceDB.frame = AceDB.frame or CreateFrame("Frame")
 
-local CallbackHandler = LibStub:GetLibrary("CallbackHandler-1.0")
+local CallbackHandler
+local CallbackDummy = { Fire = function() end }
 
 local DBObjectLib = {}
 
@@ -242,7 +243,9 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	local db = setmetatable(olddb or {}, dbmt)
 	
 	if not rawget(db, "callbacks") then 
-		db.callbacks = CallbackHandler:New(db)
+		-- try to load CallbackHandler-1.0 if it loaded after our library
+		if not CallbackHandler then CallbackHandler = LibStub:GetLibrary("CallbackHandler-1.0", true) end
+		db.callbacks = CallbackHandler and CallbackHandler:New(db) or CallbackDummy
 	end
 	
 	-- Copy methods locally into the database object, to avoid hitting

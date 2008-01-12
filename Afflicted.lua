@@ -18,34 +18,30 @@ function Afflicted:OnInitialize()
 		profile = {
 			buff = true,
 			spell = true,
-			
 			anchor = true,
 			scale = 1.0,
-			
 			arenaOnly = false,
-			
 			showPurge = false,
 			showInterrupt = false,
-			
 			alertOutput = 1,
 			timerOutput = 1,
-			
-			announce = {
-				buff = true,
-				spell = true,
-			},
-			growup = {
-				buff = false,
-				spell = false,
-			},
 			alertColor = { r = 1.0, g = 0.0, b = 0.0 },
 			timerColor = { r = 1.0, g = 0.0, b = 0.0 },
+			announce = { buff = true, spell = true, },
+			growup = { buff = false, spell = false, },
 			positions = {},
+			spells = {},
+			spellDefault = {
+				id = "none",
+				seconds = 0,
+				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
+				afflicted = false,
+				type = "spell",
+			},
 		},
 	}
 
 	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults)
-	self.spellList = AfflictedSpells
 	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 	
 	playerName = UnitName("player")
@@ -68,6 +64,9 @@ function Afflicted:OnInitialize()
 	
 	enemyGainBuff = self:Format(AURAADDEDOTHERHELPFUL)
 	enemyLoseBuff = self:Format(AURAREMOVEDOTHER)
+	
+	-- Update the spell list with the default and manual
+	self:UpdateSpellList()
 
 	-- Monitor for zone change
 	if( self.db.profile.arenaOnly ) then
@@ -127,6 +126,7 @@ function Afflicted:Reload()
 	self.buff:SetScale(self.db.profile.scale)
 	self.spell:SetScale(self.db.profile.scale)
 	
+	-- Update icon scaling as well
 	for _, frame in pairs(self.buff.active) do
 		frame:SetScale(self.db.profile.scale)
 	end
@@ -143,37 +143,53 @@ function Afflicted:Reload()
 		frame:SetScale(self.db.profile.scale)
 	end
 	
-	-- Anchor visibility
-	if( not self.db.profile.anchor ) then
-		self.spell:EnableMouse(false)
-		self.spell:SetBackdropColor(0.0, 0.0, 0.0, 0)
-		self.spell:SetBackdropBorderColor(0.90, 0.90, 0.90, 0)
-		self.spell.text:Hide()
-
+	-- Update anchors
+	self:UpdateAnchor(self.spell)
+	self:UpdateAnchor(self.buff)
+	
+	if( self.db.profile.anchor ) then
+		self.spell:Show()
+		self.buff:Show()
+	else
 		if( #(self.spell.active) == 0 ) then
 			self.spell:Hide()
 		end
-
-		self.buff:EnableMouse(false)
-		self.buff:SetBackdropColor(0.0, 0.0, 0.0, 0)
-		self.buff:SetBackdropBorderColor(0.90, 0.90, 0.90, 0)
-		self.buff.text:Hide()
-
+		
 		if( #(self.buff.active) == 0 ) then
 			self.buff:Hide()
 		end
-	else
-		self.spell:EnableMouse(true)
-		self.spell:Show()
-		self.spell:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
-		self.spell:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
-		self.spell.text:Show()
+	end
+	
+	-- Mergy
+	self:UpdateSpellList()
+end
 
-		self.buff:EnableMouse(true)
-		self.buff:Show()
-		self.buff:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
-		self.buff:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
-		self.buff.text:Show()
+-- Update anchor visibility
+function Afflicted:UpdateAnchor(frame)
+	if( self.db.profile.anchor ) then
+		frame:EnableMouse(true)
+		frame:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
+		frame:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
+		frame.text:Show()
+	else
+		frame:EnableMouse(false)
+		frame:SetBackdropColor(0.0, 0.0, 0.0, 0.0)
+		frame:SetBackdropBorderColor(0.90, 0.90, 0.90, 0.0)
+		frame.text:Hide()
+	end
+end
+
+-- Merge spells in
+function Afflicted:UpdateSpellList()
+	self.spellList = AfflictedSpells
+
+	-- Merge in the players spells
+	for name, data in pairs(self.db.profile.spells) do
+		if( type(data) == "table" ) then
+			self.spellList[name] = data
+		else
+			self.spellList[name] = nil
+		end
 	end
 end
 
@@ -333,10 +349,13 @@ function Afflicted:CreateDisplay(type)
 	frame:SetWidth(ICON_SIZE + 2)
 	frame:SetHeight(ICON_SIZE + 2)
 	frame:SetMovable(true)
-	frame:SetBackdrop(backdrop)
+	frame:EnableMouse(true)
 	frame:SetClampedToScreen(true)
 	frame:RegisterForDrag("LeftButton")
 	frame:SetScale(self.db.profile.scale)
+	frame:SetBackdrop(backdrop)
+	frame:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
+	frame:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
 	frame:SetScript("OnDragStart", onDragStart)
 	frame:SetScript("OnDragStop", onDragStop)
 	frame:Hide()
@@ -350,15 +369,8 @@ function Afflicted:CreateDisplay(type)
 	frame.text:SetPoint("CENTER", frame)
 	frame.text:SetFontObject(GameFontHighlight)
 	frame.text:SetText(L[type] or "?")
-	frame.text:Hide()
-
-	if( self.db.profile.anchor ) then
-		frame:EnableMouse(true)
-		frame:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
-		frame:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
-		
-		frame.text:Show()
-	end
+	
+	self:UpdateAnchor(frame)
 
 	if( self.db.profile.positions[type] ) then
 		frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.positions[type].x, self.db.profile.positions[type].y)
@@ -477,8 +489,10 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	frame:Show()
 	
 	-- Show base frame + resort/reposition
-	if( self.db.profile.anchor ) then
-		parent:Show()
+	parent:Show()
+	
+	if( #(parent.active) == 0 ) then
+		self:UpdateAnchor(parent)
 	end
 
 	table.insert(parent.active, frame)
@@ -530,7 +544,7 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	end
 	
 	-- No more icons, hide the base frame
-	if( #(parent.active) <= 0 ) then
+	if( #(parent.active) == 0 ) then
 		parent:Hide()
 	end
 	
@@ -551,25 +565,32 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 end
 
 function Afflicted:SendMessage(msg, var)
+	local outputVar = var .. "Output"
+	
+
 	-- Specific chat frame
-	if( type(self.db.profile[var .. "Output"]) == "number" ) then
-		local frame = getglobal("ChatFrame" .. self.db.profile[var .. "Output"])
+	if( type(self.db.profile[outputVar]) == "number" ) then
+		local frame = getglobal("ChatFrame" .. self.db.profile[outputVar])
 		if( not frame ) then
 			frame = DEFAULT_CHAT_FRAME
 		end
 
 		frame:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
 
-	-- Raid warning
-	elseif( self.db.profile[var .. "Output"] == "rw" ) then
+	-- Raid warning announcement to raid/party
+	elseif( self.db.profile[outputVar] == "rw" ) then
 		SendChatMessage(msg, "RAID_WARNING")
 
+	-- Raid warning frame, will not send it out to the party
+	elseif( self.db.profile[outputVar] == "rwframe" ) then
+		RaidNotice_AddMessage(RaidWarningFrame, msg, self.db.profile[var .. "Color"])
+
 	-- Party chat
-	elseif( self.db.profile[var .. "Output"] == "party" ) then
+	elseif( self.db.profile[outputVar] == "party" ) then
 		SendChatMessage(msg, "PARTY")
 	
 	-- Combat text
-	elseif( self.db.profile[var .. "Output"] == "ct" ) then
+	elseif( self.db.profile[outputVar] == "ct" ) then
 		self:CombatText(msg, var)
 
 	-- Default to default!
@@ -579,13 +600,15 @@ function Afflicted:SendMessage(msg, var)
 end
 
 function Afflicted:CombatText(text, var)	
+	var = var .. "Color"
+	
 	-- SCT
 	if( IsAddOnLoaded("sct") ) then
-		SCT:DisplayText(text, self.db.profile[var .. "Color"], nil, "event", 1)
+		SCT:DisplayText(text, self.db.profile[var], nil, "event", 1)
 	
 	-- MSBT
 	elseif( IsAddOnLoaded("MikScrollingBattleText") ) then
-		MikSBT.DisplayMessage(text, MikSBT.DISPLAYTYPE_NOTIFICATION, false, self.db.profile[var .. "Color"].r * 255, self.db.profile[var .. "Color"].g * 255, self.db.profile[var .. "Color"].b * 255)		
+		MikSBT.DisplayMessage(text, MikSBT.DISPLAYTYPE_NOTIFICATION, false, self.db.profile[var].r * 255, self.db.profile[var].g * 255, self.db.profile[var].b * 255)		
 	
 	-- Blizzard Combat Text
 	elseif( IsAddOnLoaded("Blizzard_CombatText") ) then
@@ -594,7 +617,7 @@ function Afflicted:CombatText(text, var)
 			CombatText_UpdateDisplayedMessages()
 		end
 		
-		CombatText_AddMessage(text, COMBAT_TEXT_SCROLL_FUNCTION, self.db.profile[var .. "Color"].r, self.db.profile[var .. "Color"].g, self.db.profile[var .. "Color"].b)
+		CombatText_AddMessage(text, COMBAT_TEXT_SCROLL_FUNCTION, self.db.profile[var].r, self.db.profile[var].g, self.db.profile[var].b)
 	end
 end
 
