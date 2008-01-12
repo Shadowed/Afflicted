@@ -64,6 +64,13 @@ AfflictedSpells = {
 		icon = "Interface\\Icons\\Spell_Holy_SealOfSacrifice",
 		type = "buff",
 	},
+
+	[L["Pain Suppression"]] = {
+		id = "painsuppression",
+		seconds = 8,
+		icon = "Interface\\Icons\\Spell_Holy_PainSupression",
+		type = "buff",
+	},
 	
 	-- Abilities
 	[L["Cloak of Shadows"]] ={

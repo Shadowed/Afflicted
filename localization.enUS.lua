@@ -33,6 +33,7 @@ AfflictedLocals = {
 	["Earth Shock"] = "Earth Shock",
 	["Pummel"] = "Pummel",
 	["Kick"] = "Kick",
+	["Pain Suppression"] = "Pain Suppression",
 	
 	-- Simplified localization for damaging abilities
 	["(.+)'s (.+) was"] = "(.+)'s (.+) was",
