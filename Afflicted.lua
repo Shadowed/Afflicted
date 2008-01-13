@@ -33,6 +33,7 @@ function Afflicted:OnInitialize()
 			spells = {},
 			spellDefault = {
 				seconds = 0,
+				limit = 0,
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
 				afflicted = false,
 				type = "spell",
@@ -440,6 +441,8 @@ function Afflicted:ClearTimers(parent)
 	for i=#(parent.active), 1, -1 do
 		parent.active[i]:Hide()
 		
+		blockSpells[parent.active[i].id] = nil
+		
 		table.insert(parent.inactive, parent.active[i])
 		table.remove(parent.active, i)
 	end
@@ -458,16 +461,26 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	if( not self.spellList[spellName] or (self.spellList[spellName] and self.spellList[spellName].disabled) ) then
 		return
 	end
-
+	
 	local spellData = self.spellList[spellName]
 	local id = spellData.id .. tostring(target)
 	local parent = self[spellData.type]
-	
+		
 	-- Unknown spell, or we don't have it enabled
 	if( not self.db.profile[spellData.type] ) then
 		return
 	end
+
+	-- Check if we need to set a trigger limit
+	if( spellData.limit > 0 ) then
+		local time = GetTime()
+		if( blockSpells[id] and blockSpells[id] >= time ) then
+			return
+		end
 		
+		blockSpells[id] = time + spellData.limit
+	end
+
 	local frame = table.remove(parent.inactive, 1)
 	if( not frame ) then
 		frame = self:CreateRow(parent)
@@ -531,6 +544,7 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 			table.insert(parent.inactive, parent.active[i])
 			table.remove(parent.active, i)
 			
+			blockSpells[id] = nil
 			removed = true
 			break
 		end
@@ -565,7 +579,6 @@ end
 
 function Afflicted:SendMessage(msg, var)
 	local outputVar = var .. "Output"
-	
 
 	-- Specific chat frame
 	if( type(self.db.profile[outputVar]) == "number" ) then

@@ -32,6 +32,7 @@ AfflictedSpells = {
 	[L["Divine Shield"]] = {
 		id = "divineshield",
 		seconds = 12,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Holy_DivineIntervention",
 		type = "buff",
 	},
@@ -39,6 +40,7 @@ AfflictedSpells = {
 	[L["Ice Block"]] = {
 		id = "iceblock",
 		seconds = 10,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Frost_Frost",
 		type = "buff",
 	},
@@ -47,6 +49,7 @@ AfflictedSpells = {
 	[L["Blessing of Protection"]] = {
 		id = "blassingofprot",
 		seconds = 10,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Holy_SealOfProtection",
 		type = "buff",
 	},
@@ -54,6 +57,7 @@ AfflictedSpells = {
 	[L["Blessing of Freedom"]] = {
 		id = "blessingofreedom",
 		seconds = 14,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Holy_SealOfValor",
 		type = "buff",
 	},
@@ -61,6 +65,7 @@ AfflictedSpells = {
 	[L["Blessing of Sacrifice"]] = {
 		id = "blessingofsac",
 		seconds = 30,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Holy_SealOfSacrifice",
 		type = "buff",
 	},
@@ -68,6 +73,7 @@ AfflictedSpells = {
 	[L["Pain Suppression"]] = {
 		id = "painsuppression",
 		seconds = 8,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Holy_PainSupression",
 		type = "buff",
 	},
@@ -76,6 +82,7 @@ AfflictedSpells = {
 	[L["Cloak of Shadows"]] ={
 		id = "cloakofshadows",
 		seconds = 5,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Shadow_NetherCloak",
 		type = "buff",
 	},
@@ -83,6 +90,7 @@ AfflictedSpells = {
 	[L["Spell Reflection"]] ={
 		id = "spellreflection",
 		seconds = 5,
+		limit = 0,
 		icon = "Interface\\Icons\\Ability_Warrior_ShieldReflection",
 		type = "buff",
 	},
@@ -91,6 +99,7 @@ AfflictedSpells = {
 	[L["Silencing Shot"]] = {
 		id = "silencingshot",
 		seconds = 20,
+		limit = 0,
 		icon = "Interface\\Icons\\INV_Spear_08",
 		type = "spell",
 	},
@@ -98,6 +107,7 @@ AfflictedSpells = {
 	[L["Silence"]] = {
 		id = "silence",
 		seconds = 45,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Shadow_ImpPhaseShift",
 		type = "spell",
 		afflicted = true,
@@ -106,6 +116,7 @@ AfflictedSpells = {
 	[L["Feral Charge"]] = {
 		id = "feralcharge",
 		seconds = 15,
+		limit = 0,
 		icon = "Interface\\Icons\\Ability_Hunter_Pet_Bear",
 		type = "spell",
 		afflicted = true,
@@ -114,6 +125,7 @@ AfflictedSpells = {
 	[L["Spell Lock"]] = {
 		id = "spelllock",
 		seconds = 24,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Shadow_MindRot",
 		type = "spell",
 		afflicted = true,
@@ -122,6 +134,7 @@ AfflictedSpells = {
 	[L["Counterspell - Silenced"]] = {
 		id = "impcounterspell",
 		seconds = 24,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Frost_IceShock",
 		type = "spell",
 		afflicted = true,
@@ -130,6 +143,7 @@ AfflictedSpells = {
 	[L["Kick"]] = {
 		id = "kick",
 		seconds = 10,
+		limit = 0,
 		icon = "Interface\\Icons\\Ability_Kick",
 		type = "spell",
 	},
@@ -137,6 +151,7 @@ AfflictedSpells = {
 	[L["Pummel"]] = {
 		id = "pummel",
 		seconds = 10,
+		limit = 0,
 		icon = "Interface\\Icons\\INV_Gauntlets_04",
 		type = "spell",
 	},
@@ -144,6 +159,7 @@ AfflictedSpells = {
 	[L["Shield Bash"]] = {
 		id = "shieldbash",
 		seconds = 12,
+		limit = 0,
 		icon = "Interface\\Icons\\Ability_Warrior_ShieldBash",
 		type = "spell",
 	},
@@ -151,6 +167,7 @@ AfflictedSpells = {
 	[L["Earth Shock"]] = {
 		id = "earthshock",
 		seconds = 5,
+		limit = 0,
 		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
 		type = "spell",
 	},

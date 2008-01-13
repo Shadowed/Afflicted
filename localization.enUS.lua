@@ -129,6 +129,9 @@ AfflictedLocals = {
 	["Frame"] = "Frame",
 	["Test Timer"] = "Test Timer",
 	
+	["Trigger limit (seconds)"] = "Trigger limit (seconds)",
+	["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."] = "Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once.",
+	
 	["Announce Timers"] = "Announce Timers",
 	["Announces when the selected types of abilities are used, and are over."] = "Announces when the selected types of abilities are used, and are over.",
 	["Interrupts & Silences"] = "Interrupts & Silences",
