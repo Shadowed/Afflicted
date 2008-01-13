@@ -78,6 +78,12 @@ AfflictedLocals = {
 	["New"] = "New",
 	["Save"] = "Save",
 	["Update"] = "Update",
+	
+	["The spell \"%s\" already exists, you cannot have multiple spells with the same name."] = "The spell \"%s\" already exists, you cannot have multiple spells with the same name.",
+	["You must enter a spell name."] = "You must enter a spell name.",
+	
+	["Spell Name"] = "Spell Name",
+	["This is the exact debuff, or spell name. If it's a debuff then it's the exact debuff name, if it's a spell it needs to be the exact spell that shows up in combat log."] = "This is the exact debuff, or spell name. If it's a debuff then it's the exact debuff name, if it's a spell it needs to be the exact spell that shows up in combat log.",
 
 	["Output color"] = "Output color",
 	["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."] = "Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\".",
@@ -90,6 +96,21 @@ AfflictedLocals = {
 	
 	["ALT + Drag the anchors to move the frames."] = "ALT + Drag the anchors to move the frames.",
 	["Show timers anchor"] = "Show timers anchor",
+	
+	["Timer type"] = "Timer type",
+	["\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge."] = "\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge.",
+	
+	["Debuff"] = "Debuff",
+	["Spell"] = "Spell",
+	["Buff"] = "Buff",
+	
+	["Cooldown/duration"] = "Cooldown/duration",
+	["Timer to show when this spell is triggered."] = "Timer to show when this spell is triggered.",
+	["Icon path"] = "Icon path",
+	["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\"."] = "Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\".",
+	
+	["Disable spell"] = "Disable spell",
+	["When disabled, you won't see any timers fired from this."] = "When disabled, you won't see any timers fired from this.",
 	
 	["Only enable inside arenas"] = "Only enable inside arenas",
 	["No timers, interrupt or removal alerts will be shown outside of arenas."] = "No timers, interrupt or removal alerts will be shown outside of arenas.",
@@ -106,6 +127,7 @@ AfflictedLocals = {
 	["Scale: %d%%"] = "Scale: %d%%",
 	
 	["Frame"] = "Frame",
+	["Test Timer"] = "Test Timer",
 	
 	["Announce Timers"] = "Announce Timers",
 	["Announces when the selected types of abilities are used, and are over."] = "Announces when the selected types of abilities are used, and are over.",
@@ -114,4 +136,5 @@ AfflictedLocals = {
 	
 	["Grow Up"] = "Grow Up",
 	["Timers that should grow up instead of down."] = "Timers that should grow up instead of down.",
+	["Icons"] = "Icons",
 }

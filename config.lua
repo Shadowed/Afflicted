@@ -3,6 +3,7 @@ local L = AfflictedLocals
 
 local OptionHouse
 local HouseAuthority
+local OHObj
 
 function Config:OnInitialize()
 	-- Open the OH UI
@@ -28,9 +29,16 @@ function Config:OnInitialize()
 	OptionHouse = LibStub("OptionHouse-1.1")
 	HouseAuthority = LibStub("HousingAuthority-1.2")
 	
-	local OHObj = OptionHouse:RegisterAddOn("Afflicted", nil, "Mayen", "r" .. max(tonumber(string.match("$Revision$", "(%d+)") or 1), Afflicted.revision))
+	OHObj = OptionHouse:RegisterAddOn("Afflicted", nil, "Mayen", "r" .. max(tonumber(string.match("$Revision$", "(%d+)") or 1), Afflicted.revision))
 	OHObj:RegisterCategory(L["General"], self, "CreateUI", nil, 1)
 	OHObj:RegisterCategory(L["Spell List"], self, "CreateSpellList", true, 2)
+	
+	for name, data in pairs(Afflicted.spellList) do
+		if( type(data) == "table" ) then
+			OHObj:RegisterSubCategory(L["Spell List"], name, self, "ModifySpell", nil, name)
+		end
+
+	end
 end
 
 
@@ -107,23 +115,64 @@ function Config:CreateUI()
 end
 
 -- Spell list
-local cachedFrame
+local cachedFrame, spellName
+function Config:SetSpellName(var, value)
+	spellName = value
+end
+
 function Config:OpenSpellModifier(var)
 	OptionHouse:Open("Afflicted", L["Spell List"], var)
 end
 
 function Config:AddSpellModifier()
-	for k, v in pairs(Afflicted.defaults.spellDefault) do
-		Afflicted.db.profile.spells[L["New"]][k] = v
+	-- Make sure it's a valid input
+	if( not spellName or string.len(spellName) == 0 ) then
+		Afflicted:Print(L["You must enter a spell name."])
+
+		return
+	else
+		for name, data in pairs(Afflicted.spellList) do
+			if( type(data) == "table" and string.lower(name) == string.lower(spellName) ) then
+				Afflicted:Print(string.format(L["The spell \"%s\" already exists, you cannot have multiple spells with the same name."], spellName))
+				return
+			end
+		end
+	end
+
+	-- Reset cache
+	cachedFrame = nil
+	
+
+	-- Copy the defaults into our base info
+	Afflicted.db.profile.spells[spellName] = {id = GetTime()}
+	for k, v in pairs(Afflicted.defaults.profile.spellDefault) do
+		Afflicted.db.profile.spells[spellName][k] = v
 	end
 	
-	OptionHouse:RegisterSubCategory(L["Spell List"], L["New"], self, "ModifySpell", nil, nil, true)
+	Afflicted:UpdateSpellList()
+	
+
+	-- Register with OH and pop open the default
+	OHObj:RegisterSubCategory(L["Spell List"], spellName, self, "ModifySpell", nil, spellName)
+	OptionHouse:Open("Afflicted", L["Spell List"], spellName)
 end
 
 function Config:DeleteSpellModifier(var)
 	Afflicted.db.profile.spells[var] = false
 	Afflicted:UpdateSpellList()
+
+	cachedFrame:Hide()
+	cachedFrame = nil
+	
+
+	OHObj:RemoveSubCategory(L["Spell List"], var, true)
+	self:CreateSpellList()
 end
+
+function Config:GetSpellName()
+	return ""
+end
+
 function Config:CreateSpellList()
 	-- This lets us implement at least a basic level of caching
 	if( cachedFrame ) then
@@ -134,34 +183,46 @@ function Config:CreateSpellList()
 	local order = 0
 	
 	-- Add a new spell
-	--table.insert(config, { group = L["New"], type = "groupOrder", order = order})
-	--table.insert(config, { group = L["New"], type = "button", text = L["Add New"], onSet = "AddSpellModifier"})
+	table.insert(config, { group = L["New"], type = "groupOrder", order = order})
+	table.insert(config, { group = L["New"], text = L["Spell Name"], help = L["This is the exact debuff, or spell name. If it's a debuff then it's the exact debuff name, if it's a spell it needs to be the exact spell that shows up in combat log."], type = "input", set = "SetSpellName", get = "GetSpellName", realTime = true, var = ""})
+	table.insert(config, { group = L["New"], type = "button", xPos = 120, text = L["Add New"], set = "AddSpellModifier"})
 	
 	-- List current ones
 	for name, data in pairs(Afflicted.spellList) do
-		order = order + 1
-		
-		local spellType
-		if( data.type == "buff" ) then
-			spellType = string.format(L["Type: %s%s%s"], GREEN_FONT_COLOR_CODE, L["Buff"], FONT_COLOR_CODE_CLOSE)
-		else
-			spellType = string.format(L["Type: %s%s%s"], GREEN_FONT_COLOR_CODE, L["Spell"], FONT_COLOR_CODE_CLOSE)
+		if( type(data) == "table" ) then
+			order = order + 1
+
+			local spellType
+			if( data.type == "buff" ) then
+				spellType = string.format(L["Type: %s%s%s"], "|cffffffff", L["Buff"], FONT_COLOR_CODE_CLOSE)
+			elseif( data.afflicted ) then
+				spellType = string.format(L["Type: %s%s%s"], "|cffffffff", L["Debuff"], FONT_COLOR_CODE_CLOSE)
+			else
+				spellType = string.format(L["Type: %s%s%s"], "|cffffffff", L["Spell"], FONT_COLOR_CODE_CLOSE)
+			end
+
+			local cooldown
+			if( data.seconds ) then
+				cooldown = string.format(L["Cooldown: %s%d%s"], "|cffffffff", data.seconds, FONT_COLOR_CODE_CLOSE)
+			else
+				cooldown = string.format(L["Cooldown: %s%d%s"], RED_FONT_COLOR_CODE, 0, FONT_COLOR_CODE_CLOSE)
+			end
+			
+			local status
+			if( not data.disabled ) then
+				status = name
+			else
+				status = RED_FONT_COLOR_CODE .. name .. FONT_COLOR_CODE_CLOSE
+			end
+
+			table.insert(config, { group = name, type = "groupOrder", order = order})
+			table.insert(config, { group = name, type = "button", texture = data.icon, height = 19, width = 19, template = ""})
+			table.insert(config, { group = name, type = "label", text = status, xPos = -60, font = GameFontHighlightSmall})
+			table.insert(config, { group = name, type = "label", text = cooldown, xPos = 60, font = GameFontNormalSmall})
+			table.insert(config, { group = name, type = "label", text = spellType, xPos = 120, font = GameFontNormalSmall})
+			table.insert(config, { group = name, type = "button", text = L["Edit"], xPos = 160, onSet = "OpenSpellModifier", var = name})
+			table.insert(config, { group = name, type = "button", text = L["Delete"], xPos = 190, onSet = "DeleteSpellModifier", var = name})
 		end
-		
-		local cooldown
-		if( data.seconds ) then
-			cooldown = string.format(L["Cooldown: %s%d%s"], GREEN_FONT_COLOR_CODE, data.seconds, FONT_COLOR_CODE_CLOSE)
-		else
-			cooldown = string.format(L["Cooldown: %s%d%s"], RED_FONT_COLOR_CODE, 0, FONT_COLOR_CODE_CLOSE)
-		end
-		
-		table.insert(config, { group = name, type = "groupOrder", order = order})
-		table.insert(config, { group = name, type = "button", texture = data.icon, height = 19, width = 19, template = ""})
-		table.insert(config, { group = name, type = "label", text = name, xPos = -60, font = GameFontHighlightSmall})
-		table.insert(config, { group = name, type = "label", text = cooldown, xPos = 60, font = GameFontHighlightSmall})
-		table.insert(config, { group = name, type = "label", text = spellType, xPos = 120, font = GameFontHighlightSmall})
-		--table.insert(config, { group = name, type = "button", text = L["Edit"], xPos = 160, onSet = "OpenSpellModifier", var = name})
-		--table.insert(config, { group = name, type = "button", text = L["Delete"], xPos = 190, onSet = "DeleteSpellModifier", var = name})
 	end
 
 	-- Update the dropdown incase any new textures were added
@@ -169,62 +230,45 @@ function Config:CreateSpellList()
 	return cachedFrame
 end
 
---[[
 -- Spell modifier
 function Config:SetSpell(var, value)
-	cachedFrame = nil
-	Afflicted.db.profile.spells[var[1] ][var[2] ] = value
-end
+	if( var[2] == "type" and value == "spell" ) then
+		Afflicted.db.profile.spells[var[1]].type = "spell"
+		Afflicted.db.profile.spells[var[1]].afflicted = true
+	else
+		Afflicted.db.profile.spells[var[1]][var[2]] = value
+		Afflicted.db.profile.spells[var[1]].afflicted = nil
+	end
 
-function Config:OnSetSpell(var, value)
+	cachedFrame = nil
 	Afflicted:UpdateSpellList()
 end
 
-function Config:SaveInfo(var)
-	OptionHouse:RegisterSubCategory(L["Spell List"], var, self, "ModifySpell", nil, nil, true)
-end
-
 function Config:GetSpell(var)
-	if( not Afflicted.db.profile.spells[var[1] ] ) then
-		cachedFrame = nil
-		
-		for k, v in pairs(Afflicted.defaults.spellDefault) do
-			Afflicted.db.profile.spells[var[1] ][k] = v
-		end
+	if( var[2] == "type" and Afflicted.spellList[var[1]].afflicted ) then
+		return "debuff"
 	end
-	
-	return Afflicted.db.profile.spells[var[1] ][var[2] ]
+
+	return Afflicted.spellList[var[1]][var[2]]
 end
 
-function Config:DeleteSpell(var)
-	OptionHouse:RemoveSubCategory(L["Spell List"], var[1], true)
+function Config:TestSpell(var)
+	Afflicted:ProcessAbility(var, UnitName("player"), true)
 end
-
-
-
---[ [
-	[L["Counterspell - Silenced"] ] = {
-		id = "impcounterspell",
-		seconds = 24,
-		icon = "Interface\\Icons\\Spell_Frost_IceShock",
-		type = "spell",
-		afflicted = true,
-	},
-] ]
-
 
 function Config:ModifySpell(category, spell)
+	if( not spell or spell == "" ) then
+		return
+	end
+	
 	local config = {
 		{ group = L["General"], type = "groupOrder", order = 1 },
-		{ order = 1, group = L["General"], text = L["Enable auto join"], type = "check", var = {"join", "enabled"}},
-		{ order = 3, group = L["General"], text = L["Priority check mode"], type = "dropdown", list = {{"less", L["Less than"]}, {"lseql", L["Less than/equal"]}},  var = {"join", "priority"}},
-		{ order = 1, group = L["Delay"], text = L["Battleground join delay"], type = "input", numeric = true, width = 30, var = {"join", "battleground"}},
-		{ order = 2, group = L["Delay"], text = L["AFK battleground join delay"], type = "input", numeric = true, width = 30, var = {"join", "afkBattleground"}},
-
-		{ group = L["Update"], type = "button", text = L["Edit"], xPos = 160, onSet = "OpenSpellModifier", var = spell})
-		{ group = L["Update"], type = "button", text = L["Delete"], xPos = 190, onSet = "DeleteSpellModifier", var = spell})
+		{ order = 1, group = L["General"], text = L["Disable spell"], help = L["When disabled, you won't see any timers fired from this."], type = "check", var = {spell, "disabled"}},
+		{ order = 2, group = L["General"], text = L["Timer type"], help = L["\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge."], type = "dropdown", list = {{"buff", L["Buff"]}, {"debuff", L["Debuff"]}, {"spell", L["Spell"]}},  var = {spell, "type"}},
+		{ order = 3, group = L["General"], text = L["Cooldown/duration"], help = L["Timer to show when this spell is triggered."], type = "input", numeric = true, width = 30, var = {spell, "seconds"}},
+		{ order = 4, group = L["General"], text = L["Icon path"], help = L["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\"."], type = "input", width = 350, var = {spell, "icon"}},
+		{ order = 5, group = L["General"], text = L["Test Timer"], type = "button", onSet = "TestSpell", var = spell},
 	}
 
-	return HouseAuthority:CreateConfiguration(config, {set = "SetSpell", get = "GetSpell", onSet = "OnSetSpell", handler = self})
+	return HouseAuthority:CreateConfiguration(config, {set = "SetSpell", get = "GetSpell", handler = self})
 end
-]]

@@ -32,7 +32,6 @@ function Afflicted:OnInitialize()
 			positions = {},
 			spells = {},
 			spellDefault = {
-				id = "none",
 				seconds = 0,
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
 				afflicted = false,
@@ -456,9 +455,9 @@ end
 -- New ability found
 function Afflicted:ProcessAbility(spellName, target, suppress)
 	-- We're not monitoring this spell
-	if( not self.spellList[spellName] ) then
+	if( not self.spellList[spellName] or (self.spellList[spellName] and self.spellList[spellName].disabled) ) then
 		return
-	end	
+	end
 
 	local spellData = self.spellList[spellName]
 	local id = spellData.id .. tostring(target)
@@ -513,7 +512,7 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 end
 
 function Afflicted:AbilityEnded(id, spellName, target, suppress)
-	if( not self.spellList[spellName] ) then
+	if( not self.spellList[spellName] or (self.spellList[spellName] and self.spellList[spellName].disabled) ) then
 		return
 	end
 	
@@ -595,7 +594,7 @@ function Afflicted:SendMessage(msg, var)
 
 	-- Default to default!
 	else
-		DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
+		self:Print(msg)
 	end
 end
 
@@ -621,6 +620,9 @@ function Afflicted:CombatText(text, var)
 	end
 end
 
+function Afflicted:Print(msg)
+	DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
+end
 
 function Afflicted:Format(text)
 	text = string.gsub(text, "([%^%(%)%.%[%]%*%+%-%?])", "%%%1")
