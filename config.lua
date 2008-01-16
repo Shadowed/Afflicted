@@ -121,6 +121,9 @@ function Config:SetSpellName(var, value)
 end
 
 function Config:OpenSpellModifier(var)
+	cachedFrame:Hide()
+	
+
 	OptionHouse:Open("Afflicted", L["Spell List"], var)
 end
 
@@ -164,7 +167,6 @@ function Config:DeleteSpellModifier(var)
 	cachedFrame:Hide()
 	cachedFrame = nil
 	
-
 	OHObj:RemoveSubCategory(L["Spell List"], var, true)
 	self:CreateSpellList()
 end
@@ -232,12 +234,14 @@ end
 
 -- Spell modifier
 function Config:SetSpell(var, value)
-	if( var[2] == "type" and value == "spell" ) then
-		Afflicted.db.profile.spells[var[1]].type = "spell"
+	if( var[2] == "type" and value == "debuff" ) then
+		Afflicted.db.profile.spells[var[1]].type = "debuff"
 		Afflicted.db.profile.spells[var[1]].afflicted = true
+	elseif( var[2] == "type" ) then
+		Afflicted.db.profile.spells[var[1]].type = value
+		Afflicted.db.profile.spells[var[1]].afflicted = nil
 	else
 		Afflicted.db.profile.spells[var[1]][var[2]] = value
-		Afflicted.db.profile.spells[var[1]].afflicted = nil
 	end
 
 	cachedFrame = nil

@@ -472,7 +472,7 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	end
 
 	-- Check if we need to set a trigger limit
-	if( spellData.limit > 0 ) then
+	if( spellData.limit and spellData.limit > 0 ) then
 		local time = GetTime()
 		if( blockSpells[id] and blockSpells[id] >= time ) then
 			return
