@@ -73,6 +73,17 @@ function Afflicted:OnInitialize()
 		self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 		self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS", "ZONE_CHANGED_NEW_AREA")
 	end
+
+	-- Middle of screen alert frame
+	self.alertFrame = CreateFrame("MessageFrame", nil, UIParent)
+	self.alertFrame:SetInsertMode("TOP")
+	self.alertFrame:SetFrameStrata("HIGH")
+	self.alertFrame:SetWidth(UIParent:GetWidth())
+	self.alertFrame:SetHeight(60)
+	self.alertFrame:SetFadeDuration(0.5)
+	self.alertFrame:SetTimeVisible(2)
+	self.alertFrame:SetFont((GameFontNormal:GetFont()), 20, "OUTLINE")
+	self.alertFrame:SetPoint("CENTER", 0, 60)
 end
 
 function Afflicted:OnEnable()
@@ -197,6 +208,14 @@ end
 -- Check if we're in an arena
 function Afflicted:ZONE_CHANGED_NEW_AREA()
 	local type = select(2, IsInInstance())
+	
+
+	-- We changed zones, so clear out any timers
+	if( type ~= instanceType ) then
+		self:ClearTimers(self.spell)
+		self:ClearTimers(self.buff)
+	end
+	
 	-- Inside an arena, but wasn't already
 	if( type == "arena" and type ~= instanceType ) then
 		self:OnEnable()
@@ -595,7 +614,8 @@ function Afflicted:SendMessage(msg, var)
 
 	-- Raid warning frame, will not send it out to the party
 	elseif( self.db.profile[outputVar] == "rwframe" ) then
-		RaidNotice_AddMessage(RaidWarningFrame, msg, self.db.profile[var .. "Color"])
+		local color = var .. "Color"
+		self.alertFrame:AddMessage(msg, self.db.profile[color].r, self.db.profile[color].g, self.db.profile[color].b)
 
 	-- Party chat
 	elseif( self.db.profile[outputVar] == "party" ) then
