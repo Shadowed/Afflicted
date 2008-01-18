@@ -121,9 +121,10 @@ function Config:SetSpellName(var, value)
 end
 
 function Config:OpenSpellModifier(var)
-	cachedFrame:Hide()
+	if( cachedFrame ) then
+		cachedFrame:Hide()
+	end
 	
-
 	OptionHouse:Open("Afflicted", L["Spell List"], var)
 end
 
@@ -143,6 +144,7 @@ function Config:AddSpellModifier()
 	end
 
 	-- Reset cache
+	cachedFrame:Hide()
 	cachedFrame = nil
 	
 
@@ -256,6 +258,10 @@ function Config:GetSpell(var)
 	return Afflicted.spellList[var[1]][var[2]]
 end
 
+function Config:Validate(var, val)
+	return tonumber(val)
+end
+
 function Config:TestSpell(var)
 	Afflicted:ProcessAbility(var, UnitName("player"), true)
 end
@@ -265,12 +271,16 @@ function Config:ModifySpell(category, spell)
 		return
 	end
 	
+	if( cachedFrame ) then
+		cachedFrame:Hide()
+	end
+	
 	local config = {
 		{ group = L["General"], type = "groupOrder", order = 1 },
 		{ order = 1, group = L["General"], text = L["Disable spell"], help = L["When disabled, you won't see any timers fired from this."], type = "check", var = {spell, "disabled"}},
 		{ order = 2, group = L["General"], text = L["Timer type"], help = L["\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge."], type = "dropdown", list = {{"buff", L["Buff"]}, {"debuff", L["Debuff"]}, {"spell", L["Spell"]}},  var = {spell, "type"}},
 		{ order = 3, group = L["General"], text = L["Cooldown/duration"], help = L["Timer to show when this spell is triggered."], type = "input", numeric = true, width = 30, default = 0, var = {spell, "seconds"}},
-		{ order = 4, group = L["General"], text = L["Trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", numeric = true, width = 30, default = 0, var = {spell, "limit"}},
+		{ order = 4, group = L["General"], text = L["Trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "limit"}},
 		{ order = 5, group = L["General"], text = L["Icon path"], help = L["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\"."], type = "input", width = 350, var = {spell, "icon"}},
 		{ order = 6, group = L["General"], text = L["Test Timer"], type = "button", onSet = "TestSpell", var = spell},
 	}

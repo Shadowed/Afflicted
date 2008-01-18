@@ -79,6 +79,8 @@ AfflictedLocals = {
 	["Save"] = "Save",
 	["Update"] = "Update",
 	
+	["You may only enter a number or a float into this, \"%s\" is invalid."] = "You may only enter a number or a float into this, \"%s\" is invalid.",
+	
 	["The spell \"%s\" already exists, you cannot have multiple spells with the same name."] = "The spell \"%s\" already exists, you cannot have multiple spells with the same name.",
 	["You must enter a spell name."] = "You must enter a spell name.",
 	
