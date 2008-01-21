@@ -236,6 +236,13 @@ end
 
 -- Spell modifier
 function Config:SetSpell(var, value)
+	-- Grab from the spell list so we can modify default list
+	if( not Afflicted.db.profile.spells[var[1]] and Afflicted.spellList[var[1]] ) then
+		for k, v in pairs(Afflicted.spellList[var[1]]) do
+			Afflicted.db.profile.spells[var[1]][k] = v
+		end
+	end
+
 	if( var[2] == "type" and value == "debuff" ) then
 		Afflicted.db.profile.spells[var[1]].type = "debuff"
 		Afflicted.db.profile.spells[var[1]].afflicted = true
@@ -253,6 +260,13 @@ end
 function Config:GetSpell(var)
 	if( var[2] == "type" and Afflicted.spellList[var[1]].afflicted ) then
 		return "debuff"
+	end
+	
+	-- Grab from the spell list so we can modify default list
+	if( not Afflicted.db.profile.spells[var[1]] and Afflicted.spellList[var[1]] ) then
+		for k, v in pairs(Afflicted.spellList[var[1]]) do
+			Afflicted.db.profile.spells[var[1]][k] = v
+		end
 	end
 
 	return Afflicted.spellList[var[1]][var[2]]
