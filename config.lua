@@ -13,8 +13,11 @@ function Config:OnInitialize()
 		if( msg == "test" ) then
 			Config:TestTimers()
 		elseif( msg == "clear" ) then
-			Afflicted:ClearTimers(Afflicted.spell)
-			Afflicted:ClearTimers(Afflicted.buff)
+			for key in pairs(Afflicted.anchors) do
+				if( Afflicted[key] ) then
+					Afflicted:ClearTimers(Afflicted[key])
+				end
+			end
 		elseif( msg == "ui" ) then
 			OptionHouse:Open("Afflicted")
 		else
@@ -44,15 +47,19 @@ end
 
 function Config:TestTimers()
 	-- Clear out any running timers first
-	Afflicted:ClearTimers(Afflicted.spell)
-	Afflicted:ClearTimers(Afflicted.buff)
+	for key in pairs(Afflicted.anchors) do
+		if( Afflicted[key] ) then
+			Afflicted:ClearTimers(Afflicted[key])
+		end
+	end
 	
 	local playerName = UnitName("player")
 	local addedTypes = {buff = 0, spell = 0}
 
 	for spell, data in pairs(AfflictedSpells) do
-		if( addedTypes[data.type] < 5 ) then
-			addedTypes[data.type] = addedTypes[data.type] + 1
+		local type = Afflicted.anchors[data.type]
+		if( addedTypes[type] < 5 ) then
+			addedTypes[type] = addedTypes[type] + 1
 			Afflicted:ProcessAbility(spell, playerName, true)
 		end
 	end
@@ -102,12 +109,10 @@ function Config:CreateUI()
 
 	local frame = HouseAuthority:CreateConfiguration(config, {set = "Set", get = "Get", onSet = "Reload", handler = self})	
 	frame:SetScript("OnHide", function()
-		if( #(Afflicted.buff.active) == 0 ) then
-			Afflicted.buff:Hide()
-		end
-		
-		if( #(Afflicted.spell.active) == 0 ) then
-			Afflicted.spell:Hide()
+		for key in pairs(Afflicted.anchors) do
+			if( Afflicted[key] and #(Afflicted[key].active) == 0 ) then
+				Afflicted[key]:Hide()
+			end
 		end
 	end)
 	
@@ -132,7 +137,6 @@ function Config:AddSpellModifier()
 	-- Make sure it's a valid input
 	if( not spellName or string.len(spellName) == 0 ) then
 		Afflicted:Print(L["You must enter a spell name."])
-
 		return
 	else
 		for name, data in pairs(Afflicted.spellList) do
@@ -146,7 +150,6 @@ function Config:AddSpellModifier()
 	-- Reset cache
 	cachedFrame:Hide()
 	cachedFrame = nil
-	
 
 	-- Copy the defaults into our base info
 	Afflicted.db.profile.spells[spellName] = {id = GetTime()}
@@ -236,33 +239,26 @@ end
 
 -- Spell modifier
 function Config:SetSpell(var, value)
-	-- Grab from the spell list so we can modify default list
-	if( not Afflicted.db.profile.spells[var[1]] and Afflicted.spellList[var[1]] ) then
-		for k, v in pairs(Afflicted.spellList[var[1]]) do
-			Afflicted.db.profile.spells[var[1]][k] = v
+	-- We're setting a spell and we have it in our merged list, but not in our SV
+	-- this lets us modify the default list of spells
+	--[[
+	if( not Afflicted.db.profile.spells[var[1] ] and Afflicted.spellList[var[1] ] ) then
+		for k, v in pairs(Afflicted.spellList[var[1] ]) do
+			Afflicted.db.profile.spells[var[1] ][k] = v
 		end
 	end
-
-	if( var[2] == "type" and value == "debuff" ) then
-		Afflicted.db.profile.spells[var[1]].type = "debuff"
-		Afflicted.db.profile.spells[var[1]].afflicted = true
-	elseif( var[2] == "type" ) then
-		Afflicted.db.profile.spells[var[1]].type = value
-		Afflicted.db.profile.spells[var[1]].afflicted = nil
-	else
-		Afflicted.db.profile.spells[var[1]][var[2]] = value
-	end
+	]]
 
 	cachedFrame = nil
+	
+
+	Afflicted.db.profile.spells[var[1]][var[2]] = value
 	Afflicted:UpdateSpellList()
 end
 
 function Config:GetSpell(var)
-	if( var[2] == "type" and Afflicted.spellList[var[1]].afflicted ) then
-		return "debuff"
-	end
-	
-	-- Grab from the spell list so we can modify default list
+	-- We're setting a spell and we have it in our merged list, but not in our SV
+	-- this lets us modify the default list of spells
 	if( not Afflicted.db.profile.spells[var[1]] and Afflicted.spellList[var[1]] ) then
 		for k, v in pairs(Afflicted.spellList[var[1]]) do
 			Afflicted.db.profile.spells[var[1]][k] = v

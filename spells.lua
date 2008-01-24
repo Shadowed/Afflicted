@@ -109,8 +109,7 @@ AfflictedSpells = {
 		seconds = 45,
 		limit = 0,
 		icon = "Interface\\Icons\\Spell_Shadow_ImpPhaseShift",
-		type = "spell",
-		afflicted = true,
+		type = "debuff",
 	},
 
 	[L["Feral Charge"]] = {
@@ -118,8 +117,7 @@ AfflictedSpells = {
 		seconds = 15,
 		limit = 0,
 		icon = "Interface\\Icons\\Ability_Hunter_Pet_Bear",
-		type = "spell",
-		afflicted = true,
+		type = "debff",
 	},
 
 	[L["Spell Lock"]] = {
@@ -127,8 +125,7 @@ AfflictedSpells = {
 		seconds = 24,
 		limit = 0,
 		icon = "Interface\\Icons\\Spell_Shadow_MindRot",
-		type = "spell",
-		afflicted = true,
+		type = "debuff",
 	},
 	
 	[L["Counterspell - Silenced"]] = {
@@ -136,8 +133,7 @@ AfflictedSpells = {
 		seconds = 24,
 		limit = 0,
 		icon = "Interface\\Icons\\Spell_Frost_IceShock",
-		type = "spell",
-		afflicted = true,
+		type = "debuff",
 	},
 
 	[L["Kick"]] = {

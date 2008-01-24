@@ -9,6 +9,7 @@ local instanceType
 local playerName
 
 local blockSpells = {}
+local anchors = {["spell"] = "spell", ["buff"] = "buff", ["debuff"] = "spell"}
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
@@ -47,8 +48,12 @@ function Afflicted:OnInitialize()
 	playerName = UnitName("player")
 		
 	-- Create display frames!
-	self.buff = self:CreateDisplay("buff")
-	self.spell = self:CreateDisplay("spell")
+	self.anchors = anchors
+	for _, key in pairs(anchors) do
+		if( not self[key] ) then
+			self[key] = self:CreateDisplay(key)
+		end
+	end
 
 	-- Parse combat log messages for matching
 	selfInterruptOther = self:Format(SPELLINTERRUPTSELFOTHER)
@@ -64,6 +69,14 @@ function Afflicted:OnInitialize()
 	
 	enemyGainBuff = self:Format(AURAADDEDOTHERHELPFUL)
 	enemyLoseBuff = self:Format(AURAREMOVEDOTHER)
+	
+	-- Do an upgrade to the new debuff type
+	for _, spell in pairs(self.db.profile.spells) do
+		if( type(spell) == "table" and spell.afflicted ) then
+			spell.type = "debuff"
+			spell.afflicted = nil
+		end
+	end
 	
 	-- Update the spell list with the default and manual
 	self:UpdateSpellList()
@@ -89,8 +102,11 @@ end
 function Afflicted:OnEnable()
 	-- Not inside an arena, so don't register anything
 	if( self.db.profile.arenaOnly and select(2, IsInInstance()) ~= "arena" ) then
-		self.spell:Hide()
-		self.buff:Hide()
+		for key in pairs(anchors) do
+			if( self[key] ) then
+				self[key]:Hide()
+			end
+		end
 		return
 	end
 		
@@ -133,44 +149,37 @@ function Afflicted:Reload()
 	self:OnDisable()
 	self:OnEnable()
 	
-	-- Scale
-	self.buff:SetScale(self.db.profile.scale)
-	self.spell:SetScale(self.db.profile.scale)
-	
-	-- Update icon scaling as well
-	for _, frame in pairs(self.buff.active) do
-		frame:SetScale(self.db.profile.scale)
-	end
-	
-	for _, frame in pairs(self.buff.inactive) do
-		frame:SetScale(self.db.profile.scale)
-	end
-	
-	for _, frame in pairs(self.spell.active) do
-		frame:SetScale(self.db.profile.scale)
-	end
-	
-	for _, frame in pairs(self.spell.inactive) do
-		frame:SetScale(self.db.profile.scale)
-	end
-	
-	-- Update anchors
-	self:UpdateAnchor(self.spell)
-	self:UpdateAnchor(self.buff)
-	
-	if( self.db.profile.anchor ) then
-		self.spell:Show()
-		self.buff:Show()
-	else
-		if( #(self.spell.active) == 0 ) then
-			self.spell:Hide()
+	-- Update anchors and icons inside
+	for key in pairs(anchors) do
+		if( self[key] ) then
+			-- Update frame scale
+			self[key]:SetScale(self.db.profile.scale)
+
+			-- Update icon scale
+
+			for _, frame in pairs(self[key].active) do
+
+				frame:SetScale(self.db.profile.scale)
+			end
+
+			for _, frame in pairs(self[key].inactive) do
+				frame:SetScale(self.db.profile.scale)
+			end
+
+
+			-- Update anchor visibility
+			self:UpdateAnchor(self[key])
+
+
+			-- Annnd make sure it's shown or hidden
+			if( self.db.profile.anchor ) then
+				self[key]:Hide()
+			elseif( #(self[key].active) == 0 ) then
+				self[key]:Hide()
+			end
 		end
+	end
 		
-		if( #(self.buff.active) == 0 ) then
-			self.buff:Hide()
-		end
-	end
-	
 	-- Mergy
 	self:UpdateSpellList()
 end
@@ -212,8 +221,11 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 
 	-- We changed zones, so clear out any timers
 	if( type ~= instanceType ) then
-		self:ClearTimers(self.spell)
-		self:ClearTimers(self.buff)
+		for key in pairs(anchors) do
+			if( self[key] ) then
+				self:ClearTimers(self[key])
+			end
+		end
 	end
 	
 	-- Inside an arena, but wasn't already
@@ -303,7 +315,7 @@ end
 function Afflicted:CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE(event, msg)
 	-- Player afflicted by a spell
 	local spell = string.match(msg, selfGetAfflicted)
-	if( spell and self.spellList[spell] and self.spellList[spell].afflicted ) then
+	if( spell and self.spellList[spell] and self.spellList[spell].type == "debuff" ) then
 		self:ProcessAbility(spell)
 	end
 end
@@ -311,7 +323,7 @@ end
 function Afflicted:CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE(event, msg)
 	-- Friendly player afflicted
 	local target, spell = string.match(msg, friendlyGetAfflicted)
-	if( spell and self.spellList[spell] and self.spellList[spell].afflicted ) then
+	if( spell and self.spellList[spell] and self.spellList[spell].type == "debuff" ) then
 		self:ProcessAbility(spell)
 	end
 end
@@ -483,10 +495,11 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	
 	local spellData = self.spellList[spellName]
 	local id = spellData.id .. tostring(target)
-	local parent = self[spellData.type]
+	local type = anchors[spellData.type]
+	local parent = self[type]
 		
 	-- Unknown spell, or we don't have it enabled
-	if( not self.db.profile[spellData.type] ) then
+	if( not self.db.profile[type] ) then
 		return
 	end
 
@@ -514,7 +527,7 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	frame.spellName = spellName
 	frame.target = target
 	frame.suppress = suppress
-	frame.type = spellData.type
+	frame.type = type
 
 	frame.icon:SetTexture(spellData.icon)
 	frame:Show()
@@ -532,8 +545,8 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	self:RepositionTimers(parent)
 
 	-- Announce it
-	if( not suppress and self.db.profile.announce[spellData.type] ) then
-		if( spellData.type == "buff" ) then
+	if( not suppress and self.db.profile.announce[type] ) then
+		if( type == "buff" ) then
 			self:SendMessage(string.format(L["GAINED %s (%s)"], spellName, target), "timer")
 		elseif( target ) then
 			self:SendMessage(string.format(L["USED %s (%s)"], spellName, target), "timer")
@@ -549,7 +562,8 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	end
 	
 	local spellData = self.spellList[spellName]
-	local parent = self[spellData.type]
+	local type = anchors[spellData.type]
+	local parent = self[type]
 	
 	id = id or (spellData.id .. tostring(target))
 	
@@ -557,7 +571,7 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	-- Remove it from display
 	local removed
 	for i=#(parent.active), 1, -1 do
-		if( parent.active[i].id == id and parent.active[i].type == spellData.type ) then
+		if( parent.active[i].id == id and parent.active[i].type == type ) then
 			parent.active[i]:Hide()
 			
 			table.insert(parent.inactive, parent.active[i])
@@ -584,8 +598,8 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	self:RepositionTimers(parent)
 	
 	-- Announce it
-	if( not suppress and self.db.profile.announce[spellData.type] ) then
-		if( spellData.type == "buff" ) then
+	if( not suppress and self.db.profile.announce[type] ) then
+		if( type == "buff" ) then
 			self:SendMessage(string.format(L["FADED %s (%s)"], spellName, target), "timer")
 
 		elseif( target ) then
