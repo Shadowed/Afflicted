@@ -117,7 +117,7 @@ AfflictedSpells = {
 		seconds = 15,
 		limit = 0,
 		icon = "Interface\\Icons\\Ability_Hunter_Pet_Bear",
-		type = "debff",
+		type = "debuff",
 	},
 
 	[L["Spell Lock"]] = {

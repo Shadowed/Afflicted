@@ -202,7 +202,7 @@ function Config:CreateSpellList()
 			local spellType
 			if( data.type == "buff" ) then
 				spellType = string.format(L["Type: %s%s%s"], "|cffffffff", L["Buff"], FONT_COLOR_CODE_CLOSE)
-			elseif( data.afflicted ) then
+			elseif( data.type == "debuff" ) then
 				spellType = string.format(L["Type: %s%s%s"], "|cffffffff", L["Debuff"], FONT_COLOR_CODE_CLOSE)
 			else
 				spellType = string.format(L["Type: %s%s%s"], "|cffffffff", L["Spell"], FONT_COLOR_CODE_CLOSE)
@@ -241,30 +241,20 @@ end
 function Config:SetSpell(var, value)
 	-- We're setting a spell and we have it in our merged list, but not in our SV
 	-- this lets us modify the default list of spells
-	--[[
-	if( not Afflicted.db.profile.spells[var[1] ] and Afflicted.spellList[var[1] ] ) then
-		for k, v in pairs(Afflicted.spellList[var[1] ]) do
-			Afflicted.db.profile.spells[var[1] ][k] = v
+	if( not Afflicted.db.profile.spells[var[1]] and Afflicted.spellList[var[1]] ) then
+		Afflicted.db.profile.spells[var[1]] = {}
+		for k, v in pairs(Afflicted.spellList[var[1]]) do
+			Afflicted.db.profile.spells[var[1]][k] = v
 		end
 	end
-	]]
-
+	
 	cachedFrame = nil
 	
-
 	Afflicted.db.profile.spells[var[1]][var[2]] = value
 	Afflicted:UpdateSpellList()
 end
 
 function Config:GetSpell(var)
-	-- We're setting a spell and we have it in our merged list, but not in our SV
-	-- this lets us modify the default list of spells
-	if( not Afflicted.db.profile.spells[var[1]] and Afflicted.spellList[var[1]] ) then
-		for k, v in pairs(Afflicted.spellList[var[1]]) do
-			Afflicted.db.profile.spells[var[1]][k] = v
-		end
-	end
-
 	return Afflicted.spellList[var[1]][var[2]]
 end
 
