@@ -2,7 +2,7 @@ Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
 
 local L = AfflictedLocals
 
-local selfFailDispel, selfSuccessDispel, selfInterruptOther, selfGetAfflicted, friendlyGetAfflicted, friendlyResistSpell, selfResistSpell, enemyGainBuff, enemyLoseBuff
+local selfFailDispel, selfSuccessDispel, selfInterruptOther, selfGetAfflicted, selfSpellRemoved, friendlyGetAfflicted, friendlyResistSpell, selfResistSpell, enemyGainBuff, enemyLoseBuff
 local selfInterrupted, friendlyInterrupted
 
 local instanceType
@@ -61,6 +61,7 @@ function Afflicted:OnInitialize()
 	selfResistSpell = self:Format(SPELLRESISTOTHERSELF)
 	selfFailDispel = self:Format(DISPELFAILEDSELFOTHER)
 	selfSuccessDispel = self:Format(AURADISPELOTHER3)
+	selfSpellRemoved = self:Format(AURADISPELSELF3)
 	selfInterrupted = self:Format(SPELLINTERRUPTOTHERSELF)
 	
 	friendlyInterrupted = self:Format(SPELLINTERRUPTOTHEROTHER)
@@ -126,6 +127,7 @@ function Afflicted:OnEnable()
 		self:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE")
 		self:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE")
 		self:RegisterEvent("CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE")
+		self:RegisterEvent("CHAT_MSG_SPELL_BREAK_AURA")
 	end
 
 	-- Buff fade/gains
@@ -255,9 +257,19 @@ function Afflicted:CHAT_MSG_SPELL_SELF_BUFF(event, msg)
 end
 
 function Afflicted:CHAT_MSG_SPELL_BREAK_AURA(event, msg)
-	local target, spell, caster = string.match(msg, selfSuccessDispel)
-	if( caster == playerName ) then
-		self:SendMessage(string.format(L["Removed %s's %s."], target, spell), "alert")
+	if( self.db.profile.spell ) then
+		local removed, caster, spell = string.match(msg, selfSpellRemoved)
+		if( removed and caster and spell ) then
+			self:ProcessAbility(spell, caster)
+			return
+		end
+	end
+
+	if( self.db.profile.showPurge ) then
+		local target, spell, caster = string.match(msg, selfSuccessDispel)
+		if( caster == playerName ) then
+			self:SendMessage(string.format(L["Removed %s's %s."], target, spell), "alert")
+		end
 	end
 end
 
