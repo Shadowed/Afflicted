@@ -214,6 +214,13 @@ function Config:CreateSpellList()
 			else
 				cooldown = string.format(L["Cooldown: %s%d%s"], RED_FONT_COLOR_CODE, 0, FONT_COLOR_CODE_CLOSE)
 			end
+
+			local triggerLimit
+			if( data.limit ) then
+				triggerLimit = string.format(L["Limit: %s%d%s"], "|cffffffff", data.limit, FONT_COLOR_CODE_CLOSE)
+			else
+				triggerLimit = string.format(L["Limit: %s%d%s"], RED_FONT_COLOR_CODE, 0, FONT_COLOR_CODE_CLOSE)
+			end
 			
 			local status
 			if( not data.disabled ) then
@@ -227,13 +234,14 @@ function Config:CreateSpellList()
 			table.insert(config, { group = name, type = "label", text = status, xPos = -60, font = GameFontHighlightSmall})
 			table.insert(config, { group = name, type = "label", text = cooldown, xPos = 60, font = GameFontNormalSmall})
 			table.insert(config, { group = name, type = "label", text = spellType, xPos = 120, font = GameFontNormalSmall})
-			table.insert(config, { group = name, type = "button", text = L["Edit"], xPos = 160, onSet = "OpenSpellModifier", var = name})
-			table.insert(config, { group = name, type = "button", text = L["Delete"], xPos = 190, onSet = "DeleteSpellModifier", var = name})
+			table.insert(config, { group = name, type = "label", text = triggerLimit, xPos = 160, font = GameFontNormalSmall})
+			table.insert(config, { group = name, type = "button", text = L["Edit"], xPos = 190, onSet = "OpenSpellModifier", var = name})
+			table.insert(config, { group = name, type = "button", text = L["Delete"], xPos = 220, onSet = "DeleteSpellModifier", var = name})
 		end
 	end
 
 	-- Update the dropdown incase any new textures were added
-	cachedFrame = HouseAuthority:CreateConfiguration(config, {handler = self, columns = 6})
+	cachedFrame = HouseAuthority:CreateConfiguration(config, {handler = self, columns = 7})
 	return cachedFrame
 end
 
@@ -278,11 +286,12 @@ function Config:ModifySpell(category, spell)
 	local config = {
 		{ group = L["General"], type = "groupOrder", order = 1 },
 		{ order = 1, group = L["General"], text = L["Disable spell"], help = L["When disabled, you won't see any timers fired from this."], type = "check", var = {spell, "disabled"}},
-		{ order = 2, group = L["General"], text = L["Timer type"], help = L["\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge."], type = "dropdown", list = {{"buff", L["Buff"]}, {"debuff", L["Debuff"]}, {"spell", L["Spell"]}},  var = {spell, "type"}},
-		{ order = 3, group = L["General"], text = L["Cooldown/duration"], help = L["Timer to show when this spell is triggered."], type = "input", numeric = true, width = 30, default = 0, var = {spell, "seconds"}},
-		{ order = 4, group = L["General"], text = L["Trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "limit"}},
-		{ order = 5, group = L["General"], text = L["Icon path"], help = L["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\"."], type = "input", width = 350, var = {spell, "icon"}},
-		{ order = 6, group = L["General"], text = L["Test Timer"], type = "button", onSet = "TestSpell", var = spell},
+		{ order = 2, group = L["General"], text = L["Ignore spell fade events"], help = L["Some buffs you don't want to have the timer removed just because it faded from the person, this is the case for things like Shadowstep where you don't want it removed 3 seconds after the buff fades because you want the cooldown timer."], type = "check", var = {spell, "dontFade"}},
+		{ order = 3, group = L["General"], text = L["Timer type"], help = L["\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge."], type = "dropdown", list = {{"buff", L["Buff"]}, {"debuff", L["Debuff"]}, {"spell", L["Spell"]}},  var = {spell, "type"}},
+		{ order = 4, group = L["General"], text = L["Cooldown/duration"], help = L["Timer to show when this spell is triggered."], type = "input", numeric = true, width = 30, default = 0, var = {spell, "seconds"}},
+		{ order = 5, group = L["General"], text = L["Trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "limit"}},
+		{ order = 6, group = L["General"], text = L["Icon path"], help = L["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\"."], type = "input", width = 350, var = {spell, "icon"}},
+		{ order = 7, group = L["General"], text = L["Test Timer"], type = "button", onSet = "TestSpell", var = spell},
 	}
 
 	return HouseAuthority:CreateConfiguration(config, {set = "SetSpell", get = "GetSpell", handler = self})

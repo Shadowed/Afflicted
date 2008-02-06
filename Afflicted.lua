@@ -340,7 +340,7 @@ function Afflicted:CHAT_MSG_SPELL_AURA_GONE_OTHER(event, msg)
 	-- Enemy lost a buff
 	local spell, target = string.match(msg, enemyLoseBuff)
 	if( spell and target ) then
-		self:AbilityEnded(nil, spell, target)
+		self:AbilityEnded(nil, spell, target, nil, true)
 	end
 end
 
@@ -556,7 +556,7 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	end
 end
 
-function Afflicted:AbilityEnded(id, spellName, target, suppress)
+function Afflicted:AbilityEnded(id, spellName, target, suppress, isFade)
 	if( not self.spellList[spellName] or (self.spellList[spellName] and self.spellList[spellName].disabled) ) then
 		return
 	end
@@ -565,9 +565,14 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress)
 	local type = anchors[spellData.type]
 	local parent = self[type]
 	
+	-- This means things like Shadowstep won't be removed from the timer since we
+	-- want it to keep ticking, down and not remove after the speed boost fades
+	if( spellData.dontFade and isFade ) then
+		return
+	end
+
 	id = id or (spellData.id .. tostring(target))
 	
-
 	-- Remove it from display
 	local removed
 	for i=#(parent.active), 1, -1 do

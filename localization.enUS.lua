@@ -106,6 +106,9 @@ AfflictedLocals = {
 	["Spell"] = "Spell",
 	["Buff"] = "Buff",
 	
+	["Ignore spell fade events"] = "Ignore spell fade events",
+	["Some buffs you don't want to have the timer removed just because it faded from the person, this is the case for things like Shadowstep where you don't want it removed 3 seconds after the buff fades because you want the cooldown timer."] = "Some buffs you don't want to have the timer removed just because it faded from the person, this is the case for things like Shadowstep where you don't want it removed 3 seconds after the buff fades because you want the cooldown timer.",
+	
 	["Cooldown/duration"] = "Cooldown/duration",
 	["Timer to show when this spell is triggered."] = "Timer to show when this spell is triggered.",
 	["Icon path"] = "Icon path",
@@ -128,6 +131,7 @@ AfflictedLocals = {
 	
 	["Scale: %d%%"] = "Scale: %d%%",
 	
+	["Limit: %s%d%s"] = "Limit: %s%d%s",
 	["Frame"] = "Frame",
 	["Test Timer"] = "Test Timer",
 	
