@@ -21,7 +21,6 @@ function Afflicted:OnInitialize()
 			spell = true,
 			anchor = true,
 			scale = 1.0,
-			arenaOnly = false,
 			showPurge = false,
 			showInterrupt = false,
 			alertOutput = 1,
@@ -32,6 +31,7 @@ function Afflicted:OnInitialize()
 			growup = { buff = false, spell = false, },
 			positions = {},
 			spells = {},
+			inside = {["arena"] = true},
 			spellDefault = {
 				seconds = 0,
 				limit = 0,
@@ -71,22 +71,15 @@ function Afflicted:OnInitialize()
 	enemyGainBuff = self:Format(AURAADDEDOTHERHELPFUL)
 	enemyLoseBuff = self:Format(AURAREMOVEDOTHER)
 	
-	-- Do an upgrade to the new debuff type
-	for _, spell in pairs(self.db.profile.spells) do
-		if( type(spell) == "table" and spell.afflicted ) then
-			spell.type = "debuff"
-			spell.afflicted = nil
-		end
-	end
-	
 	-- Update the spell list with the default and manual
 	self:UpdateSpellList()
 
 	-- Monitor for zone change
-	if( self.db.profile.arenaOnly ) then
-		self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-		self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS", "ZONE_CHANGED_NEW_AREA")
-	end
+	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
+
+	-- Quick check
+	self:ZONE_CHANGED_NEW_AREA()
 
 	-- Middle of screen alert frame
 	self.alertFrame = CreateFrame("MessageFrame", nil, UIParent)
@@ -101,16 +94,12 @@ function Afflicted:OnInitialize()
 end
 
 function Afflicted:OnEnable()
-	-- Not inside an arena, so don't register anything
-	if( self.db.profile.arenaOnly and select(2, IsInInstance()) ~= "arena" ) then
-		for key in pairs(anchors) do
-			if( self[key] ) then
-				self[key]:Hide()
-			end
-		end
+	local type = select(2, IsInInstance())
+	if( not self.db.profile.inside[type] ) then
+		ChatFrame1:AddMessage("OnEnable: Disabled, " .. tostring(type) .. ".")
 		return
 	end
-		
+	
 	-- We interrupted a spell of theirs
 	if( self.db.profile.showInterrupt ) then
 		self:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
@@ -141,15 +130,18 @@ end
 function Afflicted:OnDisable()
 	self:UnregisterAllEvents()
 	
-	if( self.db.profile.arenaOnly ) then
-		self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-		self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS", "ZONE_CHANGED_NEW_AREA")
-	end
+	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
 end
 
 function Afflicted:Reload()
 	self:OnDisable()
-	self:OnEnable()
+
+	-- Check to see if we should enable it
+	local type = select(2, IsInInstance())
+	if( self.db.profile.inside[type] ) then
+		self:OnEnable()
+	end
 	
 	-- Update anchors and icons inside
 	for key in pairs(anchors) do
@@ -158,9 +150,7 @@ function Afflicted:Reload()
 			self[key]:SetScale(self.db.profile.scale)
 
 			-- Update icon scale
-
 			for _, frame in pairs(self[key].active) do
-
 				frame:SetScale(self.db.profile.scale)
 			end
 
@@ -168,10 +158,8 @@ function Afflicted:Reload()
 				frame:SetScale(self.db.profile.scale)
 			end
 
-
 			-- Update anchor visibility
 			self:UpdateAnchor(self[key])
-
 
 			-- Annnd make sure it's shown or hidden
 			if( self.db.profile.anchor ) then
@@ -181,7 +169,7 @@ function Afflicted:Reload()
 			end
 		end
 	end
-		
+
 	-- Mergy
 	self:UpdateSpellList()
 end
@@ -219,26 +207,23 @@ end
 -- Check if we're in an arena
 function Afflicted:ZONE_CHANGED_NEW_AREA()
 	local type = select(2, IsInInstance())
-	
 
-	-- We changed zones, so clear out any timers
 	if( type ~= instanceType ) then
+		-- Clear anchors because we changed zones
 		for key in pairs(anchors) do
 			if( self[key] ) then
 				self:ClearTimers(self[key])
 			end
 		end
+		
+		-- Check if it's supposed to be enabled in this zone
+		if( self.db.profile.inside[type] ) then
+			self:OnEnable()
+		else
+			self:OnDisable()
+		end
 	end
-	
-	-- Inside an arena, but wasn't already
-	if( type == "arena" and type ~= instanceType ) then
-		self:OnEnable()
-
-	-- Was in an arena, but left it
-	elseif( type ~= "arena" and instanceType == "arena" ) then
-		self:OnDisable()
-	end
-	
+		
 	instanceType = type
 end
 
@@ -618,7 +603,6 @@ function Afflicted:AbilityEnded(id, spellName, target, suppress, isFade)
 	if( not suppress and self.db.profile.announce[type] ) then
 		if( type == "buff" ) then
 			self:SendMessage(string.format(L["FADED %s (%s)"], spellName, target), "timer")
-
 		elseif( target ) then
 			self:SendMessage(string.format(L["READY %s (%s)"], spellName, target), "timer")
 		else

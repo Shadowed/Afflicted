@@ -79,6 +79,8 @@ AfflictedLocals = {
 	["Save"] = "Save",
 	["Update"] = "Update",
 	
+	["Always On"] = "Always On",
+	
 	["You may only enter a number or a float into this, \"%s\" is invalid."] = "You may only enter a number or a float into this, \"%s\" is invalid.",
 	
 	["The spell \"%s\" already exists, you cannot have multiple spells with the same name."] = "The spell \"%s\" already exists, you cannot have multiple spells with the same name.",
@@ -117,8 +119,15 @@ AfflictedLocals = {
 	["Disable spell"] = "Disable spell",
 	["When disabled, you won't see any timers fired from this."] = "When disabled, you won't see any timers fired from this.",
 	
-	["Only enable inside arenas"] = "Only enable inside arenas",
-	["No timers, interrupt or removal alerts will be shown outside of arenas."] = "No timers, interrupt or removal alerts will be shown outside of arenas.",
+	["Only enable inside"] = "Only enable inside",
+
+	["Only enable Afflicted inside the specified areas."] = "Only enable Afflicted inside the specified areas.",
+
+	["Everywhere else"] = "Everywhere else",
+	["Arenas"] = "Arenas",
+	["Battlegrounds"] = "Battlegrounds",
+	["Raid Instances"] = "Raid Instances",
+	["Party Instances"] = "Party Instances",
 	
 	["Show interrupt alerts"] = "Show interrupt alerts",
 	["Shows player name, and the spell you interrupted to chat."] = "Shows player name, and the spell you interrupted to chat.",
