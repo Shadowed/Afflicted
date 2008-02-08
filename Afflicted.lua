@@ -96,7 +96,6 @@ end
 function Afflicted:OnEnable()
 	local type = select(2, IsInInstance())
 	if( not self.db.profile.inside[type] ) then
-		ChatFrame1:AddMessage("OnEnable: Disabled, " .. tostring(type) .. ".")
 		return
 	end
 	

@@ -138,7 +138,7 @@ function Config:AddSpellModifier()
 			if( type(data) == "table" and string.lower(name) == string.lower(spellName) ) then
 				Afflicted:Print(string.format(L["The spell \"%s\" already exists, you cannot have multiple spells with the same name."], spellName))
 				return
-		/	end
+			end
 		end
 	end
 
