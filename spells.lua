@@ -1,170 +1,158 @@
---[[
-	["CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF"] = {
-		"366055.734:Drama casts Windfury Totem.", -- [1]
-		"366064.89:Drama casts Grounding Totem.", -- [2]
-		"366068.421:Drama begins to cast Lesser Healing Wave.", -- [3]
-		"366069.812:Drama's Lesser Healing Wave heals Drama for 1317.", -- [4]
-		"366080.281:Drama casts Tremor Totem.", -- [5]
-		"366139.968:Drama casts Tremor Totem.", -- [6]
-		"366141.328:Drama casts Flametongue Totem.", -- [7]
-		"366153.218:Drama casts Tremor Totem.", -- [8]
-	},
-
-	["CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE"] = {
-		"415268.765:Frobozz casts Spellsteal on you.", -- [1]
-		"415288.406:Frobozz begins to perform Shoot.", -- [2]
-		"415307.703:Frobozz interrupts your Holy Light.", -- [3]
-	},
-
-	["CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE"] = {
-		"537968.171:Deusmortis's Pummel crits Gulem for 59.", -- [1]
-		"538426.187:Thenoose's Pummel crits you for 52.", -- [2]
-		"538979.156:Akelda's Pummel hits you for 40.", -- [3]
-		"538994.609:Akelda's Pummel hits you for 41.", -- [4]
-		"539005.093:Akelda's Pummel was dodged.", -- [5]
-		"539016.046:Akelda's Pummel crits you for 77.", -- [6]
-	},
-]]
-
 local L = AfflictedLocals
 AfflictedSpells = { 
 	-- Shields
 	[L["Divine Shield"]] = {
-		id = "divineshield",
 		seconds = 12,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Holy_DivineIntervention",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
 	},
 	
 	[L["Ice Block"]] = {
-		id = "iceblock",
 		seconds = 10,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Frost_Frost",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
+	},
+	
+	["Intercept Stun"] = {
+		seconds = 15,
+		singleLimit = 0.5,
+		showIn = "buff",
+		linkedTo = "",
 	},
 	
 	-- Buffs
 	[L["Blessing of Protection"]] = {
-		id = "blassingofprot",
 		seconds = 10,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Holy_SealOfProtection",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
 	},
 	
 	[L["Blessing of Freedom"]] = {
-		id = "blessingofreedom",
 		seconds = 14,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Holy_SealOfValor",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
 	},
 	
 	[L["Blessing of Sacrifice"]] = {
-		id = "blessingofsac",
 		seconds = 30,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Holy_SealOfSacrifice",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
 	},
 
 	[L["Pain Suppression"]] = {
-		id = "painsuppression",
 		seconds = 8,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Holy_PainSupression",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
 	},
 	
 	-- Abilities
 	[L["Cloak of Shadows"]] ={
-		id = "cloakofshadows",
 		seconds = 5,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Shadow_NetherCloak",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
 	},
 	
 	[L["Spell Reflection"]] ={
-		id = "spellreflection",
 		seconds = 5,
-		limit = 0,
-		icon = "Interface\\Icons\\Ability_Warrior_ShieldReflection",
-		type = "buff",
+		singleLimit = 0,
+		showIn = "buff",
+		linkedTo = "",
 	},
 	
 	-- Silences
 	[L["Silencing Shot"]] = {
-		id = "silencingshot",
 		seconds = 20,
-		limit = 0,
-		icon = "Interface\\Icons\\INV_Spear_08",
-		type = "spell",
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = "",
 	},
 
 	[L["Silence"]] = {
-		id = "silence",
 		seconds = 45,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Shadow_ImpPhaseShift",
+		singleLimit = 0,
 		type = "debuff",
+		showIn = "spell",
+		linkedTo = "",
 	},
 
 	[L["Feral Charge"]] = {
-		id = "feralcharge",
 		seconds = 15,
-		limit = 0,
-		icon = "Interface\\Icons\\Ability_Hunter_Pet_Bear",
-		type = "debuff",
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = "",
 	},
 
 	[L["Spell Lock"]] = {
-		id = "spelllock",
 		seconds = 24,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Shadow_MindRot",
-		type = "debuff",
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = "",
 	},
 	
-	[L["Counterspell - Silenced"]] = {
-		id = "impcounterspell",
+	[L["Counterspell"]] = {
 		seconds = 24,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Frost_IceShock",
-		type = "debuff",
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = "",
+	},
+
+	[L["Counterspell - Silenced"]] ={
+		seconds = 24,
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = L["Counterspell"],
 	},
 
 	[L["Kick"]] = {
-		id = "kick",
 		seconds = 10,
-		limit = 0,
-		icon = "Interface\\Icons\\Ability_Kick",
-		type = "spell",
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = "",
 	},
 
 	[L["Pummel"]] = {
-		id = "pummel",
 		seconds = 10,
-		limit = 0,
-		icon = "Interface\\Icons\\INV_Gauntlets_04",
-		type = "spell",
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = "",
 	},
 
 	[L["Shield Bash"]] = {
-		id = "shieldbash",
 		seconds = 12,
-		limit = 0,
-		icon = "Interface\\Icons\\Ability_Warrior_ShieldBash",
-		type = "spell",
+		singleLimit = 0,
+		showIn = "spell",
+		--linkedTo = L["Pummel"],
+		linkedTo = "",
+	},
+	
+	-- Shocks
+	[L["Flame Shock"]] = {
+		seconds = 5,
+		singleLimit = 0,
+		showIn = "spell",
+		--linkedTo = L["Earth Shock"],
+		linkedTo = "",
+	},
+	
+	[L["Frost Shock"]] = {
+		seconds = 5,
+		singleLimit = 0,
+		showIn = "spell",
+		--linkedTo = L["Earth Shock"],
+		linkedTo = "",
 	},
 	
 	[L["Earth Shock"]] = {
-		id = "earthshock",
 		seconds = 5,
-		limit = 0,
-		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
-		type = "spell",
+		singleLimit = 0,
+		showIn = "spell",
+		linkedTo = "",
 	},
 }

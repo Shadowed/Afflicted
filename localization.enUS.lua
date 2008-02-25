@@ -1,20 +1,19 @@
 AfflictedLocals = {
+	["Interrupted %s's %s (%s)"] = "Interrupted %s's %s (%s)",
+	["FAILED %s's %s"] = "FAILED %s's %s",
+	["Removed %s's %s"] = "Removed %s's %s",
+	
 	["GAINED %s (%s)"] = "GAINED %s (%s)",
+	["USED %s (%s)"] = "USED %s (%s)",
 	["FADED %s (%s)"] = "FADED %s (%s)",
-
-	["USED %s"] = "USED %s",
-	["USED %s (%s)"] = "USED %s (%s)",	
-	["READY %s"] = "READY %s",
 	["READY %s (%s)"] = "READY %s (%s)",
-
-	["Interrupted %s's %s."] = "Interrupted %s's %s.",
-	["Removed %s's %s."] = "Removed %s's %s.",
-	["FAILED %s's %s."] = "FAILED %s's %s.",
+	
+	["??"] = "??",
 	
 	-- Frame types
-	["buff"] = "B",
-	["spell"] = "S",
-	
+	["Spells"] = "Spells",
+	["Buffs"] = "Buffs",
+
 	-- Spell names
 	["Divine Shield"] = "Divine Shield",
 	["Ice Block"] = "Ice Block",
@@ -26,28 +25,17 @@ AfflictedLocals = {
 	["Cloak of Shadows"] = "Cloak of Shadows",
 	["Spell Reflection"] = "Spell Reflection",
 	["Spell Lock"] = "Spell Lock",
-	["Counterspell - Silenced"] = "Counterspell - Silenced",
 	["Counterspell"] = "Counterspell",
 	["Shield Bash"] = "Shield Bash",
 	["Silence"] = "Silence",
+	["Counterspell - Silenced"] = "Counterspell - Silenced",
 	["Earth Shock"] = "Earth Shock",
+	["Flame Shock"] = "Flame Shock",
+	["Frost Shock"] = "Frost Shock",
 	["Pummel"] = "Pummel",
 	["Kick"] = "Kick",
 	["Pain Suppression"] = "Pain Suppression",
-	
-	-- Simplified localization for damaging abilities
-	["(.+)'s (.+) was"] = "(.+)'s (.+) was",
-	["(.+)'s (.+) is"] = "(.+)'s (.+) is",
-	["(.+)'s (.+) crit"] = "(.+)'s (.+) crit",
-	["(.+)'s (.+) hit"] = "(.+)'s (.+) hit",
-	["(.+)'s (.+) miss"] = "(.+)'s (.+) miss",
-	
-	-- Slash command
-	["Afflicted slash commands"] = "Afflicted slash commands",
-	["- test - Show 5 buff and 5 silence/interrupt test timers."] = "- test - Show 5 buff and 5 silence/interrupt test timers.",
-	["- ui - Opens the OptionHouse configuration for Afflicted."] = "- ui - Opens the OptionHouse configuration for Afflicted.",
-	["- clear - Clears all running timers."] = "- clear - Clears all running timers.",
-	
+
 	-- GUI
 	["General"] = "General",
 	["Timers"] = "Timers",
@@ -57,8 +45,9 @@ AfflictedLocals = {
 	["Yes"] = "Yes",
 	["Edit"] = "Edit",
 	["Afflicted: %s%s%s"] = "Afflicted: %s%s%s",
-	["Cooldown: %s%d%s"] = "Cooldown: %s%d%s",
+	["Timer: %s%d%s"] = "Timer: %s%d%s",
 	["Type: %s%s%s"] = "Type: %s%s%s",
+	["Anchor: %s%s%s"] = "Anchor: %s%s%s",
 
 	["Buff"] = "Buff",
 	["Delete"] = "Delete",
@@ -80,6 +69,8 @@ AfflictedLocals = {
 	["Update"] = "Update",
 	
 	["Always On"] = "Always On",
+	["Anchor to show this timer inside, remember if the anchor is disabled this spell won't be tracked."] = "Anchor to show this timer inside, remember if the anchor is disabled this spell won't be tracked.",
+	["Show in"] = "Show in",
 	
 	["You may only enter a number or a float into this, \"%s\" is invalid."] = "You may only enter a number or a float into this, \"%s\" is invalid.",
 	
@@ -89,18 +80,23 @@ AfflictedLocals = {
 	["Spell Name"] = "Spell Name",
 	["This is the exact debuff, or spell name. If it's a debuff then it's the exact debuff name, if it's a spell it needs to be the exact spell that shows up in combat log."] = "This is the exact debuff, or spell name. If it's a debuff then it's the exact debuff name, if it's a spell it needs to be the exact spell that shows up in combat log.",
 
-	["Output color"] = "Output color",
-	["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."] = "Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\".",
+	["Anchor List"] = "Anchor List",
 	
-	["Show buff timers"] = "Show buff timers",
-	["Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade."] = "Show timers on buffs like Divine Shield, Ice Block, Blessing of Protection and so on, for how long until they fade.",
+	["The anchor \"%s\" already exists, you cannot have multiple anchors with the same id."] = "The anchor \"%s\" already exists, you cannot have multiple anchors with the same id.",
+	["You must enter an anchor name."] = "The must enter an anchor name.",
+	["Name of the anchor, this must be unique."] = "Name of the anchor, this must be unique.",
+	["Anchor Name"] = "Anchor Name",
 	
-	["Show silence and interrupt timers"] = "Show silence and interrupt timers",
-	["Show timers on silence and interrupt spells like Spell Lock or Silencing Shot, for how long until they're ready again."] = "Show timers on silence and interrupt spells like Spell Lock or Silencing Shot, for how long until they're ready again.",
+	["Grow Up: %s%s%s"] = "Grow Up: %s%s%s",
+	["Announce: %s%s%s"] = "Announce: %s%s%s",
+	["Dest: %s"] = "Dest: %s",
 	
 	["ALT + Drag the anchors to move the frames."] = "ALT + Drag the anchors to move the frames.",
 	["Show timers anchor"] = "Show timers anchor",
 	
+	["Check debuffs for spell"] = "Check debuffs for spell",
+	["Enables checking of debuffs enemies put onto people in our group for triggering this timer."] = "Enables checking of debuffs enemies put onto people in our group for triggering this timer.",
+
 	["Timer type"] = "Timer type",
 	["\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge."] = "\"Buff\" - Buffs like Ice Block or Divine Shield.\n\"Spells\" - Spells like Kick, Pummel, Earth Shock.\n\"Debuff\" - Debuffs like Priests Silence, or Feral Charge.",
 	
@@ -114,7 +110,7 @@ AfflictedLocals = {
 	["Cooldown/duration"] = "Cooldown/duration",
 	["Timer to show when this spell is triggered."] = "Timer to show when this spell is triggered.",
 	["Icon path"] = "Icon path",
-	["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\"."] = "Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\".",
+	["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\".\nThis will automatically be set using the in-game spell icon, so it's not required. But you can override it if you wish."] = "Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\".\nThis will automatically be set using the in-game spell icon, so it's not required. But you can override it if you wish.",
 	
 	["Disable spell"] = "Disable spell",
 	["When disabled, you won't see any timers fired from this."] = "When disabled, you won't see any timers fired from this.",
@@ -138,11 +134,42 @@ AfflictedLocals = {
 	["Show spell removal alerts"] = "Show spell removal alerts",
 	["Shows spells that you remove from enemies to chat, or failed attempts at removing something."] = "Shows spells that you remove from enemies to chat, or failed attempts at removing something.",
 	
+	["Causes timers to be added from bottom -> top order, instead of the current top -> bottom."] = "Causes timers to be added from bottom -> top order, instead of the current top -> bottom.",
+	
+	["Enable anchor"] = "Enable anchor",
+	["Enables this anchor allowing timers to show up inside it, while it's disabled any timers associated with it won't be seen."] = "Enables this anchor allowing timers to show up inside it, while it's disabled any timers associated with it won't be seen.",
+	
+	["Enable announcements"] = "Enable announcements",
+	["Enables sending abilities used/ready/faded information to the specified channel."] = "Enables sending abilities used/ready/faded information to the specified channel.",
+	
+	["Per-player trigger limit (seconds)"] = "Per-player trigger limit (seconds)",
+	["Global trigger limit (seconds)"] = "Global trigger limit (seconds)",
+	
+	["Announce color"] = "Announce color",
+	["Anchor text"] = "Anchor text",
+	["Identifier to show inside the anchors when they're enabled."] = "Identifier to show inside the anchors when they're enabled.",
+	["Announce channel"] = "Announce channel",
+	["Channel to send abilities announcements to."] = "Channel to send abilities announcements to.",
 	["Scale: %d%%"] = "Scale: %d%%",
 	
 	["Limit: %s%d%s"] = "Limit: %s%d%s",
+	["Disabled"] = "Disabled",
 	["Frame"] = "Frame",
 	["Test Timer"] = "Test Timer",
+	
+	["Shows the spell icon when the alert is sent to a local channel like middle of screen, or a chat frame."] = "Shows the spell icon when the alert is sent to a local channel like middle of screen, or a chat frame.",
+	["Show icons in local alerts"] = "Show icons in local alerts",
+	
+	["Enable alerts when you dispel a player while Afflicted is enabled."] = "Enable alerts when you dispel a player while Afflicted is enabled.",
+	["Interrupt Alerts"] = "Interrupt Alerts",
+	["Enable interrupt alerts"] = "Enable interrupt alerts",
+	
+	["Enable alerts when you interrupt an enemies player spell."] = "Enable alerts when you interrupt an enemies player spell.",
+	
+	["Enable dispel alerts"] = "Enable dispel alerts",
+	["Dispel Alerts"] = "Dispel Alerts",
+	["Show hostile dispels"] = "Show hostile dispels",
+	["Displays alerts when you dispel hostile players as well, instead of just friendly players."] = "Displays alerts when you dispel hostile players as well, instead of just friendly players.",
 	
 	["Trigger limit (seconds)"] = "Trigger limit (seconds)",
 	["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."] = "Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once.",
@@ -151,8 +178,14 @@ AfflictedLocals = {
 	["Announces when the selected types of abilities are used, and are over."] = "Announces when the selected types of abilities are used, and are over.",
 	["Interrupts & Silences"] = "Interrupts & Silences",
 	["Buffs"] = "Buffs",
+	["Grow up"] = "Grow up",
+	["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."] = "Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\".",
 	
 	["Grow Up"] = "Grow Up",
 	["Timers that should grow up instead of down."] = "Timers that should grow up instead of down.",
 	["Icons"] = "Icons",
+	
+	["Linked spell"] = "Linked spell",
+	["The parent spell, for example. \"Counterspell - Silence\" should be linked to \"Counterspell\" so that way if a timer is started for Counterspell, another won't be done for \"Counterspell - Silence\" if their on the same target."] = "The parent spell, for example. \"Counterspell - Silence\" should be linked to \"Counterspell\" so that way if a timer is started for Counterspell, another won't be done for \"Counterspell - Silence\" if their on the same target.",
+	["None"] = "None",
 }

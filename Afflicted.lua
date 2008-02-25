@@ -2,42 +2,57 @@ Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
 
 local L = AfflictedLocals
 
-local selfFailDispel, selfSuccessDispel, selfInterruptOther, selfGetAfflicted, selfSpellRemoved, friendlyGetAfflicted, friendlyResistSpell, selfResistSpell, enemyGainBuff, enemyLoseBuff
-local selfInterrupted, friendlyInterrupted
-
 local instanceType
 local playerName
 
-local blockSpells = {}
-local anchors = {["spell"] = "spell", ["buff"] = "buff", ["debuff"] = "spell"}
+local playerLimit = {}
+local globalLimit = {}
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
+local TRIGGER_LIMIT = 1
 
 function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
-			buff = true,
-			spell = true,
-			anchor = true,
-			scale = 1.0,
-			showPurge = false,
-			showInterrupt = false,
-			alertOutput = 1,
-			timerOutput = 1,
-			alertColor = { r = 1.0, g = 0.0, b = 0.0 },
-			timerColor = { r = 1.0, g = 0.0, b = 0.0 },
-			announce = { buff = true, spell = true, },
-			growup = { buff = false, spell = false, },
-			positions = {},
+			showAnchors = true,
+			showIcon = true,
+			dispelEnabled = true,
+			dispelHostile = true,
+			dispelDest = "1",
+			dispelColor = { r = 1, g = 1, b = 1 },
+			interruptEnabled = true,
+			interruptDest = "rwframe",
+			interruptColor = { r = 1, g = 1, b = 1 },
+			anchors = {
+				["spell"] = {
+					enabled = true,
+					announce = true,
+					growUp = false,
+					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
+					announceDest = "1",
+					scale = 1.0,
+					abbrev = "S",
+					text = L["Spells"],
+				},
+				["buff"] = {
+					enabled = true,
+					announce = true,
+					growUp = false,
+					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
+					announceDest = "1",
+					scale = 1.0,
+					abbrev = "B",
+					text = L["Buffs"],
+				},
+			},
 			spells = {},
-			inside = {["arena"] = true},
+			inside = {["arena"] = true, ["pvp"] = true},
 			spellDefault = {
 				seconds = 0,
-				limit = 0,
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
-				afflicted = false,
-				type = "spell",
+				showIn = "spell",
+				linekdTo = "",
 			},
 		},
 	}
@@ -48,36 +63,45 @@ function Afflicted:OnInitialize()
 	playerName = UnitName("player")
 		
 	-- Create display frames!
-	self.anchors = anchors
-	for _, key in pairs(anchors) do
+	for key in pairs(self.db.profile.anchors) do
 		if( not self[key] ) then
 			self[key] = self:CreateDisplay(key)
 		end
 	end
+	
+	-- Upgrade
+	if( self.db.profile.version ~= self.revision ) then
+		for name, data in pairs(self.db.profile.spells) do
+			if( not data.showIn ) then
+				data.singleLimit = data.limit or 0
+				data.globalLimit = 0
+				
+				if( data.type == "spell" or data.type == "buff" ) then
+					data.showIn = data.type
+				elseif( data.type == "debuff" ) then
+					data.checkDebuff = true
+					data.showIn = "spell"
+				else
+					data.showIn = "spell"
+				end
+				
+				data.limit = nil
+				data.type = nil
+			end
 
-	-- Parse combat log messages for matching
-	selfInterruptOther = self:Format(SPELLINTERRUPTSELFOTHER)
-	selfGetAfflicted = self:Format(AURAADDEDSELFHARMFUL)
-	selfResistSpell = self:Format(SPELLRESISTOTHERSELF)
-	selfFailDispel = self:Format(DISPELFAILEDSELFOTHER)
-	selfSuccessDispel = self:Format(AURADISPELOTHER3)
-	selfSpellRemoved = self:Format(AURADISPELSELF3)
-	selfInterrupted = self:Format(SPELLINTERRUPTOTHERSELF)
+			data.linkedTo = data.linkedTo or ""
+		end
+	end
 	
-	friendlyInterrupted = self:Format(SPELLINTERRUPTOTHEROTHER)
-	friendlyGetAfflicted = self:Format(AURAADDEDOTHERHARMFUL)
-	friendlyResistSpell = self:Format(SPELLRESISTOTHEROTHER)
-	
-	enemyGainBuff = self:Format(AURAADDEDOTHERHELPFUL)
-	enemyLoseBuff = self:Format(AURAREMOVEDOTHER)
-	
+	self.db.profile.version = self.revision
+
 	-- Update the spell list with the default and manual
 	self:UpdateSpellList()
 
 	-- Monitor for zone change
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
-
+	
 	-- Quick check
 	self:ZONE_CHANGED_NEW_AREA()
 
@@ -98,32 +122,8 @@ function Afflicted:OnEnable()
 	if( not self.db.profile.inside[type] ) then
 		return
 	end
-	
-	-- We interrupted a spell of theirs
-	if( self.db.profile.showInterrupt ) then
-		self:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
-	end
-
-	-- Spells we removed
-	if( self.db.profile.showPurge ) then
-		self:RegisterEvent("CHAT_MSG_SPELL_SELF_BUFF")
-		self:RegisterEvent("CHAT_MSG_SPELL_BREAK_AURA")
-	end
-	
-	-- Interrupts used, or resisted
-	if( self.db.profile.spell ) then
-		self:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE")
-		self:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE")
-		self:RegisterEvent("CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE")
-		self:RegisterEvent("CHAT_MSG_SPELL_BREAK_AURA")
-	end
-
-	-- Buff fade/gains
-	if( self.db.profile.buff ) then
-		self:RegisterEvent("CHAT_MSG_SPELL_AURA_GONE_OTHER")
-		self:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS", "CHECK_BUFF_GAINS")
-		self:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_CREATURE_BUFFS", "CHECK_BUFF_GAINS")
-	end
+		
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
 function Afflicted:OnDisable()
@@ -143,28 +143,29 @@ function Afflicted:Reload()
 	end
 	
 	-- Update anchors and icons inside
-	for key in pairs(anchors) do
-		if( self[key] ) then
+	for key, data in pairs(self.db.profile.anchors) do
+		local frame = self[key]
+		if( frame ) then
 			-- Update frame scale
-			self[key]:SetScale(self.db.profile.scale)
+			frame:SetScale(data.scale)
 
 			-- Update icon scale
-			for _, frame in pairs(self[key].active) do
-				frame:SetScale(self.db.profile.scale)
+			for _, frame in pairs(frame.active) do
+				frame:SetScale(data.scale)
 			end
 
-			for _, frame in pairs(self[key].inactive) do
-				frame:SetScale(self.db.profile.scale)
+			for _, frame in pairs(frame.inactive) do
+				frame:SetScale(data.scale)
 			end
 
 			-- Update anchor visibility
-			self:UpdateAnchor(self[key])
+			self:UpdateAnchor(frame)
 
 			-- Annnd make sure it's shown or hidden
-			if( self.db.profile.anchor ) then
-				self[key]:Hide()
-			elseif( #(self[key].active) == 0 ) then
-				self[key]:Hide()
+			if( self.db.profile.showAnchors ) then
+				frame:Hide()
+			elseif( #(frame.active) == 0 ) then
+				frame:Hide()
 			end
 		end
 	end
@@ -173,9 +174,81 @@ function Afflicted:Reload()
 	self:UpdateSpellList()
 end
 
+local GROUP_AFFILIATION = bit.bor(COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_TYPE_PLAYER, COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID)
+
+--[31:58] <Elsia> i.e. something like if band(flags,hostile) == hostile and band(flags,npc+object)==0 then
+-- Need to clean this up a bit
+function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, ...)			
+	local isDestEnemy = (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
+	local isDestGroup = (bit.band(destFlags, GROUP_AFFILIATION) > 0)
+	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
+	local isSourceGroup = (bit.band(sourceFlags, GROUP_AFFILIATION) > 0)
+		
+	-- Buff gained on an enemy, or a debuff gained from an enemy from someone in our group
+	if( eventType == "SPELL_AURA_APPLIED" ) then
+		local spellID, spellName, spellSchool, auraType = ...
+		
+		-- Group member gained a debuff
+		if( auraType == "DEBUFF" and isDestGroup ) then
+			self:ProcessAbility(eventType .. auraType, spellID, spellName, spellSchool, destGUID, "", destGUID, destName)
+			
+		-- Enemy gained a buff
+		elseif( auraType == "BUFF" and isDestEnemy ) then
+			self:ProcessAbility(eventType .. auraType, spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
+		end
+	
+	-- Buff faded from an enemy
+	elseif( eventType == "SPELL_AURA_REMOVED" ) then
+		local spellID, spellName, spellSchool, auraType = ...
+		if( auraType == "BUFF" and isDestEnemy ) then
+			self:AbilityEnded(eventType, spellId, spellName, destGUID, destName)
+		end
+	
+	-- We got interrupted, or we interrupted someone else
+	elseif( eventType == "SPELL_INTERRUPT" ) then
+		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool = ...
+	
+		-- We interrupted an enemy
+		if( isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
+			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, spellName, spellSchool), self.db.profile.interruptDest, self.db.profile.interruptColor, spellID)
+		
+		-- Someone in our group was interrupted
+		elseif( isSourceEnemy and isDestGroup ) then
+			self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
+		end
+
+	-- Basically we can lump all of these into the same category, spell used/drained/leech/missed
+	elseif( eventType == "SPELL_MISSED" or eventType == "SPELL_DAMAGE" or eventType == "SPELL_DRAIN" or eventType == "SPELL_LEECH" ) then
+		local spellID, spellName, spellSchool = ...
+		if( isSourceEnemy and isDestGroup ) then
+			self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
+		end
+		
+	-- We tried to dispel a buff, and failed
+	elseif( eventType == "SPELL_DISPEL_FAILED" or eventType == "SPELL_PERIODIC_DISPEL_FAILED" ) then
+		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
+		
+		if( not isDestEnemy or ( isDestEnemy and not self.db.profile.dispelHostile ) ) then
+			if( bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
+				self:SendMessage(string.format(L["FAILED %s's %s"], self:StripServer(destName), extraSpellName, spellName), self.db.profile.dispelDest, self.db.profile.dispelColor, extraSpellID)
+			end
+		end
+	
+	-- Managed to dispel or steal a buff
+	elseif( eventType == "SPELL_AURA_DISPELLED" or eventType == "SPELL_AURA_STOLEN" ) then
+		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
+		
+		if( not isDestEnemy or ( isDestEnemy and not self.db.profile.dispelHostile ) ) then
+			if( bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
+				self:SendMessage(string.format(L["Removed %s's %s"], self:StripServer(destName), extraSpellName, spellName), self.db.profile.dispelDest, self.db.profile.dispelColor, extraSpellID)
+			end
+		end
+	end
+end
+
 -- Update anchor visibility
 function Afflicted:UpdateAnchor(frame)
-	if( self.db.profile.anchor ) then
+	if( self.db.profile.showAnchors ) then
 		frame:EnableMouse(true)
 		frame:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
 		frame:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
@@ -202,14 +275,13 @@ function Afflicted:UpdateSpellList()
 	end
 end
 
--- Process events
--- Check if we're in an arena
+-- See if we should enable Afflicted in this zone
 function Afflicted:ZONE_CHANGED_NEW_AREA()
 	local type = select(2, IsInInstance())
 
 	if( type ~= instanceType ) then
 		-- Clear anchors because we changed zones
-		for key in pairs(anchors) do
+		for key in pairs(self.db.profile.anchors) do
 			if( self[key] ) then
 				self:ClearTimers(self[key])
 			end
@@ -226,140 +298,26 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 	instanceType = type
 end
 
-function Afflicted:CHAT_MSG_SPELL_SELF_DAMAGE(event, msg)
-	local target, spell = string.match(msg, selfInterruptOther)
-	if( spell and target ) then
-		self:SendMessage(string.format(L["Interrupted %s's %s."], target, spell), "alert")
-	end
-end
-
-function Afflicted:CHAT_MSG_SPELL_SELF_BUFF(event, msg)
-	local target, spell = string.match(msg, selfFailDispel)
-	if( spell and target ) then
-		self:SendMessage(string.format(L["FAILED %s's %s."], target, spell), "alert")
-	end
-end
-
-function Afflicted:CHAT_MSG_SPELL_BREAK_AURA(event, msg)
-	if( self.db.profile.spell ) then
-		local removed, caster, spell = string.match(msg, selfSpellRemoved)
-		if( removed and caster and spell ) then
-			self:ProcessAbility(spell, caster)
-			return
-		end
-	end
-
-	if( self.db.profile.showPurge ) then
-		local target, spell, caster = string.match(msg, selfSuccessDispel)
-		if( caster == playerName ) then
-			self:SendMessage(string.format(L["Removed %s's %s."], target, spell), "alert")
-		end
-	end
-end
-
-function Afflicted:CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE(event, msg)
-	-- Friendly player resisted a spell
-	local _, spell, target = string.match(msg, friendlyResistSpell)
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-		return
-	end
-
-	-- We resisted a spell
-	local spell, target = string.match(msg, selfResistSpell)
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-		return
-	end
-	
-	-- Dodged/Parried/Blocked an ability
-	local target, spell = string.match(msg, L["(.+)'s (.+) was"])
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-		return
-	end
-	
-	-- Hit
-	local target, spell = string.match(msg, L["(.+)'s (.+) hit"])
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-		return
-	end
-	
-	-- Crit
-	local target, spell = string.match(msg, L["(.+)'s (.+) crit"])
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-		return
-	end
-	
-	-- Absorbed
-	local target, spell = string.match(msg, L["(.+)'s (.+) is"])
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-		return
-	end
-	
-	-- Missed
-	local target, spell = string.match(msg, L["(.+)'s (.+) miss"])
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-		return
-	end
-end
-
-function Afflicted:CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE(event, msg)
-	-- Player afflicted by a spell
-	local spell = string.match(msg, selfGetAfflicted)
-	if( spell and self.spellList[spell] and self.spellList[spell].type == "debuff" ) then
-		self:ProcessAbility(spell)
-	end
-end
-
-function Afflicted:CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE(event, msg)
-	-- Friendly player afflicted
-	local target, spell = string.match(msg, friendlyGetAfflicted)
-	if( spell and self.spellList[spell] and self.spellList[spell].type == "debuff" ) then
-		self:ProcessAbility(spell)
-	end
-end
-
-function Afflicted:CHECK_BUFF_GAINS(event, msg)
-	-- Enemy player, OR pet gained a buff
-	local target, spell = string.match(msg, enemyGainBuff)
-	if( spell and target ) then
-		self:ProcessAbility(spell, target)
-	end
-end
-
-function Afflicted:CHAT_MSG_SPELL_AURA_GONE_OTHER(event, msg)
-	-- Enemy lost a buff
-	local spell, target = string.match(msg, enemyLoseBuff)
-	if( spell and target ) then
-		self:AbilityEnded(nil, spell, target, nil, true)
-	end
-end
-
 -- Dragging functions
-local function onDragStart(self)
+local function OnDragStart(self)
 	if( IsAltKeyDown() ) then
 		self.isMoving = true
 		self:StartMoving()
 	end
 end
 
-local function onDragStop(self)
+local function OnDragStop(self)
 	if( self.isMoving ) then
 		self.isMoving = nil
 		self:StopMovingOrSizing()
 		
-		local db = Afflicted.db.profile
-		if( not db.positions[self.type] ) then
-			db.positions[self.type] = {}
+		if( not Afflicted.db.profile.anchors[self.type].position ) then
+			Afflicted.db.profile.anchors[self.type].position = { x = 0, y = 0 }
 		end
 		
-		db.positions[self.type].x = self:GetLeft()
-		db.positions[self.type].y = self:GetTop()
+		local scale = self:GetEffectiveScale()
+		Afflicted.db.profile.anchors[self.type].position.x = self:GetLeft() * scale
+		Afflicted.db.profile.anchors[self.type].position.y = self:GetTop() * scale
 	end
 end
 
@@ -379,12 +337,12 @@ function Afflicted:CreateDisplay(type)
 	frame:EnableMouse(true)
 	frame:SetClampedToScreen(true)
 	frame:RegisterForDrag("LeftButton")
-	frame:SetScale(self.db.profile.scale)
+	frame:SetScale(self.db.profile.anchors[type].scale)
 	frame:SetBackdrop(backdrop)
 	frame:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
 	frame:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
-	frame:SetScript("OnDragStart", onDragStart)
-	frame:SetScript("OnDragStop", onDragStop)
+	frame:SetScript("OnDragStart", OnDragStart)
+	frame:SetScript("OnDragStop", OnDragStop)
 	frame:Hide()
 	
 	frame.active = {}
@@ -395,12 +353,14 @@ function Afflicted:CreateDisplay(type)
 	frame.text = frame:CreateFontString(nil, "OVERLAY")
 	frame.text:SetPoint("CENTER", frame)
 	frame.text:SetFontObject(GameFontHighlight)
-	frame.text:SetText(L[type] or "?")
+	frame.text:SetText(self.db.profile.anchors[type].abbrev)
 	
 	self:UpdateAnchor(frame)
-
-	if( self.db.profile.positions[type] ) then
-		frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.positions[type].x, self.db.profile.positions[type].y)
+	
+	if( self.db.profile.anchors[type].position ) then
+		local scale = frame:GetEffectiveScale()
+		frame:ClearAllPoints()
+		frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.anchors[type].position.x / scale, self.db.profile.anchors[type].position.y / scale)
 	else
 		frame:SetPoint("CENTER", UIParent, "CENTER")
 	end
@@ -415,7 +375,7 @@ local function onUpdate(self, elapsed)
 	self.lastUpdate = time
 	
 	if( self.timeLeft <= 0 ) then
-		Afflicted:AbilityEnded(self.id, self.spellName, self.target, self.suppress)
+		Afflicted:AbilityEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName, true)
 		return
 	end
 	
@@ -432,7 +392,7 @@ function Afflicted:CreateRow(parent)
 	frame:SetWidth(50)
 	frame:SetHeight(ICON_SIZE)
 	frame:SetScript("OnUpdate", onUpdate)
-	frame:SetScale(self.db.profile.scale)
+	frame:SetScale(parent:GetScale())
 	frame:SetClampedToScreen(true)
 	frame:Hide()
 	
@@ -450,9 +410,15 @@ end
 
 -- Reposition the passed frames timers
 function Afflicted:RepositionTimers(parent)
+	if( self.db.profile.anchors[parent.type].position ) then
+		local scale = parent:GetEffectiveScale()
+		parent:ClearAllPoints()
+		parent:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.anchors[parent.type].position.x / scale, self.db.profile.anchors[parent.type].position.y / scale)
+	end
+
 	-- Flip the modifier so we can change between going top -> bottom and bottom -> top
 	local mod = -1
-	if( self.db.profile.growup[parent.type] ) then
+	if( self.db.profile.anchors[parent.type].growUp ) then
 		mod = 1
 	end
 
@@ -468,7 +434,7 @@ function Afflicted:ClearTimers(parent)
 	for i=#(parent.active), 1, -1 do
 		parent.active[i]:Hide()
 		
-		blockSpells[parent.active[i].id] = nil
+		playerLimit[parent.active[i].id] = nil
 		
 		table.insert(parent.inactive, parent.active[i])
 		table.remove(parent.active, i)
@@ -482,36 +448,76 @@ local function sortTimers(a, b)
 	return a.timeLeft < b.timeLeft
 end
 
+--local lastUsed = {}
+
 -- New ability found
-function Afflicted:ProcessAbility(spellName, target, suppress)
-	-- We're not monitoring this spell
-	if( not self.spellList[spellName] or (self.spellList[spellName] and self.spellList[spellName].disabled) ) then
+function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
+	local spellData = self.spellList[spellID] or self.spellList[spellName]
+	
+	-- Check if we're monitoring this spell
+	if( not spellData or spellData.disabled or ( eventType == "SPELL_AURA_APPLIEDDEBUFF" and not spellData.checkDebuff ) ) then
 		return
 	end
 	
-	local spellData = self.spellList[spellName]
-	local id = spellData.id .. tostring(target)
-	local type = anchors[spellData.type]
-	local parent = self[type]
-		
-	-- Unknown spell, or we don't have it enabled
-	if( not self.db.profile[type] ) then
+	local anchor = self.db.profile.anchors[spellData.showIn]
+	local anchorFrame = self[spellData.showIn]
+	
+	-- Check if this spell is enabled, and the anchors enabled
+	if( not anchor or not anchor.enabled or not anchorFrame ) then
 		return
 	end
-
-	-- Check if we need to set a trigger limit
-	if( spellData.limit and spellData.limit > 0 ) then
+	
+	--lastUsed[spellID] = lastUsed[spellID] or GetTime()
+	--ChatFrame1:AddMessage("[" .. (GetTime() - lastUsed[spellID]) .. "] " .. tostring(spellName) .. ":" .. tostring(destName))
+	--lastUsed[spellID] = GetTime()
+				
+	local id = spellID .. sourceGUID
+	local globalID = spellID .. destGUID
+		
+	-- Check if this spellID + GUID combo is at the trigger limit
+	if( spellData.singleLimit and spellData.singleLimit > 0 ) then
 		local time = GetTime()
-		if( blockSpells[id] and blockSpells[id] >= time ) then
+		if( playerLimit[id] and playerLimit[id] >= time ) then
 			return
 		end
 		
-		blockSpells[id] = time + spellData.limit
+		playerLimit[id] = time + spellData.singleLimit
+	end
+	
+	-- Now check if the spellID is at the trigger limit
+	if( spellData.globalLimit and spellData.globalLimit > 0 ) then
+		local time = GetTime()
+		if( globalLimit[globalID] and globalLimit[globalID] >= time ) then
+			return
+		end
+		
+		globalLimit[globalID] = time + spellData.globalLimit
+	end
+	
+	-- Spell interrupts generally have another component that you see after, like damage or a debuff. So don't let two timers show
+	if( eventType == "SPELL_INTERRUPT" and ( not spellData.singleLimit or spellData.singleLimit < TRIGGER_LIMIT ) ) then
+		playerLimit[id] = GetTime() + TRIGGER_LIMIT
+	end
+	
+	-- If we have to check debuffs, it means we need a global limit on the specific spellID + destGUId to prevent two timers
+	if( spellData.checkDebuff and ( not spellData.globalLimit or spellData.globalLimit < TRIGGER_LIMIT ) ) then
+		globalLimit[globalID] = GetTime() + TRIGGER_LIMIT
+	end
+	
+	-- Check if it's a linked spell
+	if( spellData.linkedTo and spellData.linkedTo ~= "" ) then
+		for i=#(anchorFrame.active), 1, -1 do
+			local row = anchorFrame.active[i]
+			if( ( row.spellName == spellData.linkedTo or row.spellID == spellData.linkedTo ) and row.destGUID == destGUID ) then
+				return
+			end
+		end
 	end
 
-	local frame = table.remove(parent.inactive, 1)
+	-- Check if we need to create a new row
+	local frame = table.remove(anchorFrame.inactive, 1)
 	if( not frame ) then
-		frame = self:CreateRow(parent)
+		frame = self:CreateRow(anchorFrame)
 	end
 	
 	-- Setup
@@ -519,143 +525,208 @@ function Afflicted:ProcessAbility(spellName, target, suppress)
 	frame.lastUpdate = GetTime()
 
 	-- Spell info
+	local icon = spellData.icon
+	--[[
+	-- Linked spell, show the icon for that instead if we can
+	if( spellData.linkedTo and self.spellList[spellData.linkedTo] ) then
+		-- Make sure we aren't using default still
+		local linkedIcon = self.spellList[spellData.linkedTo].icon
+		if( linkedIcon and not string.match(icon, "INV_Misc_QuestionMark$") ) then
+			icon = linkedIcon
+		end
+	end
+	]]
+	
+	-- If we're using the question mark still, then get the spell info ID
+	if( not icon or icon == "" or string.match(icon, "INV_Misc_QuestionMark$") ) then
+		local spellIcon = select(3, GetSpellInfo(spellID))
+		if( spellIcon ) then
+			icon = spellIcon
+			-- Store it now that we know it
+			local spellSV = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
+			
+			-- We don't have a valid SV yet, so copy it in
+			if( not spellSV ) then
+				local key = spellName
+				if( self.spellList[spellID] ) then
+					key = spellID
+				end
+				
+				self.db.profile.spells[key] = {}
+				for k, v in pairs(self.spellList[key]) do
+					self.db.profile.spells[key][k] = v
+				end
+				
+				spellSV = self.db.profile.spells[key]
+			end
+			
+			-- Store the new icon
+			if( spellSV ) then
+				spellSV.icon = icon
+			end
+		end
+	end
+	
+	-- Set it for when it fades
 	frame.id = id
+	frame.eventType = eventType
+	frame.spellID = spellID
 	frame.spellName = spellName
-	frame.target = target
-	frame.suppress = suppress
-	frame.type = type
-
-	frame.icon:SetTexture(spellData.icon)
+	frame.sourceGUID = sourceGUID
+	frame.sourceName = sourceName
+	frame.destGUID = destGUID
+	frame.icon:SetTexture(icon)
 	frame:Show()
 	
 	-- Show base frame + resort/reposition
-	parent:Show()
+	anchorFrame:Show()
 	
-	if( #(parent.active) == 0 ) then
-		self:UpdateAnchor(parent)
+	if( #(anchorFrame.active) == 0 ) then
+		self:UpdateAnchor(anchorFrame)
 	end
+	
+	-- Change this icon to active
+	table.insert(anchorFrame.active, frame)
+	table.sort(anchorFrame.active, sortTimers)
 
-	table.insert(parent.active, frame)
-	table.sort(parent.active, sortTimers)
-
-	self:RepositionTimers(parent)
+	self:RepositionTimers(anchorFrame)
 
 	-- Announce it
-	if( not suppress and self.db.profile.announce[type] ) then
-		if( type == "buff" ) then
-			self:SendMessage(string.format(L["GAINED %s (%s)"], spellName, target), "timer")
-		elseif( target ) then
-			self:SendMessage(string.format(L["USED %s (%s)"], spellName, target), "timer")
+	if( anchor.announce ) then
+		if( spellData.type == "buff" ) then
+			self:SendMessage(string.format(L["GAINED %s (%s)"], spellName, self:StripServer(sourceName)), anchor.announceDest, anchor.announceColor, spellID)
 		else
-			self:SendMessage(string.format(L["USED %s"], spellName), "timer")
+			self:SendMessage(string.format(L["USED %s (%s)"], spellName, self:StripServer(sourceName)), anchor.announceDest, anchor.announceColor, spellID)
 		end
 	end
 end
 
-function Afflicted:AbilityEnded(id, spellName, target, suppress, isFade)
-	if( not self.spellList[spellName] or (self.spellList[spellName] and self.spellList[spellName].disabled) ) then
+function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName, isTimedOut)
+	local spellData = self.spellList[spellID] or self.spellList[spellName]
+	if( not spellData ) then
 		return
 	end
 	
-	local spellData = self.spellList[spellName]
-	local type = anchors[spellData.type]
-	local parent = self[type]
+	local anchor = self.db.profile.anchors[spellData.showIn]
+	local anchorFrame = self[spellData.showIn]
 	
-	-- This means things like Shadowstep won't be removed from the timer since we
-	-- want it to keep ticking, down and not remove after the speed boost fades
-	if( spellData.dontFade and isFade ) then
+	if( not anchor or not anchorFrame or not anchor.enabled or spellData.disabled or (spellData.dontFade and not isTimedOut) ) then
 		return
 	end
-
-	id = id or (spellData.id .. tostring(target))
-	
-	-- Remove it from display
+		
 	local removed
-	for i=#(parent.active), 1, -1 do
-		if( parent.active[i].id == id and parent.active[i].type == type ) then
-			parent.active[i]:Hide()
+	for i=#(anchorFrame.active), 1, -1 do
+		local row = anchorFrame.active[i]
+		if( row.spellID == spellID and row.sourceGUID == sourceGUID ) then
+			row:Hide()
 			
-			table.insert(parent.inactive, parent.active[i])
-			table.remove(parent.active, i)
+			table.insert(anchorFrame.inactive, row)
+			table.remove(anchorFrame.active, i)
 			
-			blockSpells[id] = nil
+			-- Remove the limiter for this id, but don't do it globally
+			playerLimit[row.id] = nil
 			removed = true
 			break
 		end
 	end
 	
-	-- If we didn't remove anything, then it means we never had a timer
-	-- OR, it means the timer already ran out
+	-- Didn't remove anything, nothing to change
 	if( not removed ) then
 		return
 	end
 	
 	-- No more icons, hide the base frame
-	if( #(parent.active) == 0 ) then
-		parent:Hide()
+	if( #(anchorFrame.active) == 0 ) then
+		anchorFrame:Hide()
 	end
 	
 	-- Reposition everything
-	self:RepositionTimers(parent)
+	self:RepositionTimers(anchorFrame)
 	
 	-- Announce it
-	if( not suppress and self.db.profile.announce[type] ) then
-		if( type == "buff" ) then
-			self:SendMessage(string.format(L["FADED %s (%s)"], spellName, target), "timer")
-		elseif( target ) then
-			self:SendMessage(string.format(L["READY %s (%s)"], spellName, target), "timer")
+	if( anchor.announce ) then
+		if( spellData.type == "buff" ) then
+			self:SendMessage(string.format(L["FADED %s (%s)"], spellName, self:StripServer(sourceName)), anchor.announceDest, anchor.announceColor, spellID)
 		else
-			self:SendMessage(string.format(L["READY %s"], spellName), "timer")
+			self:SendMessage(string.format(L["READY %s (%s)"], spellName, self:StripServer(sourceName)), anchor.announceDest, anchor.announceColor, spellID)
 		end
 	end
 end
 
-function Afflicted:SendMessage(msg, var)
-	local outputVar = var .. "Output"
+-- Strips server name
+function Afflicted:StripServer(text)
+	local name, server = string.match(text, "(.-)%-(.*)$")
+	if( not name and not server ) then
+		return text
+	end
+	
+	return name
+end
 
-	-- Specific chat frame
-	if( type(self.db.profile[outputVar]) == "number" ) then
-		local frame = getglobal("ChatFrame" .. self.db.profile[outputVar])
-		if( not frame ) then
-			frame = DEFAULT_CHAT_FRAME
-		end
+-- See if we should wrap an icon stuff around this
+function Afflicted:WrapIcon(msg, dest, spellID)
+	if( not self.db.profile.showIcon or not spellID ) then
+		return msg
+	end
+	
+	-- Make sure we have a valid icon
+	local icon = select(3, GetSpellInfo(spellID))
+	if( not icon ) then
+		return msg
+	end
+	
+	-- CT or RWFrame can be bigger due to more room
+	local size = 12
+	if( dest == "ct" ) then
+		size = 18	
+	elseif( dest == "rwframe" ) then
+		size = select(2, self.alertFrame:GetFont())
+	end
 
-		frame:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
+	return string.format("|T%s:%d:%d:0:-1|t %s", icon, size, size, msg)
+end
 
+function Afflicted:SendMessage(msg, dest, color, spellID)
+	-- We're ungrouped, so redirect it to RWFrame
+	if( dest == "rw" and GetNumRaidMembers() == 0 and GetNumPartyMembers() == 0 ) then
+		dest = "rwframe"
+	-- We're grouped, in a raid and not leader or assist
+	elseif( dest == "rw" and not IsRaidLeader() and not IsRaidOfficer() and GetNumRaidMembers() > 0 ) then
+		dest = "party"
+	end
+	
+	-- Strip out any () leftover from no name being given
+	msg = string.trim(string.gsub(msg, "%(%)", ""))
+		
+	-- Chat frame
+	if( tonumber(dest) ) then
+		local frame = getglobal("ChatFrame" .. dest) or DEFAULT_CHAT_FRAME
+		frame:AddMessage("|cff33ff99Afflicted|r|cffffffff:|r " .. self:WrapIcon(msg, dest, spellID), color.r, color.g, color.b)
 	-- Raid warning announcement to raid/party
-	elseif( self.db.profile[outputVar] == "rw" ) then
+	elseif( dest == "rw" ) then
 		SendChatMessage(msg, "RAID_WARNING")
-
 	-- Raid warning frame, will not send it out to the party
-	elseif( self.db.profile[outputVar] == "rwframe" ) then
-		local color = var .. "Color"
-		self.alertFrame:AddMessage(msg, self.db.profile[color].r, self.db.profile[color].g, self.db.profile[color].b)
-
+	elseif( dest == "rwframe" ) then
+		self.alertFrame:AddMessage(self:WrapIcon(msg, dest, spellID), color.r, color.g, color.b)
 	-- Party chat
-	elseif( self.db.profile[outputVar] == "party" ) then
+	elseif( dest == "party" ) then
 		SendChatMessage(msg, "PARTY")
-	
 	-- Combat text
-	elseif( self.db.profile[outputVar] == "ct" ) then
-		self:CombatText(msg, var)
-
-	-- Default to default!
-	else
-		self:Print(msg)
+	elseif( dest == "ct" ) then
+		self:CombatText(self:WrapIcon(msg, dest, spellID), color)
 	end
 end
 
-function Afflicted:CombatText(text, var)	
-	var = var .. "Color"
-	
+function Afflicted:CombatText(text, color, spellID)	
 	-- SCT
 	if( IsAddOnLoaded("sct") ) then
-		SCT:DisplayText(text, self.db.profile[var], nil, "event", 1)
-	
+		SCT:DisplayText(text, color, nil, "event", 1)
 	-- MSBT
 	elseif( IsAddOnLoaded("MikScrollingBattleText") ) then
-		MikSBT.DisplayMessage(text, MikSBT.DISPLAYTYPE_NOTIFICATION, false, self.db.profile[var].r * 255, self.db.profile[var].g * 255, self.db.profile[var].b * 255)		
-	
+		MikSBT.DisplayMessage(text, MikSBT.DISPLAYTYPE_NOTIFICATION, false, color.r * 255, color.g * 255, color.b * 255)		
+	-- Parrot
+	elseif( IsAddOnLoaded("Parrot") ) then
+		Parrot:ShowMessage(text, nil, nil, color.r, color.g, color.b)
 	-- Blizzard Combat Text
 	elseif( IsAddOnLoaded("Blizzard_CombatText") ) then
 		-- Haven't cached the movement function yet
@@ -663,17 +734,10 @@ function Afflicted:CombatText(text, var)
 			CombatText_UpdateDisplayedMessages()
 		end
 		
-		CombatText_AddMessage(text, COMBAT_TEXT_SCROLL_FUNCTION, self.db.profile[var].r, self.db.profile[var].g, self.db.profile[var].b)
+		CombatText_AddMessage(text, COMBAT_TEXT_SCROLL_FUNCTION, color.r, color.g, color.b)
 	end
 end
 
 function Afflicted:Print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF99Afflicted|r: " .. msg)
-end
-
-function Afflicted:Format(text)
-	text = string.gsub(text, "([%^%(%)%.%[%]%*%+%-%?])", "%%%1")
-	text = string.gsub(text, "%%s", "(.+)")
-	text = string.gsub(text, "%%d", "(%-?%%d+)")
-	return text
+	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Afflicted|r: " .. msg)
 end
