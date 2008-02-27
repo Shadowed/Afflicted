@@ -65,6 +65,14 @@ function Config:OnInitialize()
 	end
 end
 
+local function updateAnchorVisibility()
+	for key in pairs(Afflicted.db.profile.anchors) do
+		if( Afflicted[key] and #(Afflicted[key].active) == 0 ) then
+			Afflicted[key]:Hide()
+		end
+	end
+end
+
 -- GUI
 function Config:Set(var, value)
 	Afflicted.db.profile[var] = value
@@ -98,14 +106,7 @@ function Config:CreateUI()
 	}
 
 	local frame = HouseAuthority:CreateConfiguration(config, {set = "Set", get = "Get", onSet = "Reload", handler = self})	
-	frame:SetScript("OnHide", function()
-		for key in pairs(Afflicted.db.profile.anchors) do
-			if( Afflicted[key] and #(Afflicted[key].active) == 0 ) then
-				Afflicted[key]:Hide()
-			end
-		end
-	end)
-	
+	frame:SetScript("OnHide", updateAnchorVisibility)
 	return frame
 end
 
@@ -164,6 +165,37 @@ function Config:DeleteAnchor(var)
 			table.remove(currentAnchors, i)
 		end
 	end
+	
+	-- Default all anchors to another one if this is deleted
+	local totalMoved = 0
+	local movedName
+	
+	if( Afflicted.db.profile.anchors.Spell ) then
+		movedName = "Spell"
+	elseif( Afflicted.db.profile.anchors.Buff ) then
+		movedName = "Buff"
+	else
+		for anchor in pairs(Afflicted.db.profile.anchors) do
+			movedName = anchor
+			break
+		end
+	end
+	
+	if( movedName ) then
+		for name, data in pairs(Afflicted.db.profile.spells) do
+			if( data.showIn == var ) then
+				data.showIn = movedName
+				totalMoved = totalMoved + 1
+			end
+		end
+
+		if( totalMoved > 0 ) then
+			Afflicted:Print(string.format(L["%d timers have been moved to the anchor %s."], totalMoved, movedName))
+			Afflicted:UpdateSpellList()
+
+		end
+	end
+	
 	
 	cachedAnchorFrame:Hide()
 	cachedAnchorFrame = nil
@@ -238,6 +270,7 @@ function Config:CreateAnchorList()
 
 	-- Update the dropdown incase any new textures were added
 	cachedAnchorFrame = HouseAuthority:CreateConfiguration(config, {handler = self, columns = 5})
+	cachedAnchorFrame:SetScript("OnHide", updateAnchorVisibility)
 	return cachedAnchorFrame
 end
 
@@ -406,6 +439,7 @@ function Config:CreateSpellList()
 
 	-- Update the dropdown incase any new textures were added
 	cachedFrame = HouseAuthority:CreateConfiguration(config, {handler = self, columns = 7})
+	cachedFrame:SetScript("OnHide", updateAnchorVisibility)
 	return cachedFrame
 end
 

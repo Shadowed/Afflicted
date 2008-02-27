@@ -4,21 +4,14 @@ AfflictedSpells = {
 	[L["Divine Shield"]] = {
 		seconds = 12,
 		singleLimit = 0,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 	
 	[L["Ice Block"]] = {
 		seconds = 10,
 		singleLimit = 0,
-		showIn = "buff",
-		linkedTo = "",
-	},
-	
-	["Intercept Stun"] = {
-		seconds = 15,
-		singleLimit = 0.5,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 	
@@ -26,28 +19,28 @@ AfflictedSpells = {
 	[L["Blessing of Protection"]] = {
 		seconds = 10,
 		singleLimit = 0,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 	
 	[L["Blessing of Freedom"]] = {
 		seconds = 14,
 		singleLimit = 0,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 	
 	[L["Blessing of Sacrifice"]] = {
 		seconds = 30,
 		singleLimit = 0,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 
 	[L["Pain Suppression"]] = {
 		seconds = 8,
 		singleLimit = 0,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 	
@@ -55,14 +48,14 @@ AfflictedSpells = {
 	[L["Cloak of Shadows"]] ={
 		seconds = 5,
 		singleLimit = 0,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 	
 	[L["Spell Reflection"]] ={
 		seconds = 5,
 		singleLimit = 0,
-		showIn = "buff",
+		showIn = "Buff",
 		linkedTo = "",
 	},
 	
@@ -70,64 +63,64 @@ AfflictedSpells = {
 	[L["Silencing Shot"]] = {
 		seconds = 20,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 
 	[L["Silence"]] = {
 		seconds = 45,
 		singleLimit = 0,
-		type = "debuff",
-		showIn = "spell",
+		type = "deBuff",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 
 	[L["Feral Charge"]] = {
 		seconds = 15,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 
 	[L["Spell Lock"]] = {
 		seconds = 24,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 	
 	[L["Counterspell"]] = {
 		seconds = 24,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 
 	[L["Counterspell - Silenced"]] ={
 		seconds = 24,
 		singleLimit = 0,
-		showIn = "spell",
-		linkedTo = L["Counterspell"],
+		showIn = "Spell",
+		linkedTo = L["CounterSpell"],
 	},
 
 	[L["Kick"]] = {
 		seconds = 10,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 
 	[L["Pummel"]] = {
 		seconds = 10,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 
 	[L["Shield Bash"]] = {
 		seconds = 12,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		--linkedTo = L["Pummel"],
 		linkedTo = "",
 	},
@@ -136,7 +129,7 @@ AfflictedSpells = {
 	[L["Flame Shock"]] = {
 		seconds = 5,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		--linkedTo = L["Earth Shock"],
 		linkedTo = "",
 	},
@@ -144,7 +137,7 @@ AfflictedSpells = {
 	[L["Frost Shock"]] = {
 		seconds = 5,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		--linkedTo = L["Earth Shock"],
 		linkedTo = "",
 	},
@@ -152,7 +145,7 @@ AfflictedSpells = {
 	[L["Earth Shock"]] = {
 		seconds = 5,
 		singleLimit = 0,
-		showIn = "spell",
+		showIn = "Spell",
 		linkedTo = "",
 	},
 }

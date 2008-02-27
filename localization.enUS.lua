@@ -68,6 +68,8 @@ AfflictedLocals = {
 	["Save"] = "Save",
 	["Update"] = "Update",
 	
+	["%d timers have been moved to the anchor %s."] = "%d timers have been moved to the anchor %s.",
+	
 	["Always On"] = "Always On",
 	["Anchor to show this timer inside, remember if the anchor is disabled this spell won't be tracked."] = "Anchor to show this timer inside, remember if the anchor is disabled this spell won't be tracked.",
 	["Show in"] = "Show in",

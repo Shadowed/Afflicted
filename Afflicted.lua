@@ -10,7 +10,6 @@ local globalLimit = {}
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
-local TRIGGER_LIMIT = 1
 
 function Afflicted:OnInitialize()
 	self.defaults = {
@@ -25,7 +24,7 @@ function Afflicted:OnInitialize()
 			interruptDest = "rwframe",
 			interruptColor = { r = 1, g = 1, b = 1 },
 			anchors = {
-				["spell"] = {
+				["Spell"] = {
 					enabled = true,
 					announce = true,
 					growUp = false,
@@ -35,7 +34,7 @@ function Afflicted:OnInitialize()
 					abbrev = "S",
 					text = L["Spells"],
 				},
-				["buff"] = {
+				["Buff"] = {
 					enabled = true,
 					announce = true,
 					growUp = false,
@@ -76,13 +75,15 @@ function Afflicted:OnInitialize()
 				data.singleLimit = data.limit or 0
 				data.globalLimit = 0
 				
-				if( data.type == "spell" or data.type == "buff" ) then
-					data.showIn = data.type
+				if( data.type == "spell" ) then
+					data.showIn = "Spell"
+				elseif( data.type == "buff" ) then
+					data.showIn = "Buff"
 				elseif( data.type == "debuff" ) then
 					data.checkDebuff = true
-					data.showIn = "spell"
+					data.showIn = "Spell"
 				else
-					data.showIn = "spell"
+					data.showIn = "Spell"
 				end
 				
 				data.limit = nil
@@ -96,6 +97,7 @@ function Afflicted:OnInitialize()
 	self.db.profile.version = self.revision
 
 	-- Update the spell list with the default and manual
+	self.spellList = {}
 	self:UpdateSpellList()
 
 	-- Monitor for zone change
@@ -163,7 +165,7 @@ function Afflicted:Reload()
 
 			-- Annnd make sure it's shown or hidden
 			if( self.db.profile.showAnchors ) then
-				frame:Hide()
+				frame:Show()
 			elseif( #(frame.active) == 0 ) then
 				frame:Hide()
 			end
@@ -321,6 +323,20 @@ local function OnDragStop(self)
 	end
 end
 
+local function OnShow(self)
+	local position = Afflicted.db.profile.anchors[self.type].position
+	
+
+	if( position ) then
+		local scale = self:GetEffectiveScale()
+		self:ClearAllPoints()
+		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", position.x / scale, position.y / scale)
+	else
+		self:ClearAllPoints()
+		self:SetPoint("CENTER", UIParent, "CENTER")
+	end
+end
+
 -- Create our main display frame
 local backdrop = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -343,6 +359,7 @@ function Afflicted:CreateDisplay(type)
 	frame:SetBackdropBorderColor(0.90, 0.90, 0.90, 1.0)
 	frame:SetScript("OnDragStart", OnDragStart)
 	frame:SetScript("OnDragStop", OnDragStop)
+	frame:SetScript("OnShow", OnShow)
 	frame:Hide()
 	
 	frame.active = {}
@@ -356,15 +373,6 @@ function Afflicted:CreateDisplay(type)
 	frame.text:SetText(self.db.profile.anchors[type].abbrev)
 	
 	self:UpdateAnchor(frame)
-	
-	if( self.db.profile.anchors[type].position ) then
-		local scale = frame:GetEffectiveScale()
-		frame:ClearAllPoints()
-		frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.anchors[type].position.x / scale, self.db.profile.anchors[type].position.y / scale)
-	else
-		frame:SetPoint("CENTER", UIParent, "CENTER")
-	end
-	
 	return frame
 end
 
@@ -410,12 +418,6 @@ end
 
 -- Reposition the passed frames timers
 function Afflicted:RepositionTimers(parent)
-	if( self.db.profile.anchors[parent.type].position ) then
-		local scale = parent:GetEffectiveScale()
-		parent:ClearAllPoints()
-		parent:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.anchors[parent.type].position.x / scale, self.db.profile.anchors[parent.type].position.y / scale)
-	end
-
 	-- Flip the modifier so we can change between going top -> bottom and bottom -> top
 	local mod = -1
 	if( self.db.profile.anchors[parent.type].growUp ) then
@@ -448,8 +450,6 @@ local function sortTimers(a, b)
 	return a.timeLeft < b.timeLeft
 end
 
---local lastUsed = {}
-
 -- New ability found
 function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	local spellData = self.spellList[spellID] or self.spellList[spellName]
@@ -466,42 +466,38 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	if( not anchor or not anchor.enabled or not anchorFrame ) then
 		return
 	end
-	
-	--lastUsed[spellID] = lastUsed[spellID] or GetTime()
-	--ChatFrame1:AddMessage("[" .. (GetTime() - lastUsed[spellID]) .. "] " .. tostring(spellName) .. ":" .. tostring(destName))
-	--lastUsed[spellID] = GetTime()
-				
+					
 	local id = spellID .. sourceGUID
 	local globalID = spellID .. destGUID
+	local time = GetTime()
 		
-	-- Check if this spellID + GUID combo is at the trigger limit
-	if( spellData.singleLimit and spellData.singleLimit > 0 ) then
-		local time = GetTime()
-		if( playerLimit[id] and playerLimit[id] >= time ) then
-			return
-		end
-		
-		playerLimit[id] = time + spellData.singleLimit
+	-- Check/set single trigger limits
+	if( playerLimit[id] and playerLimit[id] >= time ) then
+		return
 	end
+
+	if( spellData.singleLimit and spellData.singleLimit > 0 ) then
+		playerLimit[id] = time + spellData.singleLimit
+	end	
 	
-	-- Now check if the spellID is at the trigger limit
+	-- Check/set global trigger limits
+
+	if( globalLimit[globalID] and globalLimit[globalID] >= time ) then
+		return
+	end
+
 	if( spellData.globalLimit and spellData.globalLimit > 0 ) then
-		local time = GetTime()
-		if( globalLimit[globalID] and globalLimit[globalID] >= time ) then
-			return
-		end
-		
 		globalLimit[globalID] = time + spellData.globalLimit
 	end
 	
 	-- Spell interrupts generally have another component that you see after, like damage or a debuff. So don't let two timers show
-	if( eventType == "SPELL_INTERRUPT" and ( not spellData.singleLimit or spellData.singleLimit < TRIGGER_LIMIT ) ) then
-		playerLimit[id] = GetTime() + TRIGGER_LIMIT
+	if( eventType == "SPELL_INTERRUPT" and ( not spellData.singleLimit or spellData.singleLimit < 2 ) ) then
+		playerLimit[id] = time + 1
 	end
 	
 	-- If we have to check debuffs, it means we need a global limit on the specific spellID + destGUId to prevent two timers
-	if( spellData.checkDebuff and ( not spellData.globalLimit or spellData.globalLimit < TRIGGER_LIMIT ) ) then
-		globalLimit[globalID] = GetTime() + TRIGGER_LIMIT
+	if( spellData.checkDebuff and ( not spellData.globalLimit or spellData.globalLimit < 1.5 ) ) then
+		globalLimit[globalID] = GetTime() + 1
 	end
 	
 	-- Check if it's a linked spell
