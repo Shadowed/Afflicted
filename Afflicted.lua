@@ -15,7 +15,7 @@ function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
 			showAnchors = true,
-			showIcon = true,
+			showIcons = true,
 			dispelEnabled = true,
 			dispelHostile = true,
 			dispelDest = "1",
@@ -212,7 +212,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	
 		-- We interrupted an enemy
 		if( isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
-			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, spellName, spellSchool), self.db.profile.interruptDest, self.db.profile.interruptColor, spellID)
+			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, extraSpellSchool), self.db.profile.interruptDest, self.db.profile.interruptColor, spellID)
 		
 		-- Someone in our group was interrupted
 		elseif( isSourceEnemy and isDestGroup ) then
@@ -466,9 +466,9 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	if( not anchor or not anchor.enabled or not anchorFrame ) then
 		return
 	end
-					
+
 	local id = spellID .. sourceGUID
-	local globalID = spellID .. destGUID
+	local debuffID = spellID .. destGUID
 	local time = GetTime()
 		
 	-- Check/set single trigger limits
@@ -481,13 +481,12 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end	
 	
 	-- Check/set global trigger limits
-
-	if( globalLimit[globalID] and globalLimit[globalID] >= time ) then
+	if( ( globalLimit[debuffID] and globalLimit[debuffID] >= time ) or ( globalLimit[spellID] and globalLimit[spellID] >= time ) ) then
 		return
 	end
 
 	if( spellData.globalLimit and spellData.globalLimit > 0 ) then
-		globalLimit[globalID] = time + spellData.globalLimit
+		globalLimit[spellID] = time + spellData.globalLimit
 	end
 	
 	-- Spell interrupts generally have another component that you see after, like damage or a debuff. So don't let two timers show
@@ -497,7 +496,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	
 	-- If we have to check debuffs, it means we need a global limit on the specific spellID + destGUId to prevent two timers
 	if( spellData.checkDebuff and ( not spellData.globalLimit or spellData.globalLimit < 1.5 ) ) then
-		globalLimit[globalID] = GetTime() + 1
+		globalLimit[debuffID] = GetTime() + 1
 	end
 	
 	-- Check if it's a linked spell
@@ -661,7 +660,7 @@ end
 
 -- See if we should wrap an icon stuff around this
 function Afflicted:WrapIcon(msg, dest, spellID)
-	if( not self.db.profile.showIcon or not spellID ) then
+	if( not self.db.profile.showIcons or not spellID ) then
 		return msg
 	end
 	
