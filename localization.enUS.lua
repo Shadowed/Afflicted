@@ -35,6 +35,17 @@ AfflictedLocals = {
 	["Pummel"] = "Pummel",
 	["Kick"] = "Kick",
 	["Pain Suppression"] = "Pain Suppression",
+	
+	-- Schools
+	["Schools"] = "Schools",
+	["School Lockout"] = "School Lockout",
+	["Physical"] = "Physical",
+	["Holy"] = "Holy",
+	["Fire"] = "Fire",
+	["Nature"] = "Nature",
+	["Frost"] = "Frost",
+	["Shadow"] = "Shadow",
+	["Arcane"] = "Arcane",
 
 	-- GUI
 	["General"] = "General",
@@ -67,6 +78,10 @@ AfflictedLocals = {
 	["New"] = "New",
 	["Save"] = "Save",
 	["Update"] = "Update",
+	
+	["Show the name that the timer is for, formatted as <time left> - <name>."] = "Show the name that the timer is for, formatted as <time left> - <name>.",
+	["Show school lock outs"] = "Show school lock outs",
+	["Shows how many seconds a person is locked out for from a specific spell school."] = "Shows how many seconds a person is locked out for from a specific spell school.",
 	
 	["%d timers have been moved to the anchor %s."] = "%d timers have been moved to the anchor %s.",
 	

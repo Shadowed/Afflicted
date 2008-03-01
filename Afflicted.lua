@@ -11,6 +11,8 @@ local globalLimit = {}
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
 
+local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
+
 function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
@@ -212,7 +214,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	
 		-- We interrupted an enemy
 		if( isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
-			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, extraSpellSchool), self.db.profile.interruptDest, self.db.profile.interruptColor, spellID)
+			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, spellSchools[extraSpellSchool] or ""), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
 		
 		-- Someone in our group was interrupted
 		elseif( isSourceEnemy and isDestGroup ) then

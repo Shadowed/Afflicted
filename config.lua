@@ -90,7 +90,7 @@ function Config:CreateUI()
 	local config = {
 		{ group = L["General"], type = "groupOrder", order = 1 },
 		{ order = 1, group = L["General"], text = L["Only enable inside"], help = L["Only enable Afflicted inside the specified areas."], type = "dropdown", list = {{"none", L["Everywhere else"]}, {"pvp", L["Battlegrounds"]}, {"arena", L["Arenas"]}, {"raid", L["Raid Instances"]}, {"party", L["Party Instances"]}}, multi = true, var = "inside"},
-		{ order = 2, group = L["General"], text = L["Show icons in local alerts"], help = L["Shows the spell icon when the alert is sent to a local channel like middle of screen, or a chat frame."], type = "check", var = "showIcon"},
+		{ order = 2, group = L["General"], text = L["Show icons in local alerts"], help = L["Shows the spell icon when the alert is sent to a local channel like middle of screen, or a chat frame."], type = "check", var = "showIcons"},
 		{ order = 3, group = L["General"], text = L["Show timers anchor"], help = L["ALT + Drag the anchors to move the frames."], type = "check", var = "showAnchors"},
 
 		{ group = L["Dispel Alerts"], type = "groupOrder", order = 2 },
@@ -297,11 +297,13 @@ function Config:ModifyAnchor(category, anchor)
 		{ group = L["General"], type = "groupOrder", order = 1 },
 		{ order = 1, group = L["General"], text = L["Enable anchor"], help = L["Enables this anchor allowing timers to show up inside it, while it's disabled any timers associated with it won't be seen."], type = "check", var = {anchor, "enabled"}},
 		{ order = 2, group = L["General"], text = L["Enable announcements"], help = L["Enables sending abilities used/ready/faded information to the specified channel."], type = "check", var = {anchor, "announce"}},
-		{ order = 3, group = L["General"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = {anchor, "announceDest"}},
-		{ order = 4, group = L["General"], text = L["Announce color"], help = L["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."], type = "color", var = {anchor, "announceColor"}},
-		{ order = 5, group = L["General"], text = L["Grow up"], help = L["Causes timers to be added from bottom -> top order, instead of the current top -> bottom."], type = "check", var = {anchor, "growUp"}},
-		{ order = 6, group = L["General"], text = L["Anchor text"], help = L["Identifier to show inside the anchors when they're enabled."], type = "input",width = 30, default = "?", var = {anchor, "abbrev"}},
-		{ order = 7, group = L["General"], format = L["Scale: %d%%"], min = 0.0, max = 2.0, default = 1.0, type = "slider", var = {anchor, "scale"}},
+		--{ order = 1, group = L["General"], text = L["Show source name"], help = L["Show the name that the timer is for, formatted as <time left> - <name>."], type = "check", var = {anchor, "showName"}},
+		--{ order = 3, group = L["General"], text = L["Show school lock outs"], help = L["Shows how many seconds a person is locked out for from a specific spell school."], type = "check", var = {anchor, "showLockout"}},
+		{ order = 4, group = L["General"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = {anchor, "announceDest"}},
+		{ order = 5, group = L["General"], text = L["Announce color"], help = L["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."], type = "color", var = {anchor, "announceColor"}},
+		{ order = 6, group = L["General"], text = L["Grow up"], help = L["Causes timers to be added from bottom -> top order, instead of the current top -> bottom."], type = "check", var = {anchor, "growUp"}},
+		{ order = 7, group = L["General"], text = L["Anchor text"], help = L["Identifier to show inside the anchors when they're enabled."], type = "input",width = 30, default = "?", var = {anchor, "abbrev"}},
+		{ order = 8, group = L["General"], format = L["Scale: %d%%"], min = 0.0, max = 2.0, default = 1.0, type = "slider", var = {anchor, "scale"}},
 	}
 
 	return HouseAuthority:CreateConfiguration(config, {set = "SetAnchor", get = "GetAnchor", onSet = "Reload", handler = self})
