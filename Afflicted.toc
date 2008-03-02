@@ -18,7 +18,6 @@ localization.enUS.lua
 localization.deDE.lua
 localization.frFR.lua
 
-combat.lua
 spells.lua
 Afflicted.lua
 config.lua
