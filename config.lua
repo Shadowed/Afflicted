@@ -24,11 +24,32 @@ function Config:OnInitialize()
 					Afflicted:ClearTimers(Afflicted[key])
 				end
 			end
+		elseif( msg == "test" ) then
+			-- Clear out any running timers first
+			for key in pairs(Afflicted.db.profile.anchors) do
+				if( Afflicted[key] ) then
+					Afflicted:ClearTimers(Afflicted[key])
+				end
+			end
+
+			local addedTypes = {}
+			for spell, data in pairs(AfflictedSpells) do
+				if( not addedTypes[data.showIn] ) then
+					addedTypes[data.showIn] = 0
+				end
+
+				if( addedTypes[data.showIn] < 5 and data.icon and data.icon ~= "" ) then
+					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
+					Afflicted:ProcessAbility("TEST", 0, spell, 0, GetTime() .. spell, "", "", "")
+				end
+			end
+
 		elseif( msg == "ui" ) then
 			OptionHouse:Open("Afflicted")
 		else
 			DEFAULT_CHAT_FRAME:AddMessage(L["Afflicted slash commands"])
 			DEFAULT_CHAT_FRAME:AddMessage(L["- clear - Clears all running timers."])
+			DEFAULT_CHAT_FRAME:AddMessage(L["- test - Shows test timers in Afflicted."])
 			DEFAULT_CHAT_FRAME:AddMessage(L["- ui - Opens the OptionHouse configuration for Afflicted."])
 		end
 	end

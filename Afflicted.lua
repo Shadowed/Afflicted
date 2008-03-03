@@ -211,7 +211,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	elseif( eventType == "SPELL_AURA_REMOVED" ) then
 		local spellID, spellName, spellSchool, auraType = ...
 		if( auraType == "BUFF" and isDestEnemy ) then
-			self:AbilityEnded(eventType, spellId, spellName, destGUID, destName)
+			self:AbilityEnded(eventType, spellID, spellName, destGUID, destName)
 		end
 	
 	-- We got interrupted, or we interrupted someone else
@@ -253,7 +253,16 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 				self:SendMessage(string.format(L["Removed %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelDest, self.db.profile.dispelColor, extraSpellID)
 			end
 		end
+	
+	-- Check if we should clear timers
+	elseif( eventType == "PARTY_KILL" and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+		self:UnitDied(destGUID, destName)
+		
+	-- Don't use UNIT_DIED inside arenas due to accuracy issues, outside of arenas we don't care too much
+	elseif( instanceType ~= "arena" and eventType == "UNIT_DIED" and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+		self:UnitDied(destGUID, destName)
 	end
+
 end
 
 -- Update anchor visibility
@@ -578,6 +587,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	frame.sourceGUID = sourceGUID
 	frame.sourceName = sourceName
 	frame.destGUID = destGUID
+	frame.dontFade = spellData.dontFade
 	frame.icon:SetTexture(icon)
 	frame:Show()
 	
@@ -595,7 +605,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	self:RepositionTimers(anchorFrame)
 
 	-- Announce it
-	if( anchor.announce ) then
+	if( anchor.announce and eventType ~= "TEST" ) then
 		if( spellData.type == "buff" ) then
 			self:SendMessage(string.format(L["GAINED %s (%s)"], spellName, self:StripServer(sourceName)), anchor.announceDest, anchor.announceColor, spellID)
 		else
@@ -604,6 +614,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 end
 
+-- Ability ended due to event, or timers up
 function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName, isTimedOut)
 	local spellData = self.spellList[spellID] or self.spellList[spellName]
 	if( not spellData ) then
@@ -647,11 +658,42 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 	self:RepositionTimers(anchorFrame)
 	
 	-- Announce it
-	if( anchor.announce ) then
+	if( anchor.announce and eventType ~= "TEST" ) then
 		if( spellData.type == "buff" ) then
 			self:SendMessage(string.format(L["FADED %s (%s)"], spellName, self:StripServer(sourceName)), anchor.announceDest, anchor.announceColor, spellID)
 		else
 			self:SendMessage(string.format(L["READY %s (%s)"], spellName, self:StripServer(sourceName)), anchor.announceDest, anchor.announceColor, spellID)
+		end
+	end
+end
+
+-- Check if we should remove the timers due to them dying
+function Afflicted:UnitDied(destGUID)
+	-- Loop through all created anchors
+	for anchorName in pairs(self.db.profile.anchors) do
+		local frame = self[anchorName]
+		if( frame and #(frame.active) > 0 ) then
+			-- Now through all active timers
+			for i=#(frame.active), 1, -1 do
+				local row = frame.active[i]
+
+				if( row.sourceGUID == destGUID and not row.dontFade ) then
+					row:Hide()
+
+					table.insert(frame.inactive, row)
+					table.remove(frame.active, i)
+
+					playerLimit[row.id] = nil
+				end
+			end
+
+			-- No more icons, hide the base frame
+			if( #(frame.active) == 0 ) then
+				frame:Hide()
+			end
+
+			-- Reposition everything
+			self:RepositionTimers(frame)
 		end
 	end
 end

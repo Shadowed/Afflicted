@@ -13,7 +13,13 @@ AfflictedLocals = {
 	-- Frame types
 	["Spells"] = "Spells",
 	["Buffs"] = "Buffs",
-
+	
+	-- Cmd
+	["Afflicted slash commands"] = "Afflicted slash commands",
+	["- clear - Clears all running timers."] = "- clear - Clears all running timers.",
+	["- ui - Opens the OptionHouse configuration for Afflicted."] = "- ui - Opens the OptionHouse configuration for Afflicted.",
+	["- test - Shows test timers in Afflicted."] = "- test - Shows test timers in Afflicted.",
+	
 	-- Spell names
 	["Divine Shield"] = "Divine Shield",
 	["Ice Block"] = "Ice Block",
