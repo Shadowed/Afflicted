@@ -178,12 +178,12 @@ function Afflicted:Reload()
 	self:UpdateSpellList()
 end
 
-local COMBATLOG_OBJECT_TYPE_PLAYER = COMBATLOG_OBJECT_TYPE_PLAYER or 0x00000400
-local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY or 0x00000010
-local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE or 0x00000001
-local COMBATLOG_OBJECT_AFFILIATION_PARTY = COMBATLOG_OBJECT_AFFILIATION_PARTY or 0x00000002
-local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID or 0x00000004
-local COMBATLOG_OBJECT_REACTION_HOSTILE	= COMBATLOG_OBJECT_REACTION_HOSTILE or 0x00000040
+local COMBATLOG_OBJECT_TYPE_PLAYER = COMBATLOG_OBJECT_TYPE_PLAYER
+local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY
+local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
+local COMBATLOG_OBJECT_AFFILIATION_PARTY = COMBATLOG_OBJECT_AFFILIATION_PARTY
+local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
+local COMBATLOG_OBJECT_REACTION_HOSTILE	= COMBATLOG_OBJECT_REACTION_HOSTILE
 local GROUP_AFFILIATION = bit.bor(COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_TYPE_PLAYER, COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID)
 
 --[31:58] <Elsia> i.e. something like if band(flags,hostile) == hostile and band(flags,npc+object)==0 then
@@ -193,7 +193,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	local isDestGroup = (bit.band(destFlags, GROUP_AFFILIATION) > 0)
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 	local isSourceGroup = (bit.band(sourceFlags, GROUP_AFFILIATION) > 0)
-		
+			
 	-- Buff gained on an enemy, or a debuff gained from an enemy from someone in our group
 	if( eventType == "SPELL_AURA_APPLIED" ) then
 		local spellID, spellName, spellSchool, auraType = ...
@@ -255,11 +255,11 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		end
 	
 	-- Check if we should clear timers
-	elseif( eventType == "PARTY_KILL" and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+	elseif( eventType == "PARTY_KILL" and isDestEnemy ) then
 		self:UnitDied(destGUID, destName)
 		
 	-- Don't use UNIT_DIED inside arenas due to accuracy issues, outside of arenas we don't care too much
-	elseif( instanceType ~= "arena" and eventType == "UNIT_DIED" and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+	elseif( instanceType ~= "arena" and eventType == "UNIT_DIED" and isDestEnemy ) then
 		self:UnitDied(destGUID, destName)
 	end
 
@@ -342,8 +342,6 @@ end
 
 local function OnShow(self)
 	local position = Afflicted.db.profile.anchors[self.type].position
-	
-
 	if( position ) then
 		local scale = self:GetEffectiveScale()
 		self:ClearAllPoints()
@@ -511,7 +509,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		playerLimit[id] = time + 1
 	end
 	
-	-- If we have to check debuffs, it means we need a global limit on the specific spellID + destGUId to prevent two timers
+	-- If we have to check debuffs, it means we need a global limit on the specific spellID + destGUID to prevent two timers
 	if( spellData.checkDebuff and ( not spellData.globalLimit or spellData.globalLimit < 1.5 ) ) then
 		globalLimit[debuffID] = GetTime() + 1
 	end
@@ -728,7 +726,7 @@ function Afflicted:WrapIcon(msg, dest, spellID)
 		size = select(2, self.alertFrame:GetFont())
 	end
 
-	return string.format("|T%s:%d:%d:0:-1|t %s", icon, size, size, msg)
+	return string.format("|T%s:0:0|t %s", icon, msg)
 end
 
 function Afflicted:SendMessage(msg, dest, color, spellID)
