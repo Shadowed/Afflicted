@@ -1,7 +1,4 @@
--- Bug testing
-if( not Afflicted ) then
-	return
-end
+if( not Afflicted ) then return end
 
 local Config = Afflicted:NewModule("Config")
 local L = AfflictedLocals
@@ -9,6 +6,7 @@ local L = AfflictedLocals
 local OptionHouse
 local HouseAuthority
 local OHObj
+local SML
 
 local currentAnchors = {}
 local spellList = {{"", L["None"]}}
@@ -20,16 +18,12 @@ function Config:OnInitialize()
 	SlashCmdList["AFFLICTED"] = function(msg)
 		if( msg == "clear" ) then
 			for key in pairs(Afflicted.db.profile.anchors) do
-				if( Afflicted[key] ) then
-					Afflicted:ClearTimers(Afflicted[key])
-				end
+				Afflicted.visual:ClearTimers(key)
 			end
 		elseif( msg == "test" ) then
 			-- Clear out any running timers first
 			for key in pairs(Afflicted.db.profile.anchors) do
-				if( Afflicted[key] ) then
-					Afflicted:ClearTimers(Afflicted[key])
-				end
+				Afflicted.visual:ClearTimers(key)
 			end
 
 			local addedTypes = {}
@@ -67,6 +61,7 @@ function Config:OnInitialize()
 	-- Register with OptionHouse
 	OptionHouse = LibStub("OptionHouse-1.1")
 	HouseAuthority = LibStub("HousingAuthority-1.2")
+	SML = Afflicted.SML
 	
 	OHObj = OptionHouse:RegisterAddOn("Afflicted", nil, "Mayen", "r" .. max(tonumber(string.match("$Revision$", "(%d+)") or 1), Afflicted.revision))
 	OHObj:RegisterCategory(L["General"], self, "CreateUI", nil, 1)
@@ -84,6 +79,15 @@ function Config:OnInitialize()
 			OHObj:RegisterSubCategory(L["Spell List"], name, self, "ModifySpell", nil, name)
 		end
 	end
+
+	SML:Register(SML.MediaType.STATUSBAR, "BantoBar", "Interface\\Addons\\Afflicted\\images\\banto")
+	SML:Register(SML.MediaType.STATUSBAR, "Smooth",   "Interface\\Addons\\Afflicted\\images\\smooth")
+	SML:Register(SML.MediaType.STATUSBAR, "Perl",     "Interface\\Addons\\Afflicted\\images\\perl")
+	SML:Register(SML.MediaType.STATUSBAR, "Glaze",    "Interface\\Addons\\Afflicted\\images\\glaze")
+	SML:Register(SML.MediaType.STATUSBAR, "Charcoal", "Interface\\Addons\\Afflicted\\images\\Charcoal")
+	SML:Register(SML.MediaType.STATUSBAR, "Otravi",   "Interface\\Addons\\Afflicted\\images\\otravi")
+	SML:Register(SML.MediaType.STATUSBAR, "Striped",  "Interface\\Addons\\Afflicted\\images\\striped")
+	SML:Register(SML.MediaType.STATUSBAR, "LiteStep", "Interface\\Addons\\Afflicted\\images\\LiteStep")
 end
 
 local function updateAnchorVisibility()
@@ -108,21 +112,31 @@ function Config:Reload()
 end
 
 function Config:CreateUI()
+	local textures = {}
+	for _, name in pairs(SML:List(SML.MediaType.STATUSBAR)) do
+		table.insert(textures, {name, name})
+	end
+
 	local config = {
 		{ group = L["General"], type = "groupOrder", order = 1 },
 		{ order = 1, group = L["General"], text = L["Only enable inside"], help = L["Only enable Afflicted inside the specified areas."], type = "dropdown", list = {{"none", L["Everywhere else"]}, {"pvp", L["Battlegrounds"]}, {"arena", L["Arenas"]}, {"raid", L["Raid Instances"]}, {"party", L["Party Instances"]}}, multi = true, var = "inside"},
 		{ order = 2, group = L["General"], text = L["Show icons in local alerts"], help = L["Shows the spell icon when the alert is sent to a local channel like middle of screen, or a chat frame."], type = "check", var = "showIcons"},
 		{ order = 3, group = L["General"], text = L["Show timers anchor"], help = L["ALT + Drag the anchors to move the frames."], type = "check", var = "showAnchors"},
 
-		{ group = L["Dispel Alerts"], type = "groupOrder", order = 2 },
+		{ group = L["Bars"], type = "groupOrder", order = 2 },
+		{ order = 1, group = L["Bars"], text = L["Show timer as bars"], help = L["Shows timers as bars instead of just icons, requires a reloadui to take effect."], type = "check", var = "showBars"},
+		{ order = 2, group = L["Bars"], format = L["Bar size"], min = 10, max = 300, maxText = "300", minText = "10", default = 180, type = "slider", var = "barWidth"},
+		{ order = 3, group = L["Bars"], text = L["Bar texture"], help = L["Texture to be used for the timer bars."], type = "dropdown", list = textures, var = "barName"},
+
+		{ group = L["Dispel Alerts"], type = "groupOrder", order = 3 },
 		{ order = 1, group = L["Dispel Alerts"], text = L["Enable dispel alerts"], help = L["Enable alerts when you dispel a player while Afflicted is enabled."], type = "check", var = "dispelEnabled"},
 		{ order = 1, group = L["Dispel Alerts"], text = L["Show hostile dispels"], help = L["Displays alerts when you dispel hostile players as well, instead of just friendly players."], type = "check", var = "dispelHostile"},
-		{ order = 2, group = L["Dispel Alerts"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = "dispelDest"},
+		{ order = 2, group = L["Dispel Alerts"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"none", L["None"]}, {"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = "dispelDest"},
 		{ order = 3, group = L["Dispel Alerts"], text = L["Announce color"], help = L["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."], type = "color", var = "dispelColor"},
 
-		{ group = L["Interrupt Alerts"], type = "groupOrder", order = 3 },
+		{ group = L["Interrupt Alerts"], type = "groupOrder", order = 4 },
 		{ order = 1, group = L["Interrupt Alerts"], text = L["Enable interrupt alerts"], help = L["Enable alerts when you interrupt an enemies player spell."], type = "check", var = "interruptEnabled"},
-		{ order = 2, group = L["Interrupt Alerts"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = "interruptDest"},
+		{ order = 2, group = L["Interrupt Alerts"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"none", L["None"]}, {"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = "interruptDest"},
 		{ order = 3, group = L["Interrupt Alerts"], text = L["Announce color"], help = L["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."], type = "color", var = "interruptColor"},
 	}
 
@@ -263,7 +277,7 @@ function Config:CreateAnchorList()
 
 		local announce
 		if( data.announce ) then
-			local locatio = L["Unknown"]
+			local location = L["Unknown"]
 			if( tonumber(data.announceDest) ) then
 				location = string.format(L["Chat frame #%d"], tonumber(data.announceDest))
 			elseif( data.announceDest == "rwframe" ) then
@@ -305,6 +319,7 @@ function Config:GetAnchor(var)
 	return Afflicted.db.profile.anchors[var[1]][var[2]]
 end
 
+local displayAnchors = {}
 function Config:ModifyAnchor(category, anchor)
 	if( not anchor or anchor == "" ) then
 		return
@@ -318,14 +333,31 @@ function Config:ModifyAnchor(category, anchor)
 		{ group = L["General"], type = "groupOrder", order = 1 },
 		{ order = 1, group = L["General"], text = L["Enable anchor"], help = L["Enables this anchor allowing timers to show up inside it, while it's disabled any timers associated with it won't be seen."], type = "check", var = {anchor, "enabled"}},
 		{ order = 2, group = L["General"], text = L["Enable announcements"], help = L["Enables sending abilities used/ready/faded information to the specified channel."], type = "check", var = {anchor, "announce"}},
-		--{ order = 1, group = L["General"], text = L["Show source name"], help = L["Show the name that the timer is for, formatted as <time left> - <name>."], type = "check", var = {anchor, "showName"}},
-		--{ order = 3, group = L["General"], text = L["Show school lock outs"], help = L["Shows how many seconds a person is locked out for from a specific spell school."], type = "check", var = {anchor, "showLockout"}},
-		{ order = 4, group = L["General"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = {anchor, "announceDest"}},
-		{ order = 5, group = L["General"], text = L["Announce color"], help = L["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."], type = "color", var = {anchor, "announceColor"}},
-		{ order = 6, group = L["General"], text = L["Grow up"], help = L["Causes timers to be added from bottom -> top order, instead of the current top -> bottom."], type = "check", var = {anchor, "growUp"}},
-		{ order = 7, group = L["General"], text = L["Anchor text"], help = L["Identifier to show inside the anchors when they're enabled."], type = "input",width = 30, default = "?", var = {anchor, "abbrev"}},
-		{ order = 8, group = L["General"], format = L["Scale: %d%%"], min = 0.0, max = 2.0, default = 1.0, type = "slider", var = {anchor, "scale"}},
+		{ order = 3, group = L["General"], text = L["Announce channel"], help = L["Channel to send abilities announcements to."], type = "dropdown", list = {{"none", L["None"]}, {"ct", L["Combat Text"]}, {"rw", L["Raid Warning"]}, {"rwframe", L["Middle of screen"]}, {"party", L["Party"]}, {1, string.format(L["Chat frame #%d"], 1)}, {2, string.format(L["Chat frame #%d"], 2)}, {3, string.format(L["Chat frame #%d"], 3)}, {4, string.format(L["Chat frame #%d"], 4)}, {5, string.format(L["Chat frame #%d"], 5)}, {6, string.format(L["Chat frame #%d"], 6)}, {7, string.format(L["Chat frame #%d"], 7)}}, var = {anchor, "announceDest"}},
+		{ order = 4, group = L["General"], text = L["Announce color"], help = L["Color the text should be shown in if you're outputting using \"Middle of screen\" or \"Combat text\"."], type = "color", var = {anchor, "announceColor"}},
+		{ order = 5, group = L["General"], text = L["Grow up"], help = L["Causes timers to be added from bottom -> top order, instead of the current top -> bottom."], type = "check", var = {anchor, "growUp"}},
+		{ order = 7, group = L["General"], format = L["Scale: %d%%"], min = 0.0, max = 2.0, default = 1.0, type = "slider", var = {anchor, "scale"}},
+
+		{ group = L["Messages"], type = "groupOrder", order = 3 },
+		{ order = 1, group = L["Messages"], text = L["Gain message"], help = L["Text used when an enemy gains a buff, or a friendly player is afflicted by a debuff."], width = 300, type = "input", var = {anchor, "gainMessage"}},
+		{ order = 2, group = L["Messages"], text = L["Fade message"], help = L["Text used when an enemies buff or debuff fades."],  width = 300, type = "input", var = {anchor, "fadeMessage"}},
+		{ order = 3, group = L["Messages"], text = L["Used message"], help = L["Text used when an enemies ability is used."], width = 300, type = "input", var = {anchor, "usedMessage"}},
+		{ order = 4, group = L["Messages"], text = L["Ready message"], help = L["Text used when an enemies ability is ready again."], width = 300, type = "input", var = {anchor, "readyMessage"}},
 	}
+	
+	if( Afflicted.db.profile.showBars and Afflicted.currentVisual == "bars" ) then
+		for i=#(displayAnchors), 1, -1 do
+			table.remove(displayAnchors, i)
+		end
+
+		table.insert(displayAnchors, {"", L["None"]})
+		for name, data in pairs(Afflicted.modules.Bars.GTB:GetGroups()) do
+			table.insert(displayAnchors, {name, name})
+		end
+
+		table.insert(config, { group = L["Redirection"], type = "groupOrder", order = 2 })
+		table.insert(config, { order = 1, group = L["Redirection"], text = L["Redirect bar timers to"], help = L["Anchor to redirect all bar timers to, for example you can make it so all timers from \"Buff\" go to the \"Spell\" anchor without having to redo all of the show in options."], type = "dropdown", list = displayAnchors, var = {anchor, "redirectTo"}})
+	end
 
 	return HouseAuthority:CreateConfiguration(config, {set = "SetAnchor", get = "GetAnchor", onSet = "Reload", handler = self})
 end
@@ -510,11 +542,19 @@ function Config:ModifySpell(category, spell)
 		{ order = 2, group = L["General"], text = L["Ignore spell fade events"], help = L["Some buffs you don't want to have the timer removed just because it faded from the person, this is the case for things like Shadowstep where you don't want it removed 3 seconds after the buff fades because you want the cooldown timer."], type = "check", var = {spell, "dontFade"}},
 		{ order = 3, group = L["General"], text = L["Check debuffs for spell"], help = L["Enables checking of debuffs enemies put onto people in our group for triggering this timer."], type = "check", var = {spell, "checkDebuff"}},
 		{ order = 4, group = L["General"], text = L["Show in"], help = L["Anchor to show this timer inside, remember if the anchor is disabled this spell won't be tracked."], type = "dropdown", list = currentAnchors,  var = {spell, "showIn"}},
-		{ order = 5, group = L["General"], text = L["Cooldown/duration"], help = L["Timer to show when this spell is triggered."], type = "input", numeric = true, width = 30, default = 0, var = {spell, "seconds"}},
-		{ order = 6, group = L["General"], text = L["Per-player trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "singleLimit"}},
-		{ order = 7, group = L["General"], text = L["Global trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "globalLimit"}},
-		{ order = 8, group = L["General"], text = L["Linked spell"], help = L["The parent spell, for example. \"Counterspell - Silence\" should be linked to \"Counterspell\" so that way if a timer is started for Counterspell, another won't be done for \"Counterspell - Silence\" if their on the same target."], type = "dropdown", list = spellList, default = "", var = {spell, "linkedTo"}},
-		{ order = 9, group = L["General"], text = L["Icon path"], help = L["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\".\nThis will automatically be set using the in-game spell icon, so it's not required. But you can override it if you wish."], type = "input", width = 350, var = {spell, "icon"}},
+		{ order = 5, group = L["General"], text = L["Repeating timer"], help = L["Keeps repeating the timer everytime it hits 0 until the timer in question is removed either by the item being destroyed, or another way."], type = "check", var = {spell, "repeating"}},
+		{ order = 6, group = L["General"], text = L["Cooldown/duration"], help = L["Timer to show when this spell is triggered."], type = "input", numeric = true, width = 30, default = 0, var = {spell, "seconds"}},
+		{ order = 7, group = L["General"], text = L["Linked spell"], help = L["The parent spell, for example. \"Counterspell - Silence\" should be linked to \"Counterspell\" so that way if a timer is started for Counterspell, another won't be done for \"Counterspell - Silence\" if their on the same target."], type = "dropdown", list = spellList, default = "", var = {spell, "linkedTo"}},
+		{ order = 8, group = L["General"], text = L["Icon path"], help = L["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\".\nThis will automatically be set using the in-game spell icon, so it's not required. But you can override it if you wish."], type = "input", width = 350, var = {spell, "icon"}},
+
+		{ group = L["Limits"], type = "groupOrder", order = 2 },
+		{ order = 1, group = L["Limits"], text = L["Per-player trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "singleLimit"}},
+		{ order = 2, group = L["Limits"], text = L["Global trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "globalLimit"}},
+		
+		{ group = L["Messages"], type = "groupOrder", order = 3 },
+		{ order = 1, group = L["Messages"], text = L["Enable custom message"], help = L["Enables this anchor allowing timers to show up inside it, while it's disabled any timers associated with it won't be seen."], type = "check", var = {spell, "enableCustom"}},
+		{ order = 2, group = L["Messages"], text = L["Triggered  message"],  width = 300, help = L["Custom text for when this timer is triggered, overrides the anchor text."], type = "input", var = {spell, "triggeredMessage"}},
+		{ order = 3, group = L["Messages"], text = L["Faded message"],  width = 300, help = L["Custom text for when this timer fades, either because the time ran out of the target was removed."], type = "input", var = {spell, "fadedMessage"}},
 	}
 
 	return HouseAuthority:CreateConfiguration(config, {set = "SetSpell", get = "GetSpell", handler = self})

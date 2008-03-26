@@ -3,10 +3,10 @@ AfflictedLocals = {
 	["FAILED %s's %s"] = "FAILED %s's %s",
 	["Removed %s's %s"] = "Removed %s's %s",
 	
-	["GAINED %s (%s)"] = "GAINED %s (%s)",
-	["USED %s (%s)"] = "USED %s (%s)",
-	["FADED %s (%s)"] = "FADED %s (%s)",
-	["READY %s (%s)"] = "READY %s (%s)",
+	["GAINED *spell (*target)"] = "GAINED *spell (*target)",
+	["USED *spell (*target)"] = "USED *spell (*target)",
+	["FADED *spell (*target)"] = "FADED *spell (*target)",
+	["READY *spell (*target)"] = "READY *spell (*target)",
 	
 	["??"] = "??",
 	
@@ -54,6 +54,8 @@ AfflictedLocals = {
 	["Arcane"] = "Arcane",
 
 	-- GUI
+	["Enable custom message"] = "Enable custom message",
+	["Show timer as bars"] = "Show timer as bars",
 	["General"] = "General",
 	["Timers"] = "Timers",
 	["Alerts"] = "Alerts",
@@ -65,6 +67,37 @@ AfflictedLocals = {
 	["Timer: %s%d%s"] = "Timer: %s%d%s",
 	["Type: %s%s%s"] = "Type: %s%s%s",
 	["Anchor: %s%s%s"] = "Anchor: %s%s%s",
+	
+	["Redirect bar timers to"] = "Redirect bar timers to",
+	["Anchor to redirect all bar timers to, for example you can make it so all timers from \"Buff\" go to the \"Spell\" anchor without having to redo all of the show in options."] = "Anchor to redirect all bar timers to, for example you can make it so all timers from \"Buff\" go to the \"Spell\" anchor without having to redo all of the show in options.",
+	["Redirection"] = "Redirection",
+
+	["Enable timer as bars"] = "Enable timer as bars",
+	["Shows timers as bars instead of just icons, requires a reloadui to take effect."] = "Shows timers as bars instead of just icons, requires a reloadui to take effect.",
+	
+	["Messages"] = "Messages",
+	
+	["Triggered message"] = "Triggered message",
+	["Faded message"] = "Faded message",
+	["Limits"] = "Limits",
+	
+	["Custom text for when this timer is triggered, overrides the anchor text."] = "Custom text for when this timer is triggered, overrides the anchor text.",
+	["Custom text for when this timer fades, either because the time ran out of the target was removed."] = "Custom text for when this timer fades, either because the time ran out of the target was removed.",
+	
+	["Gain message"] = "Gain message",
+	["Fade message"] = "Fade message",
+	["Ready message"] = "Ready message",
+	["Used message"] = "Used message",
+	
+	["Text used when an enemy gains a buff, or a friendly player is afflicted by a debuff."] = "Text used when an enemy gains a buff, or a friendly player is afflicted by a debuff.",
+	["Text used when an enemies buff or debuff fades."] = "Text used when an enemies buff or debuff fades.",
+	["Text used when an enemies ability is used."] = "Text used when an enemies ability is used.",
+	["Text used when an enemies ability is ready again."] = "Text used when an enemies ability is ready again.",
+	
+	["Bar size"] = "Bar size",
+	["Bar texture"] = "Bar texture",
+	["Texture to be used for the timer bars."] = "Texture to be used for the timer bars.",
+	["Bars"] = "Bars",
 
 	["Buff"] = "Buff",
 	["Delete"] = "Delete",
@@ -84,6 +117,9 @@ AfflictedLocals = {
 	["New"] = "New",
 	["Save"] = "Save",
 	["Update"] = "Update",
+	
+	["Repeating timer"] = "Repeating timer",
+	["Keeps repeating the timer everytime it hits 0 until the timer in question is removed either by the item being destroyed, or another way."] = "Keeps repeating the timer everytime it hits 0 until the timer in question is removed either by the item being destroyed, or another way.",
 	
 	["Show the name that the timer is for, formatted as <time left> - <name>."] = "Show the name that the timer is for, formatted as <time left> - <name>.",
 	["Show school lock outs"] = "Show school lock outs",

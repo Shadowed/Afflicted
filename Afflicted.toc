@@ -4,15 +4,17 @@
 ## Author: Mayen
 ## Version: $Revision$
 ## SavedVariables: AfflictedDB
-## OptionalDeps: OptionHouse, HousingAuthority
+## OptionalDeps: LibStub, GTB, Ace3, OptionHouse, HousingAuthority
 
 libs\LibStub-1.0\LibStub-1.0.xml
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 libs\AceDB-3.0\AceDB-3.0.xml
 libs\AceAddon-3.0\AceAddon-3.0.xml
 libs\AceEvent-3.0\AceEvent-3.0.xml
+libs\LibSharedMedia-3.0\lib.xml
 libs\OptionHouse.lua
 libs\HousingAuthority.lua
+libs\GTB.lua
 
 localization.enUS.lua
 localization.deDE.lua
@@ -21,3 +23,5 @@ localization.frFR.lua
 spells.lua
 Afflicted.lua
 config.lua
+bars.lua
+icons.lua
