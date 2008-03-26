@@ -48,6 +48,9 @@ function Config:OnInitialize()
 		end
 	end
 	
+end
+
+function Config:LoadData()
 	-- Set up current anchors
 	for k, v in pairs(Afflicted.db.profile.anchors) do
 		table.insert(currentAnchors, {k, v.text})
@@ -288,9 +291,11 @@ function Config:CreateAnchorList()
 				location = L["Party"]
 			elseif( data.announceDest == "ct" ) then
 				location = L["Combat Text"]
+			elseif( data.announceDest == "none" ) then
+				location = L["None"]
 			end
 
-			announce = string.format(L["Announce: %s%s%s"], "|cffffffff", location, FONT_COLOR_CODE_CLOSE)
+			announce = string.format(L["Announce: %s%s%s"], "|cffffffff", location or L["None"], FONT_COLOR_CODE_CLOSE)
 		else
 			announce = string.format(L["Announce: %s%s%s"], "|cffffffff", L["Disabled"], FONT_COLOR_CODE_CLOSE)
 		end
@@ -553,7 +558,7 @@ function Config:ModifySpell(category, spell)
 		
 		{ group = L["Messages"], type = "groupOrder", order = 3 },
 		{ order = 1, group = L["Messages"], text = L["Enable custom message"], help = L["Enables this anchor allowing timers to show up inside it, while it's disabled any timers associated with it won't be seen."], type = "check", var = {spell, "enableCustom"}},
-		{ order = 2, group = L["Messages"], text = L["Triggered  message"],  width = 300, help = L["Custom text for when this timer is triggered, overrides the anchor text."], type = "input", var = {spell, "triggeredMessage"}},
+		{ order = 2, group = L["Messages"], text = L["Triggered message"],  width = 300, help = L["Custom text for when this timer is triggered, overrides the anchor text."], type = "input", var = {spell, "triggeredMessage"}},
 		{ order = 3, group = L["Messages"], text = L["Faded message"],  width = 300, help = L["Custom text for when this timer fades, either because the time ran out of the target was removed."], type = "input", var = {spell, "fadedMessage"}},
 	}
 

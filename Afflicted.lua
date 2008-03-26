@@ -74,26 +74,28 @@ function Afflicted:OnInitialize()
 	-- Upgrade
 	if( self.db.profile.version ~= self.revision ) then
 		for name, data in pairs(self.db.profile.spells) do
-			if( not data.showIn ) then
-				data.singleLimit = data.limit or 0
-				data.globalLimit = 0
-				
-				if( data.type == "spell" ) then
-					data.showIn = "Spell"
-				elseif( data.type == "buff" ) then
-					data.showIn = "Buff"
-				elseif( data.type == "debuff" ) then
-					data.checkDebuff = true
-					data.showIn = "Spell"
-				else
-					data.showIn = "Spell"
-				end
-				
-				data.limit = nil
-				data.type = nil
-			end
+			if( type(data) == "table" ) then
+				if( not data.showIn ) then
+					data.singleLimit = data.limit or 0
+					data.globalLimit = 0
 
-			data.linkedTo = data.linkedTo or ""
+					if( data.type == "spell" ) then
+						data.showIn = "Spell"
+					elseif( data.type == "buff" ) then
+						data.showIn = "Buff"
+					elseif( data.type == "debuff" ) then
+						data.checkDebuff = true
+						data.showIn = "Spell"
+					else
+						data.showIn = "Spell"
+					end
+
+					data.limit = nil
+					data.type = nil
+				end
+
+				data.linkedTo = data.linkedTo or ""
+			end
 		end
 	end
 	
@@ -102,7 +104,7 @@ function Afflicted:OnInitialize()
 	-- Update the spell list with the default and manual
 	self.spellList = {}
 	self:UpdateSpellList()
-
+	
 	-- Setup our visual style
 	if( self.db.profile.showBars and self.modules.Bars ) then
 		self.visual = self.modules.Bars:LoadVisual()
@@ -117,6 +119,8 @@ function Afflicted:OnInitialize()
 		self:UnregisterAllEvents()
 		return
 	end
+	
+	Afflicted.modules.Config:LoadData()
 
 	-- Monitor for zone change
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
