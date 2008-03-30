@@ -72,13 +72,13 @@ function Config:LoadData()
 	OHObj:RegisterCategory(L["Spell List"], self, "CreateSpellList", true, 3)
 	
 	for name, data in pairs(Afflicted.db.profile.anchors) do
-		if( type(data) == "table" ) then
+		if( type(data) == "table" and name ) then
 			OHObj:RegisterSubCategory(L["Anchor List"], name, self, "ModifyAnchor", nil, name)
 		end
 	end
 
 	for name, data in pairs(Afflicted.spellList) do
-		if( type(data) == "table" ) then
+		if( type(data) == "table" and name ) then
 			OHObj:RegisterSubCategory(L["Spell List"], name, self, "ModifySpell", nil, name)
 		end
 	end
@@ -125,6 +125,7 @@ function Config:CreateUI()
 		{ order = 1, group = L["General"], text = L["Only enable inside"], help = L["Only enable Afflicted inside the specified areas."], type = "dropdown", list = {{"none", L["Everywhere else"]}, {"pvp", L["Battlegrounds"]}, {"arena", L["Arenas"]}, {"raid", L["Raid Instances"]}, {"party", L["Party Instances"]}}, multi = true, var = "inside"},
 		{ order = 2, group = L["General"], text = L["Show icons in local alerts"], help = L["Shows the spell icon when the alert is sent to a local channel like middle of screen, or a chat frame."], type = "check", var = "showIcons"},
 		{ order = 3, group = L["General"], text = L["Show timers anchor"], help = L["ALT + Drag the anchors to move the frames."], type = "check", var = "showAnchors"},
+		{ order = 3, group = L["General"], text = L["Only record timers for target/focus"], help = L["Only records timers if the person afflicted is your current target, or focus."], type = "check", var = "showTarget"},
 
 		{ group = L["Bars"], type = "groupOrder", order = 2 },
 		{ order = 1, group = L["Bars"], text = L["Show timer as bars"], help = L["Shows timers as bars instead of just icons, requires a reloadui to take effect."], type = "check", var = "showBars"},
@@ -497,7 +498,7 @@ function Config:CreateSpellList()
 		end
 	end
 
-	-- Update the dropdown incase any new textures were added
+	-- Update the dropdown in case any new textures were added
 	cachedFrame = HouseAuthority:CreateConfiguration(config, {handler = self, columns = 7})
 	cachedFrame:SetScript("OnHide", updateAnchorVisibility)
 	return cachedFrame
@@ -544,13 +545,15 @@ function Config:ModifySpell(category, spell)
 	local config = {
 		{ group = L["General"], type = "groupOrder", order = 1 },
 		{ order = 1, group = L["General"], text = L["Disable spell"], help = L["When disabled, you won't see any timers fired from this."], type = "check", var = {spell, "disabled"}},
-		{ order = 2, group = L["General"], text = L["Ignore spell fade events"], help = L["Some buffs you don't want to have the timer removed just because it faded from the person, this is the case for things like Shadowstep where you don't want it removed 3 seconds after the buff fades because you want the cooldown timer."], type = "check", var = {spell, "dontFade"}},
-		{ order = 3, group = L["General"], text = L["Check debuffs for spell"], help = L["Enables checking of debuffs enemies put onto people in our group for triggering this timer."], type = "check", var = {spell, "checkDebuff"}},
 		{ order = 4, group = L["General"], text = L["Show in"], help = L["Anchor to show this timer inside, remember if the anchor is disabled this spell won't be tracked."], type = "dropdown", list = currentAnchors,  var = {spell, "showIn"}},
 		{ order = 5, group = L["General"], text = L["Repeating timer"], help = L["Keeps repeating the timer everytime it hits 0 until the timer in question is removed either by the item being destroyed, or another way."], type = "check", var = {spell, "repeating"}},
 		{ order = 6, group = L["General"], text = L["Cooldown/duration"], help = L["Timer to show when this spell is triggered."], type = "input", numeric = true, width = 30, default = 0, var = {spell, "seconds"}},
 		{ order = 7, group = L["General"], text = L["Linked spell"], help = L["The parent spell, for example. \"Counterspell - Silence\" should be linked to \"Counterspell\" so that way if a timer is started for Counterspell, another won't be done for \"Counterspell - Silence\" if their on the same target."], type = "dropdown", list = spellList, default = "", var = {spell, "linkedTo"}},
 		{ order = 8, group = L["General"], text = L["Icon path"], help = L["Full icon path to the texture, for example \"Interface\\Icons\\<NAME>\".\nThis will automatically be set using the in-game spell icon, so it's not required. But you can override it if you wish."], type = "input", width = 350, var = {spell, "icon"}},
+
+		{ group = L["Events"], type = "groupOrder", order = 2 },
+		{ order = 1, group = L["Events"], text = L["Check events"], help = L["Events to check for when seeing if this timer should be activated."], multi = true, type = "dropdown", list = {{"SPELL_DAMAGE", L["General damage"]}, {"SPELL_AURA_APPLIEDDEBUFFGROUP", L["Group gains debuff"]}, {"SPELL_AURA_APPLIEDBUFFENEMY", L["Enemy gains buff"]}, {"SPELL_SUMMON", L["Enemy summons object"]}, {"SPELL_CREATE", L["Enemy creates object"]}, {"SPELL_INTERRUPT", L["Enemy interrupts group"]}}, var = {spell, "checkEvents"}},
+		{ order = 2, group = L["Events"], text = L["Ignore spell fade events"], help = L["Some buffs you don't want to have the timer removed just because it faded from the person, this is the case for things like Shadowstep where you don't want it removed 3 seconds after the buff fades because you want the cooldown timer."], type = "check", var = {spell, "dontFade"}},
 
 		{ group = L["Limits"], type = "groupOrder", order = 2 },
 		{ order = 1, group = L["Limits"], text = L["Per-player trigger limit (seconds)"], help = L["Limits how many times this timer can be triggered in the entered amount of seconds, you may need to enter 0.50-1.0 seconds for things like Physic Scream that debuff multiple people at once."], type = "input", validate = "Validate", error = L["You may only enter a number or a float into this, \"%s\" is invalid."], width = 30, default = 0, var = {spell, "singleLimit"}},

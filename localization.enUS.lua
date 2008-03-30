@@ -68,9 +68,23 @@ AfflictedLocals = {
 	["Type: %s%s%s"] = "Type: %s%s%s",
 	["Anchor: %s%s%s"] = "Anchor: %s%s%s",
 	
+	["Events"] = "Events",
+	
+	["Events to check for when seeing if this timer should be activated."] = "Events to check for when seeing if this timer should be activated.",
+	
+	["General damage"] = "General damage",
+	["Group gains debuff"] = "Group gains debuff",
+	["Enemy gains buff"] = "Enemy gains buff",
+	["Enemy summons object"] = "Enemy summons object",
+	["Enemy creates object"] = "Enemy creates object",
+	["Enemy interrupts group"] = "Enemy interrupts group",
+	
 	["Redirect bar timers to"] = "Redirect bar timers to",
 	["Anchor to redirect all bar timers to, for example you can make it so all timers from \"Buff\" go to the \"Spell\" anchor without having to redo all of the show in options."] = "Anchor to redirect all bar timers to, for example you can make it so all timers from \"Buff\" go to the \"Spell\" anchor without having to redo all of the show in options.",
 	["Redirection"] = "Redirection",
+	
+	["Only record timers for target/focus"] = "Only record timers for target/focus",
+	["Only records timers if the person afflicted is your current target, or focus."] = "Only records timers if the person afflicted is your current target, or focus.",
 
 	["Enable timer as bars"] = "Enable timer as bars",
 	["Shows timers as bars instead of just icons, requires a reloadui to take effect."] = "Shows timers as bars instead of just icons, requires a reloadui to take effect.",
@@ -88,6 +102,7 @@ AfflictedLocals = {
 	["Fade message"] = "Fade message",
 	["Ready message"] = "Ready message",
 	["Used message"] = "Used message",
+	["Middle of screen anchor"] = "Middle of screen anchor",
 	
 	["Text used when an enemy gains a buff, or a friendly player is afflicted by a debuff."] = "Text used when an enemy gains a buff, or a friendly player is afflicted by a debuff.",
 	["Text used when an enemies buff or debuff fades."] = "Text used when an enemies buff or debuff fades.",

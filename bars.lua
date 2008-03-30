@@ -1,7 +1,7 @@
 if( not Afflicted ) then return end
 
 local Bars = Afflicted:NewModule("Bars", "AceEvent-3.0")
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual", "TimerExists"}
 local SML, GTBLib
 local barData = {}
 
@@ -106,7 +106,7 @@ function Bars:CreateDisplay(type)
 	frame.group:SetWidth(Afflicted.db.profile.barWidth)
 	frame.group:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
 	frame.group:SetDisplayGroup(anchorData.redirectTo ~= "" and anchorData.redirectTo or nil)
-		
+	
 	return frame
 end
 
@@ -143,6 +143,10 @@ function Bars:ClearTimers(type)
 	anchorFrame.group:UnregisterAllBars()
 end
 
+function Bars:TimerExists(spellData, spellID, sourceGUID, destGUID)
+	return (barData[spellID .. sourceGUID])
+end
+
 -- Create a new timer
 function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 	local anchorFrame = Bars[spellData.showIn]
@@ -168,6 +172,8 @@ end
 function Bars:OnBarFade(barID)
 	if( barID and barData[barID] ) then
 		Afflicted:AbilityEnded(string.split(",", barData[barID]))
+
+		barData[barID] = nil
 	end
 end
 

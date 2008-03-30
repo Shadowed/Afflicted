@@ -4,22 +4,10 @@ local Icons = Afflicted:NewModule("Icons", "AceEvent-3.0")
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "TimerExists", "ReloadVisual"}
 
 function Icons:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-end
-
--- We delay this until PEW to fix UIScale issues
-function Icons:PLAYER_ENTERING_WORLD()
-	for key, data in pairs(Afflicted.db.profile.anchors) do
-		local frame = self[key]
-		if( frame ) then
-			frame:Show()
-		end
-	end
-	
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 -- Reposition the passed frames timers
@@ -34,8 +22,17 @@ local function repositionTimers(type)
 
 	-- Reposition everything
 	for id, icon in pairs(frame.active) do
-		icon:ClearAllPoints()
-		icon:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 2, mod * POSITION_SIZE * id)
+		if( id > 1 ) then
+			icon:ClearAllPoints()
+			icon:SetPoint("TOPLEFT", frame.active[id - 1], "BOTTOMLEFT", 0, 0)
+		else
+			local scale = frame:GetEffectiveScale()
+			local position = Afflicted.db.profile.anchors[type].position
+			local y = (position.y / scale) - 12
+		
+			icon:ClearAllPoints()
+			icon:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", position.x / scale, y)
+		end
 	end
 end
 
@@ -93,7 +90,7 @@ local function OnUpdate(self, elapsed)
 			self.timeLeft = self.startSeconds
 			self.lastUpdate = time
 			
-			local anchor = self:GetParent()
+			local anchor = Icons[self.type]
 			table.sort(anchor.active, sortTimers)
 			repositionTimers(anchor.type)
 			return
@@ -112,7 +109,7 @@ end
 
 -- Create our little icon frame
 local function createRow(parent)
-	local frame = CreateFrame("Frame", nil, parent)
+	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:SetWidth(50)
 	frame:SetHeight(ICON_SIZE)
 	frame:SetScript("OnUpdate", OnUpdate)
@@ -159,11 +156,10 @@ function Icons:CreateDisplay(type)
 	frame.inactive = {}
 	frame.type = type
 	
-	if( not Afflicted.db.profile.showAnchors ) then
-		frame:SetAlpha(0)
-		frame:EnableMouse(false)
+	if( Afflicted.db.profile.showAnchors ) then
+		frame:Show()
 	end
-
+	
 	-- Display name
 	frame.text = frame:CreateFontString(nil, "OVERLAY")
 	frame.text:SetPoint("CENTER", frame)
@@ -203,8 +199,20 @@ function Icons:ClearTimers(type)
 		table.insert(frame.inactive, frame.active[i])
 		table.remove(frame.active, i)
 	end
+end
+
+function Icons:TimerExists(spellData, spellID, sourceGUID, destGUID)
+	local anchorFrame = Icons[spellData.showIn]
+	if( anchorFrame ) then
+		for i=#(anchorFrame.active), 1, -1 do
+			local row = anchorFrame.active[i]
+			if( ( row.spellName == spellData.linkedTo or row.spellID == spellData.linkedTo ) and row.destGUID == destGUID ) then
+				return true
+			end
+		end
+	end
 	
-	--frame:Hide()
+	return nil
 end
 
 -- Create a new timer
@@ -234,7 +242,8 @@ function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID,
 	frame.startSeconds = spellData.seconds
 	frame.timeLeft = spellData.seconds
 	frame.lastUpdate = GetTime()
-
+	
+	frame.type = anchorFrame.type
 	frame.icon:SetTexture(spellData.icon)
 	frame:Show()
 	
@@ -297,12 +306,23 @@ function Icons:ReloadVisual()
 
 			-- Annnd make sure it's shown or hidden
 			if( Afflicted.db.profile.showAnchors ) then
-				frame:SetAlpha(1)
-				frame:EnableMouse(true)
+				frame:Show()
 			else
-				frame:SetAlpha(0)
-				frame:EnableMouse(false)
+				frame:Hide()
 			end
 		end
 	end
+end
+
+
+-- We delay this until PEW to fix UIScale issues
+function Icons:PLAYER_ENTERING_WORLD()
+	for key, data in pairs(Afflicted.db.profile.anchors) do
+		local frame = self[key]
+		if( frame ) then
+			OnShow(frame)
+		end
+	end
+	
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end

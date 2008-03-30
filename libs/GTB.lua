@@ -1,5 +1,5 @@
 local major = "GTB-Beta1"
-local minor = tonumber(string.match("$Revision: 405 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 634 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 
@@ -580,6 +580,11 @@ end
 function GTB.UnregisterAllBars(group)
 	assert(3, group.name and groups[group.name], string.format(L["MUST_CALL"], "UnregisteRAllBars"))
 	
+	-- Check if we're supposed to redirect this to another group, and that the group exists
+	if( group.redirectTo and groups[group.redirectTo] ) then
+		group = groups[group.redirectTo]
+	end
+
 	-- Clear the used bars list
 	local totalBars = #(group.usedBars)
 	for i=totalBars, 1, -1 do
@@ -641,7 +646,6 @@ function GTB.SetBarIcon(group, id, icon, left, right, top, bottom)
 
 	local frame = group.bars[id]
 	
-
 	-- No bar exists for this id, fail silently
 	if( not frame ) then
 		return
@@ -675,7 +679,20 @@ function GTB.SetRepeatingTimer(group, id, flag)
 	argcheck(id, 2, "string", "number")
 	argcheck(flag, 3, "boolean")
 	assert(3, group.name and groups[group.name], string.format(L["MUST_CALL"], "SetRepeatingTimer"))
+
+	-- Check if we're supposed to redirect this to another group, and that the group exists
+	if( group.redirectTo and groups[group.redirectTo] ) then
+		group = groups[group.redirectTo]
+	end
+
+	local frame = group.bars[id]
 	
+	-- No bar exists for this id, fail silently
+	if( not frame ) then
+		return
+	end
+	
+	-- Flag as repeating!
 	if( group.bars[id] ) then
 		group.bars[id].repeating = flag
 	end
@@ -688,6 +705,11 @@ function GTB.RegisterOnClick(group, id, handler, func, ...)
 	argcheck(func, 4, "function", "string")
 	assert(3, group.name and groups[group.name], string.format(L["MUST_CALL"], "RegisterOnClick"))
 	
+	-- Check if we're supposed to redirect this to another group, and that the group exists
+	if( group.redirectTo and groups[group.redirectTo] ) then
+		group = groups[group.redirectTo]
+	end
+
 	local frame = group.bars[id]
 	
 	-- No bar exists for this id, fail silently

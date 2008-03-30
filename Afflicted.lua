@@ -63,6 +63,8 @@ function Afflicted:OnInitialize()
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
 				showIn = "spell",
 				linkedTo = "",
+				repeating = false,
+				checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = true, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 			},
 		},
 	}
@@ -95,6 +97,14 @@ function Afflicted:OnInitialize()
 				end
 
 				data.linkedTo = data.linkedTo or ""
+				
+				if( not data.checkEvents ) then
+					data.checkEvents = {}
+					data.checkDebuffs = nil
+					for k, v in pairs(self.defaults.profile.spellDefault.checkEvents) do
+						data.checkEvents[k] = v	
+					end
+				end
 			end
 		end
 	end
@@ -182,7 +192,6 @@ local eventRegistered = {["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REMOVED"] =
 function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, ...)
 	if( not eventRegistered[eventType] ) then
 		return
-
 	end
 	
 
@@ -197,18 +206,18 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		
 		-- Group member gained a debuff
 		if( auraType == "DEBUFF" and isDestGroup ) then
-			self:ProcessAbility(eventType .. auraType, spellID, spellName, spellSchool, destGUID, "", destGUID, destName)
+			self:ProcessAbility(eventType .. auraType .. "GROUP", spellID, spellName, spellSchool, destGUID, "", destGUID, destName)
 			
 		-- Enemy gained a buff
 		elseif( auraType == "BUFF" and isDestEnemy ) then
-			self:ProcessAbility(eventType .. auraType, spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
+			self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
 		end
 	
 	-- Buff faded from an enemy
 	elseif( eventType == "SPELL_AURA_REMOVED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
 		if( auraType == "BUFF" ) then
-			self:AbilityEnded(eventType, spellID, spellName, destGUID, destName)
+			self:AbilityEnded(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
 		end
 	
 	-- Check for something being summoned (Pets)
@@ -238,9 +247,9 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	elseif( eventType == "SPELL_MISSED" or eventType == "SPELL_DAMAGE" or eventType == "SPELL_DRAIN" or eventType == "SPELL_LEECH" ) then
 		local spellID, spellName, spellSchool = ...
 		if( isSourceEnemy and isDestGroup ) then
-			self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
+			self:ProcessAbility("SPELL_DAMAGE", spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 		end
-		
+				
 	-- We tried to dispel a buff, and failed
 	elseif( eventType == "SPELL_DISPEL_FAILED" or eventType == "SPELL_PERIODIC_DISPEL_FAILED" ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
@@ -255,7 +264,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	elseif( eventType == "SPELL_AURA_DISPELLED" or eventType == "SPELL_AURA_STOLEN" ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
 		
-		if( not isDestEnemy or ( isDestEnemy and not self.db.profile.dispelHostile ) ) then
+		if( not isDestEnemy or ( isDestEnemy and self.db.profile.dispelHostile ) ) then
 			if( bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
 				self:SendMessage(string.format(L["Removed %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelDest, self.db.profile.dispelColor, extraSpellID)
 			end
@@ -312,12 +321,16 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	local spellData = self.spellList[spellID] or self.spellList[spellName]
 	
 	-- Check if we're monitoring this spell
-	if( not spellData or spellData.disabled or ( eventType == "SPELL_AURA_APPLIEDDEBUFF" and not spellData.checkDebuff ) ) then
+	if( not spellData or spellData.disabled or not spellData.checkEvents[eventType] ) then
 		return
 	end
 	
+	-- Check if it matches our target/focus only
+	if( self.db.profile.showTarget and UnitGUID("target") ~= sourceGUID and UnitGUID("focus") ~= sourceGUID ) then
+		return
+	end
+
 	local anchor = self.db.profile.anchors[spellData.showIn]
-	
 
 	-- Check if this spell is enabled, and the anchors enabled
 	if( not anchor or not anchor.enabled ) then
@@ -357,13 +370,8 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 	
 	-- Check if it's a linked spell
-	if( spellData.linkedTo and spellData.linkedTo ~= "" ) then
-		for i=#(anchorFrame.active), 1, -1 do
-			local row = anchorFrame.active[i]
-			if( ( row.spellName == spellData.linkedTo or row.spellID == spellData.linkedTo ) and row.destGUID == destGUID ) then
-				return
-			end
-		end
+	if( spellData.linkedTo and spellData.linkedTo ~= "" and self.visual:TimerExists(spellData, spellID, sourceGUID, destGUID) ) then
+		return
 	end
 	
 	-- Check if we need to update the icon
