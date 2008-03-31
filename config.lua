@@ -26,15 +26,18 @@ function Config:OnInitialize()
 				Afflicted.visual:ClearTimers(key)
 			end
 
+			local i = 0
 			local addedTypes = {}
 			for spell, data in pairs(AfflictedSpells) do
+				i = i + 1
+				
 				if( not addedTypes[data.showIn] ) then
 					addedTypes[data.showIn] = 0
 				end
 
 				if( addedTypes[data.showIn] < 5 and data.icon and data.icon ~= "" ) then
 					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
-					Afflicted:ProcessAbility("TEST", 0, spell, 0, GetTime() .. spell, "", "", "")
+					Afflicted:ProcessAbility("TEST", i, spell, i, GetTime() .. spell, "", "", "")
 				end
 			end
 
@@ -407,7 +410,14 @@ function Config:AddSpellModifier()
 	-- Copy the defaults into our base info
 	Afflicted.db.profile.spells[spellName] = {}
 	for k, v in pairs(Afflicted.defaults.profile.spellDefault) do
-		Afflicted.db.profile.spells[spellName][k] = v
+		if( type(v) == "table" ) then
+			Afflicted.db.profile.spells[spellName][k] = {}
+			for k2, v2 in pairs(v) do
+				Afflicted.db.profile.spells[spellName][k][k2] = v2
+			end
+		else
+			Afflicted.db.profile.spells[spellName][k] = v
+		end
 	end
 	
 	Afflicted:UpdateSpellList()

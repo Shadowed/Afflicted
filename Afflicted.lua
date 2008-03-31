@@ -9,6 +9,8 @@ local globalLimit = {}
 
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
+local LOCKOUT_TIME = 1.75
+
 function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
@@ -64,7 +66,7 @@ function Afflicted:OnInitialize()
 				showIn = "spell",
 				linkedTo = "",
 				repeating = false,
-				checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = true, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
+				checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 			},
 		},
 	}
@@ -77,6 +79,13 @@ function Afflicted:OnInitialize()
 	if( self.db.profile.version ~= self.revision ) then
 		for name, data in pairs(self.db.profile.spells) do
 			if( type(data) == "table" ) then
+				if( not data.checkEvents ) then
+					data.checkEvents = {}
+					for k, v in pairs(self.defaults.profile.spellDefault.checkEvents) do
+						data.checkEvents[k] = v	
+					end
+				end
+
 				if( not data.showIn ) then
 					data.singleLimit = data.limit or 0
 					data.globalLimit = 0
@@ -86,7 +95,7 @@ function Afflicted:OnInitialize()
 					elseif( data.type == "buff" ) then
 						data.showIn = "Buff"
 					elseif( data.type == "debuff" ) then
-						data.checkDebuff = true
+						data.checkEvents["SPELL_AURA_APPLIEDDEBUFFGROUP"] = true
 						data.showIn = "Spell"
 					else
 						data.showIn = "Spell"
@@ -95,16 +104,14 @@ function Afflicted:OnInitialize()
 					data.limit = nil
 					data.type = nil
 				end
+				
+				if( data.checkDebuffs ) then
+					data.checkDebuffs = nil
+					data.checkEvents["SPELL_AURA_APPLIEDDEBUFFGROUP"] = true
+				end
+				
 
 				data.linkedTo = data.linkedTo or ""
-				
-				if( not data.checkEvents ) then
-					data.checkEvents = {}
-					data.checkDebuffs = nil
-					for k, v in pairs(self.defaults.profile.spellDefault.checkEvents) do
-						data.checkEvents[k] = v	
-					end
-				end
 			end
 		end
 	end
@@ -130,7 +137,9 @@ function Afflicted:OnInitialize()
 		return
 	end
 	
-	Afflicted.modules.Config:LoadData()
+	if( Afflicted.modules.Config ) then
+		Afflicted.modules.Config:LoadData()
+	end
 
 	-- Monitor for zone change
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
@@ -186,7 +195,7 @@ local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
 local COMBATLOG_OBJECT_AFFILIATION_PARTY = COMBATLOG_OBJECT_AFFILIATION_PARTY
 local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
 local COMBATLOG_OBJECT_REACTION_HOSTILE	= COMBATLOG_OBJECT_REACTION_HOSTILE
-local GROUP_AFFILIATION = bit.bor(COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_TYPE_PLAYER, COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID)
+local GROUP_AFFILIATION = bit.bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_AFFILIATION_MINE)
 
 local eventRegistered = {["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true, ["SPELL_MISSED"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_DRAIN"] = true, ["SPELL_LEECH"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_PERIODIC_DISPEL_FAILED"] = true, ["SPELL_AURA_DISPELLED"] = true, ["SPELL_AURA_STOLEN"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true}
 function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, ...)
@@ -203,7 +212,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Buff gained on an enemy, or a debuff gained from an enemy from someone in our group
 	if( eventType == "SPELL_AURA_APPLIED" ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		
+			
 		-- Group member gained a debuff
 		if( auraType == "DEBUFF" and isDestGroup ) then
 			self:ProcessAbility(eventType .. auraType .. "GROUP", spellID, spellName, spellSchool, destGUID, "", destGUID, destName)
@@ -319,8 +328,6 @@ end
 -- New ability found
 function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	local spellData = self.spellList[spellID] or self.spellList[spellName]
-	
-	-- Check if we're monitoring this spell
 	if( not spellData or spellData.disabled or not spellData.checkEvents[eventType] ) then
 		return
 	end
@@ -329,10 +336,8 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	if( self.db.profile.showTarget and UnitGUID("target") ~= sourceGUID and UnitGUID("focus") ~= sourceGUID ) then
 		return
 	end
-
+	
 	local anchor = self.db.profile.anchors[spellData.showIn]
-
-	-- Check if this spell is enabled, and the anchors enabled
 	if( not anchor or not anchor.enabled ) then
 		return
 	end
@@ -361,12 +366,12 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	
 	-- Spell interrupts generally have another component that you see after, like damage or a debuff. So don't let two timers show
 	if( eventType == "SPELL_INTERRUPT" and ( not spellData.singleLimit or spellData.singleLimit < 2 ) ) then
-		playerLimit[id] = time + 1
+		playerLimit[id] = time + LOCKOUT_TIME
 	end
 	
 	-- If we have to check debuffs, it means we need a global limit on the specific spellID + destGUID to prevent two timers
-	if( spellData.checkDebuff and ( not spellData.globalLimit or spellData.globalLimit < 1.5 ) ) then
-		globalLimit[debuffID] = GetTime() + 1
+	if( spellData.checkEvents["SPELL_AURA_APPLIEDDEBUFFGROUP"] and ( not spellData.globalLimit or spellData.globalLimit < LOCKOUT_TIME ) ) then
+		globalLimit[debuffID] = GetTime() + LOCKOUT_TIME
 	end
 	
 	-- Check if it's a linked spell
@@ -545,7 +550,6 @@ end
 function Afflicted:SendMessage(msg, dest, color, spellID)
 	if( dest == "none" ) then
 		return
-
 	end
 	
 

@@ -14,21 +14,25 @@ end
 local function repositionTimers(type)
 	local frame = Icons[type]
 	
-	-- Flip the modifier so we can change between going top -> bottom and bottom -> top
-	local mod = -1
-	if( Afflicted.db.profile.anchors[type].growUp ) then
-		mod = 1
-	end
-
 	-- Reposition everything
 	for id, icon in pairs(frame.active) do
 		if( id > 1 ) then
 			icon:ClearAllPoints()
-			icon:SetPoint("TOPLEFT", frame.active[id - 1], "BOTTOMLEFT", 0, 0)
+			if( not Afflicted.db.profile.anchors[type].growUp ) then
+				icon:SetPoint("TOPLEFT", frame.active[id - 1], "BOTTOMLEFT", 0, 0)
+			else
+				icon:SetPoint("BOTTOMLEFT", frame.active[id - 1], "TOPLEFT", 0, 0)
+			end
 		else
 			local scale = frame:GetEffectiveScale()
 			local position = Afflicted.db.profile.anchors[type].position
-			local y = (position.y / scale) - 12
+			local y = position.y / scale
+			
+			if( Afflicted.db.profile.anchors[type].growUp ) then
+				y = y + ICON_SIZE
+			else
+				y = y - 12
+			end
 		
 			icon:ClearAllPoints()
 			icon:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", position.x / scale, y)

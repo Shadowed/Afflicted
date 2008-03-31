@@ -104,8 +104,15 @@ function Bars:CreateDisplay(type)
 	frame.group:RegisterOnFade(Bars, "OnBarFade")
 	frame.group:SetScale(anchorData.scale)
 	frame.group:SetWidth(Afflicted.db.profile.barWidth)
-	frame.group:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
 	frame.group:SetDisplayGroup(anchorData.redirectTo ~= "" and anchorData.redirectTo or nil)
+	frame.group:SetBarGrowth(anchorData.growUp and "UP" or "DOWN")
+	
+
+	if( not anchorData.growUp ) then
+		frame.group:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
+	else
+		frame.group:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
+	end
 	
 	return frame
 end
@@ -193,11 +200,18 @@ function Bars:ReloadVisual()
 		local frame = Bars[key]
 		if( frame ) then
 			frame.group:SetScale(data.scale)
-			frame.group:SetWidth(Afflicted.db.profile.barWidth)
 			frame.group:SetDisplayGroup(data.redirectTo ~= "" and data.redirectTo or nil)
+			frame.group:SetBarGrowth(data.growUp and "UP" or "DOWN")
+			frame.group:SetWidth(Afflicted.db.profile.barWidth)
 
 			frame:SetWidth(Afflicted.db.profile.barWidth)
 			frame:SetScale(data.scale)
+
+			if( not data.growUp ) then
+				frame.group:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
+			else
+				frame.group:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
+			end
 		
 			if( not Afflicted.db.profile.showAnchors ) then
 				frame:SetAlpha(0)
