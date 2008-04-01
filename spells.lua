@@ -6,6 +6,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	[L["Ice Block"]] = {
@@ -13,6 +14,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	-- Buffs
@@ -21,6 +23,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	[L["Blessing of Freedom"]] = {
@@ -28,6 +31,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	[L["Blessing of Sacrifice"]] = {
@@ -35,6 +39,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Pain Suppression"]] = {
@@ -42,6 +47,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	-- Abilities
@@ -50,6 +56,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	[L["Spell Reflection"]] ={
@@ -57,6 +64,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Buff",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	-- Silences
@@ -65,14 +73,15 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Silence"]] = {
 		seconds = 45,
 		singleLimit = 0,
-		type = "deBuff",
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = true, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Feral Charge"]] = {
@@ -80,6 +89,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Spell Lock"]] = {
@@ -87,6 +97,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	[L["Counterspell"]] = {
@@ -94,6 +105,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Counterspell - Silenced"]] ={
@@ -101,6 +113,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = L["CounterSpell"],
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Kick"]] = {
@@ -108,6 +121,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Pummel"]] = {
@@ -115,6 +129,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 
 	[L["Shield Bash"]] = {
@@ -123,6 +138,7 @@ AfflictedSpells = {
 		showIn = "Spell",
 		--linkedTo = L["Pummel"],
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	-- Shocks
@@ -132,6 +148,7 @@ AfflictedSpells = {
 		showIn = "Spell",
 		--linkedTo = L["Earth Shock"],
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	[L["Frost Shock"]] = {
@@ -140,6 +157,7 @@ AfflictedSpells = {
 		showIn = "Spell",
 		--linkedTo = L["Earth Shock"],
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 	
 	[L["Earth Shock"]] = {
@@ -147,5 +165,6 @@ AfflictedSpells = {
 		singleLimit = 0,
 		showIn = "Spell",
 		linkedTo = "",
+		checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 	},
 }
