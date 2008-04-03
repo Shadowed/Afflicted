@@ -65,6 +65,7 @@ AfflictedLocals = {
 	["Edit"] = "Edit",
 	["Afflicted: %s%s%s"] = "Afflicted: %s%s%s",
 	["Timer: %s%d%s"] = "Timer: %s%d%s",
+	["Check events"] = "Check events",
 	["Type: %s%s%s"] = "Type: %s%s%s",
 	["Anchor: %s%s%s"] = "Anchor: %s%s%s",
 	

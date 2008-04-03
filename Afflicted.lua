@@ -217,7 +217,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		-- Group member gained a debuff
 		if( auraType == "DEBUFF" and isDestGroup ) then
 			self:ProcessAbility(eventType .. auraType .. "GROUP", spellID, spellName, spellSchool, destGUID, "", destGUID, destName)
-			
+		
 		-- Enemy gained a buff
 		elseif( auraType == "BUFF" and isDestEnemy ) then
 			self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
@@ -357,7 +357,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end	
 	
 	-- Check/set global trigger limits
-	if( ( globalLimit[debuffID] and globalLimit[debuffID] >= time ) or ( globalLimit[spellID] and globalLimit[spellID] >= time ) ) then
+	if( ( globalLimit[spellID] and globalLimit[spellID] >= time ) or ( globalLimit[debuffID] and globalLimit[debuffID] >= time ) ) then
 		return
 	end
 
