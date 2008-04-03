@@ -17,12 +17,14 @@ function Afflicted:OnInitialize()
 			showAnchors = true,
 			showIcons = true,
 			showBars = true,
+			
 			dispelEnabled = true,
 			dispelHostile = true,
-			dispelDest = "1",
+			dispelDest = "party",
 			dispelColor = { r = 1, g = 1, b = 1 },
+			
 			interruptEnabled = true,
-			interruptDest = "rwframe",
+			interruptDest = "party",
 			interruptColor = { r = 1, g = 1, b = 1 },
 			
 			barWidth = 180,
@@ -31,7 +33,7 @@ function Afflicted:OnInitialize()
 			anchors = {
 				["Spell"] = {
 					enabled = true,
-					announce = true,
+					announce = false,
 					growUp = false,
 					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
 					announceDest = "1",
@@ -45,7 +47,7 @@ function Afflicted:OnInitialize()
 				},
 				["Buff"] = {
 					enabled = true,
-					announce = true,
+					announce = false,
 					growUp = false,
 					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
 					announceDest = "1",
@@ -203,7 +205,6 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		return
 	end
 	
-
 	local isDestEnemy = (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 	local isDestGroup = (bit.band(destFlags, GROUP_AFFILIATION) > 0)
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
@@ -244,7 +245,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool = ...
 	
 		-- We interrupted an enemy
-		if( isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
+		if( self.db.profile.interruptEnabled and isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
 			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, spellSchools[extraSpellSchool] or ""), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
 		
 		-- Someone in our group was interrupted
