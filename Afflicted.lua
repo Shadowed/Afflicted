@@ -4,9 +4,7 @@ local L = AfflictedLocals
 
 local instanceType
 
-local playerLimit = {}
-local globalLimit = {}
-
+local timerLimits = {}
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
 local LOCKOUT_TIME = 1.75
@@ -30,8 +28,11 @@ function Afflicted:OnInitialize()
 			barWidth = 180,
 			barName = "BantoBar",
 			
+			spells = {},
+			inside = {["arena"] = true, ["pvp"] = true},
+			
 			anchors = {
-				["Spell"] = {
+				["spells"] = {
 					enabled = true,
 					announce = false,
 					growUp = false,
@@ -45,7 +46,7 @@ function Afflicted:OnInitialize()
 					fadeMessage = L["FADED *spell (*target)"],
 					readyMessage = L["READY *spell (*target)"],
 				},
-				["Buff"] = {
+				["buffs"] = {
 					enabled = true,
 					announce = false,
 					growUp = false,
@@ -60,8 +61,19 @@ function Afflicted:OnInitialize()
 					readyMessage = L["READY *spell (*target)"],
 				},
 			},
-			spells = {},
-			inside = {["arena"] = true, ["pvp"] = true},
+			anchorDefault = {
+					enabled = true,
+					announce = false,
+					growUp = false,
+					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
+					announceDest = "1",
+					scale = 1.0,
+
+					gainMessage = L["GAINED *spell (*target)"],
+					usedMessage = L["USED *spell (*target)"],
+					fadeMessage = L["FADED *spell (*target)"],
+					readyMessage = L["READY *spell (*target)"],
+			},
 			spellDefault = {
 				seconds = 0,
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
@@ -139,10 +151,6 @@ function Afflicted:OnInitialize()
 		return
 	end
 	
-	if( Afflicted.modules.Config ) then
-		Afflicted.modules.Config:LoadData()
-	end
-
 	-- Monitor for zone change
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
@@ -293,7 +301,7 @@ end
 
 -- Merge spells in
 function Afflicted:UpdateSpellList()
-	self.spellList = AfflictedSpells
+	self.spellList = AfflictedSpells or {}
 
 	-- Merge in the players spells
 	for name, data in pairs(self.db.profile.spells) do
@@ -334,7 +342,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 	
 	-- Check if it matches our target/focus only
-	if( self.db.profile.showTarget and UnitGUID("target") ~= sourceGUID and UnitGUID("focus") ~= sourceGUID ) then
+	if( self.db.profile.showTarget and UnitGUID("target") ~= sourceGUID and UnitGUID("focus") ~= sourceGUID and eventType ~= "TEST" ) then
 		return
 	end
 	
@@ -342,45 +350,36 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	if( not anchor or not anchor.enabled ) then
 		return
 	end
-
+	
+	-- Trigger limits
 	local id = spellID .. sourceGUID
 	local debuffID = spellID .. destGUID
 	local time = GetTime()
-		
-	-- Check/set single trigger limits
-	if( playerLimit[id] and playerLimit[id] >= time ) then
+	
+
+	if( ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
 		return
 	end
-
-	if( spellData.singleLimit and spellData.singleLimit > 0 ) then
-		playerLimit[id] = time + spellData.singleLimit
-	end	
 	
-	-- Check/set global trigger limits
-	if( ( globalLimit[spellID] and globalLimit[spellID] >= time ) or ( globalLimit[debuffID] and globalLimit[debuffID] >= time ) ) then
-		return
-	end
-
-	if( spellData.globalLimit and spellData.globalLimit > 0 ) then
-		globalLimit[spellID] = time + spellData.globalLimit
+	if( spellData.singleLimit > 0 ) then
+		timerLimits[id] = time + spellData.singleLimit
 	end
 	
-	-- Spell interrupts generally have another component that you see after, like damage or a debuff. So don't let two timers show
-	if( eventType == "SPELL_INTERRUPT" and ( not spellData.singleLimit or spellData.singleLimit < 2 ) ) then
-		playerLimit[id] = time + LOCKOUT_TIME
+	if( spellData.globalLimit > 0 ) then
+		timerLimits[debuffID] = time + spellData.globalLimit
 	end
-	
-	-- If we have to check debuffs, it means we need a global limit on the specific spellID + destGUID to prevent two timers
-	if( spellData.checkEvents["SPELL_AURA_APPLIEDDEBUFFGROUP"] and ( not spellData.globalLimit or spellData.globalLimit < LOCKOUT_TIME ) ) then
-		globalLimit[debuffID] = GetTime() + LOCKOUT_TIME
-	end
-	
-	-- Check if it's a linked spell
+			
+	-- Linked spells mean that while the timer still exists we don't trigger another of it
 	if( spellData.linkedTo and spellData.linkedTo ~= "" and self.visual:TimerExists(spellData, spellID, sourceGUID, destGUID) ) then
 		return
 	end
+
+	-- Cooldowns
+	if( spellData.cooldown ) then
 	
-	-- Check if we need to update the icon
+	end
+	
+	-- If we have no icon, or we're using the question mark one then update the SV with the new one
 	local icon = spellData.icon
 	if( not icon or icon == "" or string.match(icon, "INV_Misc_QuestionMark$") ) then
 		local spellIcon = select(3, GetSpellInfo(spellID))
@@ -388,23 +387,6 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 			icon = spellIcon
 			-- Store it now that we know it
 			local spellSV = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
-			
-			-- We don't have a valid SV yet, so copy it in
-			if( not spellSV ) then
-				local key = spellName
-				if( self.spellList[spellID] ) then
-					key = spellID
-				end
-				
-				self.db.profile.spells[key] = {}
-				for k, v in pairs(self.spellList[key]) do
-					self.db.profile.spells[key][k] = v
-				end
-				
-				spellSV = self.db.profile.spells[key]
-			end
-			
-			-- Store the new icon
 			if( spellSV ) then
 				spellSV.icon = icon
 			end
@@ -426,7 +408,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 				return
 			end
 			
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFF" or eventType == "SPELL_AURA_APPLIEDBUFF" or eventType == "SPELL_AURA_REMOVED" ) then
+		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_REMOVEDENEMY" ) then
 			msg = anchor.gainMessage
 		else
 			msg = anchor.usedMessage
@@ -458,7 +440,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 	end
 	
 	-- Unlock the limiter early
-	playerLimit[spellID .. sourceGUID] = nil
+	timerLimits[spellID .. sourceGUID] = nil
 
 	-- Announce it
 	if( anchor.announce and eventType ~= "TEST" ) then
@@ -500,7 +482,7 @@ function Afflicted:UnitDied(destGUID)
 					table.insert(frame.inactive, row)
 					table.remove(frame.active, i)
 
-					playerLimit[row.id] = nil
+					timerLimits[row.id] = nil
 				end
 			end
 
