@@ -147,4 +147,64 @@ AfflictedLocals = {
 	["Allows you to add a new spell that Afflicted should start tracking."] = "Allows you to add a new spell that Afflicted should start tracking.",
 	["Spell name or spell ID"] = "Spell name or spell ID",
 	["The name of the spell, or the spell ID. This is note always the exact spell name, for example Intercept is actually Intercept Stun."] = "The name of the spell, or the spell ID. This is note always the exact spell name, for example Intercept is actually Intercept Stun.",
+	
+	["Disable spell"] = "Disable spell",
+	["While disabled, this spell will be completely ignored and no timer will be started for it."] = "While disabled, this spell will be completely ignored and no timer will be started for it.",
+	
+	["Timer"] = "Timer",
+	
+	["Repeating timer"] = "Repeating timer",
+	["Sets the timer as repeating, meaning once it hits 0 it'll start back up at the original time until the timer is specifically removed."] = "Sets the timer as repeating, meaning once it hits 0 it'll start back up at the original time until the timer is specifically removed.",
+	
+	["Ignore fade events"] = "Ignore fade events",
+	["Prevents the timer from ending early due to the spell fading early before the timer runs out."] = "Prevents the timer from ending early due to the spell fading early before the timer runs out.",
+	
+	["Duration"] = "Duration",
+	["How many seconds this timer should last."] = "How many seconds this timer should last.",
+	
+	["Show inside anchor"] = "Show inside anchor",
+	["Anchor to display this timer inside, if the anchor is disabled then this timer won't show up."] = "Anchor to display this timer inside, if the anchor is disabled then this timer won't show up.",
+	
+	["Link spell to"] = "Link spell to",
+	["If you link this spell to another, then it means this spell will not trigger a new timer started while the timer is running for the spell it's linked to."] = "If you link this spell to another, then it means this spell will not trigger a new timer started while the timer is running for the spell it's linked to.",
+	
+	["Trigger limits"] = "Trigger limits",
+	["Lets you prevent timers from trigger too quickly, causing duplicates."] = "Lets you prevent timers from trigger too quickly, causing duplicates.",
+	
+	["Per-player limit"] = "Per-player limit",
+	["How many seconds between the time this timer triggers, and the next one can trigger. This is the per player one, meaning it won't trigger more then the set amount per the player it triggered on/from."] = "How many seconds between the time this timer triggers, and the next one can trigger. This is the per player one, meaning it won't trigger more then the set amount per the player it triggered on/from.",
+	
+	["Per-spell limit"] = "Per-spell limit",
+	["How many seconds between the time this timer triggers, and the next one can trigger. This is the per spell one, meaning it won't trigger more then the set amount per the spellID that triggers it."] = "How many seconds between the time this timer triggers, and the next one can trigger. This is the per spell one, meaning it won't trigger more then the set amount per the spellID that triggers it.",
+	
+	["Icon path"] = "Icon path",
+	["Icon path to use for display, you do not have to specify this option. As long as you leave it blank or using the question mark icon then will auto-detect and save it."] = "Icon path to use for display, you do not have to specify this option. As long as you leave it blank or using the question mark icon then will auto-detect and save it.",
+	
+	["Check events to trigger"] = "Check events to trigger",
+	["List of events that should be checked to see if we should trigger this timer."] = "List of events that should be checked to see if we should trigger this timer.",
+	
+	["General damage"] = "General damage",
+	
+	["Group member, gained debuff"] = "Group member, gained debuff",
+	["Enemy, gained buff"] = "Enemy, gained buff",
+	["Enemy, summons object"] = "Enemy, summons object",
+	["Enemy, creates object"] = "Enemy, creates object",
+	["Group member, interrupted by enemy"] = "Group member, interrupted by enemy",
+	
+	["Custom announcements"] = "Custom announcements",
+	
+	["Enable custom messages"] = "Enable custom messages",
+	["Allows you to override the per-anchor messages for this specific timer."] = "Allows you to override the per-anchor messages for this specific timer.",
+	
+	["Triggered message"] = "Triggered message",
+	["Custom message to use for when this timer starts, if you leave the message blank and you have custom messages enabled then no message will be given when it's triggered."] = "Custom message to use for when this timer starts, if you leave the message blank and you have custom messages enabled then no message will be given when it's triggered.",
+	
+	["Ended message"] = "Ended message",
+	["Custom message to use for when this timer ends, if you leave the message blank and you have custom messages enabled then no message will be given when it's ends."] = "Custom message to use for when this timer ends, if you leave the message blank and you have custom messages enabled then no message will be given when it's ends.",
+	
+	["Cooldown"] = "Cooldown",
+	["Allows you to start a new timer when this one is triggered that has the cooldown left on the ability, use this if you want to track both the timer duration and the timer cooldown."] = "Allows you to start a new timer when this one is triggered that has the cooldown left on the ability, use this if you want to track both the timer duration and the timer cooldown.",
+	
+	["How many seconds this cooldown timer should last."] = "How many seconds this cooldown timer should last.",
+	
 }

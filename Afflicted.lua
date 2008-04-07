@@ -76,10 +76,10 @@ function Afflicted:OnInitialize()
 			},
 			spellDefault = {
 				seconds = 0,
+				cooldown = 0,
+				singleLimit = 0,
+				globalLimit = 0,
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
-				showIn = "spell",
-				linkedTo = "",
-				repeating = false,
 				checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
 			},
 		},
@@ -126,6 +126,24 @@ function Afflicted:OnInitialize()
 				
 
 				data.linkedTo = data.linkedTo or ""
+				
+				if( data.showIn == "Spells" or data.showIn == "Spell" ) then
+					data.showIn = "spells"
+				elseif( data.showIn == "Buffs" or data.showIn == "Buff" ) then
+					data.showIn = "buffs"
+				end
+				
+				if( not data.cooldown ) then
+					data.cooldown = 0
+				end
+				
+				if( not data.globalLimit ) then
+					data.globalLimit = 0
+				end
+				
+				if( not data.singleLimit ) then
+					data.singleLimit = 0
+				end
 			end
 		end
 	end
@@ -175,7 +193,7 @@ function Afflicted:OnEnable()
 	if( not self.db.profile.inside[type] ) then
 		return
 	end
-		
+	
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
@@ -290,11 +308,11 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	
 	-- Check if we should clear timers
 	elseif( eventType == "PARTY_KILL" and isDestEnemy ) then
-		self:UnitDied(destGUID, destName)
-		
+		self.visual:UnitDied(destGUID, destName)
+
 	-- Don't use UNIT_DIED inside arenas due to accuracy issues, outside of arenas we don't care too much
 	elseif( instanceType ~= "arena" and eventType == "UNIT_DIED" and isDestEnemy ) then
-		self:UnitDied(destGUID, destName)
+		self.visual:UnitDied(destGUID, destName)
 	end
 
 end
@@ -356,7 +374,6 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	local debuffID = spellID .. destGUID
 	local time = GetTime()
 	
-
 	if( ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
 		return
 	end
@@ -372,11 +389,6 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	-- Linked spells mean that while the timer still exists we don't trigger another of it
 	if( spellData.linkedTo and spellData.linkedTo ~= "" and self.visual:TimerExists(spellData, spellID, sourceGUID, destGUID) ) then
 		return
-	end
-
-	-- Cooldowns
-	if( spellData.cooldown ) then
-	
 	end
 	
 	-- If we have no icon, or we're using the question mark one then update the SV with the new one
@@ -463,37 +475,6 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 		msg = string.gsub(msg, "*target", self:StripServer(sourceName))
 		
 		self:SendMessage(msg, anchor.announceDest, anchor.announceColor, spellID)
-	end
-end
-
--- Check if we should remove the timers due to them dying
-function Afflicted:UnitDied(destGUID)
-	-- Loop through all created anchors
-	for anchorName in pairs(self.db.profile.anchors) do
-		local frame = self[anchorName]
-		if( frame and #(frame.active) > 0 ) then
-			-- Now through all active timers
-			for i=#(frame.active), 1, -1 do
-				local row = frame.active[i]
-
-				if( row.sourceGUID == destGUID and not row.dontFade ) then
-					row:Hide()
-
-					table.insert(frame.inactive, row)
-					table.remove(frame.active, i)
-
-					timerLimits[row.id] = nil
-				end
-			end
-
-			-- No more icons, hide the base frame
-			if( #(frame.active) == 0 ) then
-				frame:Hide()
-			end
-
-			-- Reposition everything
-			self:RepositionTimers(frame)
-		end
 	end
 end
 

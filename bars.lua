@@ -1,7 +1,7 @@
 if( not Afflicted ) then return end
 
 local Bars = Afflicted:NewModule("Bars", "AceEvent-3.0")
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual", "TimerExists"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual", "UnitDied", "TimerExists"}
 local SML, GTBLib
 local barData = {}
 
@@ -150,8 +150,21 @@ function Bars:ClearTimers(type)
 	anchorFrame.group:UnregisterAllBars()
 end
 
+-- Checks if we have a timer running for this person
 function Bars:TimerExists(spellData, spellID, sourceGUID, destGUID)
 	return (barData[spellID .. sourceGUID])
+end
+
+-- Unit died, removed their timers
+function Bars:UnitDied(destGUID, destName)
+	for id in pairs(barData) do
+		local spellID, barGUID = string.split(":", id)
+		if( destGUID == barGUID ) then
+			for key in pairs(Afflicted.db.profile.anchors) do
+				Bars[key].group:UnregisterBar(id)
+			end
+		end
+	end
 end
 
 -- Create a new timer
@@ -161,7 +174,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		return
 	end
 		
-	local id = spellID .. sourceGUID
+	local id = spellID .. ":" .. sourceGUID
 	local text = spellName
 	if( sourceName and sourceName ~= "" ) then
 		text = string.format("%s - %s", spellName, sourceName)
@@ -173,6 +186,20 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 	anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
 	anchorFrame.group:RegisterBar(id, spellData.seconds, text, spellData.icon)
 	anchorFrame.group:SetRepeatingTimer(id, spellData.repeating or false)
+	
+	-- Start a cooldown timer
+	if( spellData.cooldown > 0 ) then
+		local id = spellID .. sourceGUID .. "CD"
+		local text
+		if( sourceName ~= "" ) then
+			text = string.format("%s - %s (CD)", spellName, sourceName)
+		else
+			text = string.format("%s (CD)", spellName)
+		end
+
+		anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
+		anchorFrame.group:RegisterBar(id, spellData.seconds, text, spellData.icon)
+	end
 end
 
 -- Bar timer ran out
@@ -191,7 +218,7 @@ function Bars:RemoveTimer(anchorName, spellID, sourceGUID)
 		return
 	end
 
-	return anchorFrame.group:UnregisterBar(spellID .. sourceGUID)
+	return anchorFrame.group:UnregisterBar(spellID .. ":" .. sourceGUID)
 end
 
 function Bars:ReloadVisual()

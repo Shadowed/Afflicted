@@ -4,7 +4,7 @@ local Icons = Afflicted:NewModule("Icons", "AceEvent-3.0")
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "TimerExists", "ReloadVisual"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "TimerExists", "UnitDied", "ReloadVisual"}
 
 function Icons:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -205,6 +205,7 @@ function Icons:ClearTimers(type)
 	end
 end
 
+-- Check if we have a tiemr running for this person
 function Icons:TimerExists(spellData, spellID, sourceGUID, destGUID)
 	local anchorFrame = Icons[spellData.showIn]
 	if( anchorFrame ) then
@@ -219,12 +220,42 @@ function Icons:TimerExists(spellData, spellID, sourceGUID, destGUID)
 	return nil
 end
 
+-- Unit died, remove their timers
+function Icons:UnitDied(destGUID, destName)
+	-- Loop through all created anchors
+	for anchorName in pairs(Afflicted.db.profile.anchors) do
+		local frame = Icons[anchorName]
+		if( frame and #(frame.active) > 0 ) then
+			-- Now through all active timers
+			for i=#(frame.active), 1, -1 do
+				local row = frame.active[i]
+
+				if( row.sourceGUID == destGUID and not row.dontFade ) then
+					row:Hide()
+
+					table.insert(frame.inactive, row)
+					table.remove(frame.active, i)
+				end
+			end
+
+			-- No more icons, hide the base frame
+			if( #(frame.active) == 0 ) then
+				frame:Hide()
+			end
+
+			-- Reposition everything
+			Icons:RepositionTimers(frame)
+		end
+	end
+end
+
 -- Create a new timer
-function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
+local function createTimer(showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, seconds)
 	local anchorFrame = Icons[spellData.showIn]
 	if( not anchorFrame ) then
 		return
 	end	
+
 	-- Check if we need to create a new row
 	local frame = table.remove(anchorFrame.inactive, 1)
 	if( not frame ) then
@@ -254,6 +285,15 @@ function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID,
 	-- Change this icon to active
 	table.insert(anchorFrame.active, frame)
 	table.sort(anchorFrame.active, sortTimers)
+end
+
+function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
+	createTimer(spellData.showIn, eventType, spellData.repeatTimer, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.seconds)
+	
+
+	if( spellData.cooldown > 0 ) then
+		createTimer(spellData.showIn, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.cooldown)
+	end
 
 	repositionTimers(anchorFrame.type)
 end
