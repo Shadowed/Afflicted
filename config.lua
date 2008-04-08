@@ -26,6 +26,7 @@ local announceDest = {["none"] = L["None"], ["ct"] = L["Combat text"], ["party"]
 
 local function set(info, value)
 	local arg1, arg2, arg3 = string.split(".", info.arg)
+	
 	if( arg2 and arg3 ) then
 		Afflicted.db.profile[arg1][arg2][arg3] = value
 	elseif( arg2 ) then
@@ -54,6 +55,30 @@ end
 local function getString(info)
 	return tostring(get(info))
 end
+
+local function setMulti(info, value, state)
+	local arg1, arg2, arg3 = string.split(".", info.arg)
+	if( arg2 and arg3 ) then
+		Afflicted.db.profile[arg1][arg2][arg3][value] = state
+	elseif( arg2 ) then
+		Afflicted.db.profile[arg1][arg2][value] = state
+	else
+		Afflicted.db.profile[arg1][value] = state
+	end
+end
+
+local function getMulti(info, value)
+	local arg1, arg2, arg3 = string.split(".", info.arg)
+	
+	if( arg2 and arg3 ) then
+		return Afflicted.db.profile[arg1][arg2][arg3][value]
+	elseif( arg2 ) then
+		return Afflicted.db.profile[arg1][arg2][value]
+	else
+		return Afflicted.db.profile[arg1][value]
+	end
+end
+
 
 -- Return all registered SML textures
 local textures = {}
@@ -393,6 +418,8 @@ function Config:CreateSpellDisplay(info, value)
 						name = L["Check events to trigger"],
 						desc = L["List of events that should be checked to see if we should trigger this timer."],
 						values = checkEvents,
+						set = setMulti,
+						get = getMulti,
 						width = "double",
 						arg = "spells." .. value .. ".checkEvents",
 					},

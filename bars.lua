@@ -192,13 +192,13 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		local id = spellID .. sourceGUID .. "CD"
 		local text
 		if( sourceName ~= "" ) then
-			text = string.format("%s - %s (CD)", spellName, sourceName)
+			text = string.format("[CD] %s - %s", spellName, sourceName)
 		else
-			text = string.format("%s (CD)", spellName)
+			text = string.format("[CD] %s", spellName)
 		end
 
 		anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
-		anchorFrame.group:RegisterBar(id, spellData.seconds, text, spellData.icon)
+		anchorFrame.group:RegisterBar(id, spellData.cooldown, text, spellData.icon)
 	end
 end
 

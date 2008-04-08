@@ -93,7 +93,7 @@ function Afflicted:OnInitialize()
 	if( self.db.profile.version ~= self.revision ) then
 		for name, data in pairs(self.db.profile.spells) do
 			if( type(data) == "table" ) then
-				if( not data.checkEvents ) then
+				if( not data.checkEvents or type(data.checkEvents) ~= "table" ) then
 					data.checkEvents = {}
 					for k, v in pairs(self.defaults.profile.spellDefault.checkEvents) do
 						data.checkEvents[k] = v	
@@ -143,6 +143,10 @@ function Afflicted:OnInitialize()
 				
 				if( not data.singleLimit ) then
 					data.singleLimit = 0
+				end
+				
+				if( type(data.seconds) == "string" ) then
+					data.seconds = tonumber(data.seconds) or 0
 				end
 			end
 		end
@@ -372,9 +376,11 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	-- Trigger limits
 	local id = spellID .. sourceGUID
 	local debuffID = spellID .. destGUID
+	local nameID = spellName .. sourceGUID
 	local time = GetTime()
 	
-	if( ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
+	
+	if( ( timerLimits[nameID] and timerLimits[nameID] >= time ) or ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
 		return
 	end
 	
@@ -383,7 +389,12 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 	
 	if( spellData.globalLimit > 0 ) then
-		timerLimits[debuffID] = time + spellData.globalLimit
+		timerLimits[spellID] = time + spellData.globalLimit
+
+		-- Handle the special case of things like Shadowstep, where the spellID's are different, but the names are the same.
+		if( eventType == "SPELL_AURA_APPLIEDBUFFENEMY" ) then
+			timerLimits[nameID] = time + spellData.globalLimit
+		end
 	end
 			
 	-- Linked spells mean that while the timer still exists we don't trigger another of it
@@ -465,7 +476,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 				return
 			end
 			
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFF" or eventType == "SPELL_AURA_APPLIEDBUFF" or eventType == "SPELL_AURA_REMOVED" ) then
+		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_REMOVED" ) then
 			msg = anchor.fadeMessage
 		else
 			msg = anchor.readyMessage
