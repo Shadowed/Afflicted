@@ -90,7 +90,7 @@ function Afflicted:OnInitialize()
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 		
 	-- Upgrade
-	if( self.db.profile.version <= 655 ) then
+	if( self.db.profile.version and self.db.profile.version <= 655 ) then
 		self.db.profile.anchors = CopyTable(self.defaults.profile.anchors)
 		self.db.profile.spells = CopyTable(self.defaults.profile.spells)
 		self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
