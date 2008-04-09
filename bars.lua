@@ -152,7 +152,7 @@ end
 
 -- Checks if we have a timer running for this person
 function Bars:TimerExists(spellData, spellID, sourceGUID, destGUID)
-	return (barData[spellID .. sourceGUID])
+	return (barData[spellData.linkedTo .. sourceGUID])
 end
 
 -- Unit died, removed their timers
@@ -181,7 +181,8 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 	end
 	
 	-- We can only pass one argument, so we do this to prevent creating and dumping tables and such
-	barData[id] = string.format("%s,%d,%s,%s,%s,true", eventType, spellID, spellName, sourceGUID, sourceName)
+	barData[id] = string.format("%s,%d,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
+	barData[spellName .. sourceGUID] = true
 
 	anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
 	anchorFrame.group:RegisterBar(id, spellData.seconds, text, spellData.icon)
@@ -205,9 +206,11 @@ end
 -- Bar timer ran out
 function Bars:OnBarFade(barID)
 	if( barID and barData[barID] ) then
-		Afflicted:AbilityEnded(string.split(",", barData[barID]))
+		local eventType, spellID, spellName, sourceGUID, sourceName = string.split(",", barData[barID])
+		Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName, true)
 
 		barData[barID] = nil
+		barData[spellName .. sourceGUID] = nil
 	end
 end
 

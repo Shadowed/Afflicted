@@ -28,7 +28,7 @@ function Afflicted:OnInitialize()
 			barWidth = 180,
 			barName = "BantoBar",
 			
-			spells = {},
+			spells = AfflictedSpells,
 			inside = {["arena"] = true, ["pvp"] = true},
 			
 			anchors = {
@@ -80,7 +80,7 @@ function Afflicted:OnInitialize()
 				singleLimit = 0,
 				globalLimit = 0,
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
-				checkEvents = {["TEST"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = false, ["SPELL_AURA_APPLIEDBUFFENEMY"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true},
+				TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
 			},
 		},
 	}
@@ -90,73 +90,13 @@ function Afflicted:OnInitialize()
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 		
 	-- Upgrade
-	if( self.db.profile.version ~= self.revision ) then
-		for name, data in pairs(self.db.profile.spells) do
-			if( type(data) == "table" ) then
-				if( not data.checkEvents or type(data.checkEvents) ~= "table" ) then
-					data.checkEvents = {}
-					for k, v in pairs(self.defaults.profile.spellDefault.checkEvents) do
-						data.checkEvents[k] = v	
-					end
-				end
-
-				if( not data.showIn ) then
-					data.singleLimit = data.limit or 0
-					data.globalLimit = 0
-
-					if( data.type == "spell" ) then
-						data.showIn = "Spell"
-					elseif( data.type == "buff" ) then
-						data.showIn = "Buff"
-					elseif( data.type == "debuff" ) then
-						data.checkEvents["SPELL_AURA_APPLIEDDEBUFFGROUP"] = true
-						data.showIn = "Spell"
-					else
-						data.showIn = "Spell"
-					end
-
-					data.limit = nil
-					data.type = nil
-				end
-				
-				if( data.checkDebuffs ) then
-					data.checkDebuffs = nil
-					data.checkEvents["SPELL_AURA_APPLIEDDEBUFFGROUP"] = true
-				end
-				
-
-				data.linkedTo = data.linkedTo or ""
-				
-				if( data.showIn == "Spells" or data.showIn == "Spell" ) then
-					data.showIn = "spells"
-				elseif( data.showIn == "Buffs" or data.showIn == "Buff" ) then
-					data.showIn = "buffs"
-				end
-				
-				if( not data.cooldown ) then
-					data.cooldown = 0
-				end
-				
-				if( not data.globalLimit ) then
-					data.globalLimit = 0
-				end
-				
-				if( not data.singleLimit ) then
-					data.singleLimit = 0
-				end
-				
-				if( type(data.seconds) == "string" ) then
-					data.seconds = tonumber(data.seconds) or 0
-				end
-			end
-		end
+	if( self.db.profile.version <= 655 ) then
+		self.db.profile.anchors = CopyTable(self.defaults.profile.anchors)
+		self.db.profile.spells = CopyTable(self.defaults.profile.spells)
+		self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
 	end
 	
 	self.db.profile.version = self.revision
-
-	-- Update the spell list with the default and manual
-	self.spellList = {}
-	self:UpdateSpellList()
 	
 	-- Setup our visual style
 	if( self.db.profile.showBars and self.modules.Bars ) then
@@ -218,7 +158,6 @@ function Afflicted:Reload()
 	end
 	
 	self.visual:ReloadVisual()
-	self:UpdateSpellList()
 end
 
 local COMBATLOG_OBJECT_TYPE_PLAYER = COMBATLOG_OBJECT_TYPE_PLAYER
@@ -287,7 +226,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	elseif( eventType == "SPELL_MISSED" or eventType == "SPELL_DAMAGE" or eventType == "SPELL_DRAIN" or eventType == "SPELL_LEECH" ) then
 		local spellID, spellName, spellSchool = ...
 		if( isSourceEnemy and isDestGroup ) then
-			self:ProcessAbility("SPELL_DAMAGE", spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
+			self:ProcessAbility("SPELL_MISC", spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 		end
 				
 	-- We tried to dispel a buff, and failed
@@ -321,20 +260,6 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 
 end
 
--- Merge spells in
-function Afflicted:UpdateSpellList()
-	self.spellList = AfflictedSpells or {}
-
-	-- Merge in the players spells
-	for name, data in pairs(self.db.profile.spells) do
-		if( type(data) == "table" ) then
-			self.spellList[name] = data
-		else
-			self.spellList[name] = nil
-		end
-	end
-end
-
 -- See if we should enable Afflicted in this zone
 function Afflicted:ZONE_CHANGED_NEW_AREA()
 	local type = select(2, IsInInstance())
@@ -358,8 +283,13 @@ end
 
 -- New ability found
 function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
-	local spellData = self.spellList[spellID] or self.spellList[spellName]
-	if( not spellData or spellData.disabled or not spellData.checkEvents[eventType] ) then
+	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
+	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
+	if( type(spellData) == "number" ) then
+		spellData = self.db.profile.spells[spellData]
+	end
+	
+	if( not spellData or spellData.disabled or not spellData[eventType] ) then
 		return
 	end
 	
@@ -378,7 +308,6 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	local debuffID = spellID .. destGUID
 	local nameID = spellName .. sourceGUID
 	local time = GetTime()
-	
 	
 	if( ( timerLimits[nameID] and timerLimits[nameID] >= time ) or ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
 		return
@@ -408,12 +337,13 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		local spellIcon = select(3, GetSpellInfo(spellID))
 		if( spellIcon ) then
 			icon = spellIcon
-			-- Store it now that we know it
-			local spellSV = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
-			if( spellSV ) then
-				spellSV.icon = icon
-			end
+			spellData.icon = icon
 		end
+	end
+	
+	-- Save the spell name if it's a spellID-saved var
+	if( self.db.profile.spells[spellID] ) then
+		self.db.profile.spells[spellID].text = (GetSpellInfo(spellID))
 	end
 	
 	-- Start it up
@@ -446,7 +376,7 @@ end
 
 -- Ability ended due to event, or timers up
 function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName, isTimedOut)
-	local spellData = self.spellList[spellID] or self.spellList[spellName]
+	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
 	if( not spellData ) then
 		return
 	end

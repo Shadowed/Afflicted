@@ -3,7 +3,6 @@ if( not Afflicted ) then return end
 local Config = Afflicted:NewModule("Config")
 local L = AfflictedLocals
 
-local OptionHouse
 local SML, registered, options, config, dialog
 
 function Config:OnInitialize()
@@ -26,6 +25,7 @@ local announceDest = {["none"] = L["None"], ["ct"] = L["Combat text"], ["party"]
 
 local function set(info, value)
 	local arg1, arg2, arg3 = string.split(".", info.arg)
+	if( tonumber(arg2) ) then arg2 = tonumber(arg2) end
 	
 	if( arg2 and arg3 ) then
 		Afflicted.db.profile[arg1][arg2][arg3] = value
@@ -34,10 +34,13 @@ local function set(info, value)
 	else
 		Afflicted.db.profile[arg1] = value
 	end
+	
+	Afflicted:Reload()
 end
 
 local function get(info)
 	local arg1, arg2, arg3 = string.split(".", info.arg)
+	if( tonumber(arg2) ) then arg2 = tonumber(arg2) end
 	
 	if( arg2 and arg3 ) then
 		return Afflicted.db.profile[arg1][arg2][arg3]
@@ -52,12 +55,22 @@ local function setNumber(info, value)
 	set(info, tonumber(value))
 end
 
+local function setType(info, value)
+	if( tonumber(value) ) then
+		set(info, tonumber(value))
+	else
+		set(info, value)
+	end
+end
+
 local function getString(info)
 	return tostring(get(info))
 end
 
 local function setMulti(info, value, state)
 	local arg1, arg2, arg3 = string.split(".", info.arg)
+	if( tonumber(arg2) ) then arg2 = tonumber(arg2) end
+
 	if( arg2 and arg3 ) then
 		Afflicted.db.profile[arg1][arg2][arg3][value] = state
 	elseif( arg2 ) then
@@ -65,10 +78,13 @@ local function setMulti(info, value, state)
 	else
 		Afflicted.db.profile[arg1][value] = state
 	end
+
+	Afflicted:Reload()
 end
 
 local function getMulti(info, value)
 	local arg1, arg2, arg3 = string.split(".", info.arg)
+	if( tonumber(arg2) ) then arg2 = tonumber(arg2) end
 	
 	if( arg2 and arg3 ) then
 		return Afflicted.db.profile[arg1][arg2][arg3][value]
@@ -296,16 +312,16 @@ function Config:GetSpells()
 	spells[""] = L["None"]
 
 	for id, data in pairs(Afflicted.db.profile.spells) do
-		local text = id
-		if( type(tonumber(id)) == "number" ) then
+		if( tonumber(id) and type(data) == "table" ) then
+			local text = id
 			if( data.text ) then
 				text = data.text
 			else
-				text = string.format("#%d", tonumber(id))
+				text = string.format("#%s", id)
 			end
+
+			spells[tostring(id)] = tostring(text)
 		end
-	
-		spells[id] = text
 	end
 	
 	return spells
@@ -322,7 +338,7 @@ function Config:GetAnchors()
 	return anchors
 end
 
-local checkEvents = { ["SPELL_DAMAGE"] = L["General damage"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group member, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group member, interrupted by enemy"] }
+local checkEvents = { ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group member, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group member, interrupted by enemy"] }
 
 function Config:CreateSpellDisplay(info, value)
 	if( not Afflicted.db.profile.spells[value] ) then
@@ -343,7 +359,7 @@ function Config:CreateSpellDisplay(info, value)
 	options.args.spells.args[string.gsub(value, " ", "")] = {
 		order = 1,
 		type = "group",
-		name = value,
+		name = tostring(text),
 		get = get,
 		set = set,
 		handler = Config,
@@ -372,6 +388,8 @@ function Config:CreateSpellDisplay(info, value)
 				desc = L["If you link this spell to another, then it means this spell will not trigger a new timer started while the timer is running for the spell it's linked to."],
 				values = "GetSpells",
 				width = "double",
+				get = getString,
+				set = setType,
 				arg = "spells." .. value .. ".linkedTo",
 			},
 			icon = {
@@ -421,7 +439,7 @@ function Config:CreateSpellDisplay(info, value)
 						set = setMulti,
 						get = getMulti,
 						width = "double",
-						arg = "spells." .. value .. ".checkEvents",
+						arg = "spells." .. value,
 					},
 				},
 			},
@@ -713,7 +731,9 @@ local function loadOptions()
 	
 	-- Load our created anchors in
 	for id, data in pairs(Afflicted.db.profile.spells) do
-		Config:CreateSpellDisplay(nil, id)
+		if( type(data) == "table" ) then
+			Config:CreateSpellDisplay(nil, id)
+		end
 	end
 end
 
@@ -734,15 +754,17 @@ SlashCmdList["AFFLICTED"] = function(msg)
 		local i = 0
 		local addedTypes = {}
 		for spell, data in pairs(AfflictedSpells) do
-			i = i + 1
+			if( type(data) == "table" ) then
+				i = i + 1
 
-			if( not addedTypes[data.showIn] ) then
-				addedTypes[data.showIn] = 0
-			end
+				if( not addedTypes[data.showIn] ) then
+					addedTypes[data.showIn] = 0
+				end
 
-			if( addedTypes[data.showIn] < 5 and data.icon and data.icon ~= "" ) then
-				addedTypes[data.showIn] = addedTypes[data.showIn] + 1
-				Afflicted:ProcessAbility("TEST", i, spell, i, GetTime() .. spell, "", "", "")
+				if( addedTypes[data.showIn] < 5 and data.icon and data.icon ~= "" ) then
+					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
+					Afflicted:ProcessAbility("TEST", i, spell, i, GetTime() .. spell, "", "", "")
+				end
 			end
 		end
 
@@ -762,6 +784,6 @@ SlashCmdList["AFFLICTED"] = function(msg)
 		DEFAULT_CHAT_FRAME:AddMessage(L["Afflicted slash commands"])
 		DEFAULT_CHAT_FRAME:AddMessage(L["- clear - Clears all running timers."])
 		DEFAULT_CHAT_FRAME:AddMessage(L["- test - Shows test timers in Afflicted."])
-		DEFAULT_CHAT_FRAME:AddMessage(L["- ui - Opens the OptionHouse configuration for Afflicted."])
+		DEFAULT_CHAT_FRAME:AddMessage(L["- ui - Opens the configuration for Afflicted."])
 	end
 end

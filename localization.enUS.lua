@@ -8,31 +8,9 @@ AfflictedLocals = {
 	["FADED *spell (*target)"] = "FADED *spell (*target)",
 	["READY *spell (*target)"] = "READY *spell (*target)",
 	
-	-- Frame types
+	-- Default frames
 	["Spells"] = "Spells",
 	["Buffs"] = "Buffs",
-	
-	-- temp
-	["Divine Shield"] = "Divine Shield",
-	["Ice Block"] = "Ice Block",
-	["Feral Charge"] = "Feral Charge",
-	["Silencing Shot"] = "Silencing Shot",
-	["Blessing of Protection"] = "Blessing of Protection",
-	["Blessing of Freedom"] = "Blessing of Freedom",
-	["Blessing of Sacrifice"] = "Blessing of Sacrifice",
-	["Cloak of Shadows"] = "Cloak of Shadows",
-	["Spell Reflection"] = "Spell Reflection",
-	["Spell Lock"] = "Spell Lock",
-	["Counterspell"] = "Counterspell",
-	["Shield Bash"] = "Shield Bash",
-	["Silence"] = "Silence",
-	["Counterspell - Silenced"] = "Counterspell - Silenced",
-	["Earth Shock"] = "Earth Shock",
-	["Flame Shock"] = "Flame Shock",
-	["Frost Shock"] = "Frost Shock",
-	["Pummel"] = "Pummel",
-	["Kick"] = "Kick",
-	["Pain Suppression"] = "Pain Suppression",
 
 	-- Schools
 	["Schools"] = "Schools",
@@ -48,8 +26,10 @@ AfflictedLocals = {
 	-- Cmd
 	["Afflicted slash commands"] = "Afflicted slash commands",
 	["- clear - Clears all running timers."] = "- clear - Clears all running timers.",
-	["- ui - Opens the OptionHouse configuration for Afflicted."] = "- ui - Opens the OptionHouse configuration for Afflicted.",
+	["- ui - Opens the configuration for Afflicted."] = "- ui - Opens the configuration for Afflicted.",
 	["- test - Shows test timers in Afflicted."] = "- test - Shows test timers in Afflicted.",
+	
+	["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."] = "Your configuration has been upgraded to the latest version, anchors and spells have been wiped.",
 	
 	-- GUI
 	["General"] = "General",
@@ -183,7 +163,7 @@ AfflictedLocals = {
 	["Check events to trigger"] = "Check events to trigger",
 	["List of events that should be checked to see if we should trigger this timer."] = "List of events that should be checked to see if we should trigger this timer.",
 	
-	["General damage"] = "General damage",
+	["General damage/misses/resists"] = "General damage/misses/resists",
 	
 	["Group member, gained debuff"] = "Group member, gained debuff",
 	["Enemy, gained buff"] = "Enemy, gained buff",
