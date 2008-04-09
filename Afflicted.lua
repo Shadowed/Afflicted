@@ -80,7 +80,7 @@ function Afflicted:OnInitialize()
 				singleLimit = 0,
 				globalLimit = 0,
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
-				TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+				TEST = true, SPELL_CAST_SUCCESS = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
 			},
 		},
 	}
@@ -168,7 +168,7 @@ local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
 local COMBATLOG_OBJECT_REACTION_HOSTILE	= COMBATLOG_OBJECT_REACTION_HOSTILE
 local GROUP_AFFILIATION = bit.bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_AFFILIATION_MINE)
 
-local eventRegistered = {["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true, ["SPELL_MISSED"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_DRAIN"] = true, ["SPELL_LEECH"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_PERIODIC_DISPEL_FAILED"] = true, ["SPELL_AURA_DISPELLED"] = true, ["SPELL_AURA_STOLEN"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true}
+local eventRegistered = {["SPELL_CAST_SUCCESS"] = true, ["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true, ["SPELL_MISSED"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_DRAIN"] = true, ["SPELL_LEECH"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_PERIODIC_DISPEL_FAILED"] = true, ["SPELL_AURA_DISPELLED"] = true, ["SPELL_AURA_STOLEN"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true}
 function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, ...)
 	if( not eventRegistered[eventType] ) then
 		return
@@ -178,7 +178,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	local isDestGroup = (bit.band(destFlags, GROUP_AFFILIATION) > 0)
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 	local isSourceGroup = (bit.band(sourceFlags, GROUP_AFFILIATION) > 0)
-			
+		
 	-- Buff gained on an enemy, or a debuff gained from an enemy from someone in our group
 	if( eventType == "SPELL_AURA_APPLIED" ) then
 		local spellID, spellName, spellSchool, auraType = ...
@@ -198,6 +198,11 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		if( auraType == "BUFF" ) then
 			self:AbilityEnded(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
 		end
+
+	-- Spell casted succesfully
+	elseif( eventType == "SPELL_CAST_SUCCESS" and isSourceEnemy ) then
+		local spellID, spellName, spellSchool, auraType = ...
+		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	
 	-- Check for something being summoned (Pets)
 	elseif( eventType == "SPELL_SUMMON" and isSourceEnemy ) then
@@ -325,7 +330,8 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 			timerLimits[nameID] = time + spellData.globalLimit
 		end
 	end
-			
+	
+	
 	-- Linked spells mean that while the timer still exists we don't trigger another of it
 	if( spellData.linkedTo and spellData.linkedTo ~= "" and self.visual:TimerExists(spellData, spellID, sourceGUID, destGUID) ) then
 		return
@@ -342,8 +348,9 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 	
 	-- Save the spell name if it's a spellID-saved var
-	if( self.db.profile.spells[spellID] ) then
-		self.db.profile.spells[spellID].text = (GetSpellInfo(spellID))
+	local text = GetSpellInfo(spellID)
+	if( text ) then
+		spellData.text = text
 	end
 	
 	-- Start it up

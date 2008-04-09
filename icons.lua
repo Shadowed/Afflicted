@@ -250,8 +250,8 @@ function Icons:UnitDied(destGUID, destName)
 end
 
 -- Create a new timer
-local function createTimer(showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, seconds)
-	local anchorFrame = Icons[spellData.showIn]
+local function createTimer(showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, icon, seconds)
+	local anchorFrame = Icons[showIn]
 	if( not anchorFrame ) then
 		return
 	end	
@@ -265,8 +265,8 @@ local function createTimer(showIn, eventType, repeating, spellID, spellName, sou
 	-- Set it for when it fades
 	frame.id = id
 	frame.eventType = eventType
-	frame.repeatTimer = spellData.repeatTimer
-
+	frame.repeatTimer = repeating
+	
 	frame.spellID = spellID
 	frame.spellName = spellName
 
@@ -274,28 +274,28 @@ local function createTimer(showIn, eventType, repeating, spellID, spellName, sou
 	frame.sourceName = sourceName
 	frame.destGUID = destGUID
 
-	frame.startSeconds = spellData.seconds
-	frame.timeLeft = spellData.seconds
+	frame.startSeconds = seconds
+	frame.timeLeft = seconds
 	frame.lastUpdate = GetTime()
 	
 	frame.type = anchorFrame.type
-	frame.icon:SetTexture(spellData.icon)
+	frame.icon:SetTexture(icon)
 	frame:Show()
 	
 	-- Change this icon to active
 	table.insert(anchorFrame.active, frame)
 	table.sort(anchorFrame.active, sortTimers)
+
+	-- Reposition
+	repositionTimers(anchorFrame.type)
 end
 
 function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
-	createTimer(spellData.showIn, eventType, spellData.repeatTimer, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.seconds)
+	createTimer(spellData.showIn, eventType, spellData.repeatTimer, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
 	
-
 	if( spellData.cooldown > 0 ) then
-		createTimer(spellData.showIn, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.cooldown)
+		createTimer(spellData.showIn, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown)
 	end
-
-	repositionTimers(anchorFrame.type)
 end
 
 -- Remove a specific anchors timer by spellID/sourceGUID

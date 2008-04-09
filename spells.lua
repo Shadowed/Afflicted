@@ -1,5 +1,145 @@
 local L = AfflictedLocals
 AfflictedSpells = { 
+	-- Scare Beast
+	[1513] = 14327,
+	[14326] = 14327,
+	[14327] = {
+		disabled = true,
+		text = "Scare Beast",
+		seconds = 30,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Scatter Shot
+	[19503] = {
+		text = "Scatter Shot",
+		seconds = 30,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Freeze (Water Elemental)
+	[33395] = {
+		disabled = true,
+		text = "Freeze",
+		seconds = 25,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 2,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Blink
+	[1953] = {
+		text = "Blink",
+		seconds = 15,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Frost Nova
+	[122] = 27088,
+	[865] = 27088,
+	[6131] = 27088,
+	[10230] = 27088,
+	[27088] = {
+		disabled = true,
+		text = "Frost Nova",
+		seconds = 21,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 2,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Disarm
+	[676] = {
+		disabled = true,
+		text = "Disarm",
+		seconds = 10,
+		cooldown = 60,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+
+	-- Intervene
+	[676] = {
+		disabled = true,
+		text = "Intervene",
+		seconds = 30,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 2,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Intimidating Shout
+	[3411] = {
+		disabled = true,
+		text = "Intimidating Shout",
+		seconds = 180,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 2,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Fear Ward
+	[6346] = {
+		disabled = true,
+		text = "Repentance",
+		seconds = 180,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Repentance
+	[20066] = {
+		disabled = true,
+		text = "Repentance",
+		seconds = 60,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Hammer of Justice
+	[853] = 10308,
+	[5588] = 10308,
+	[5589] = 10308,
+	[10308] = {
+		disabled = true,
+		text = "Hammer of Justice",
+		seconds = 45,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+
 	-- Divine Shield
 	[642] = 1020,
 	[1020] = {
@@ -9,12 +149,13 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Kidney Shot
 	[408] = 8643,
 	[8643] = {
+		disabled = true,
 		text = "Kidney Shot",
 		disabled = true,
 		seconds = 20,
@@ -22,7 +163,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Psychic Scream
@@ -37,7 +178,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 2,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Power Infusion
@@ -48,7 +189,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	--  Evasion
@@ -60,7 +201,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Icy Veins
@@ -71,11 +212,12 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Berserker Rage
 	[18499] = {
+		disabled = true,
 		text = "Berserker Rage",
 		disabled = true,
 		seconds = 10,
@@ -83,7 +225,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Viper sting
@@ -97,7 +239,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	
@@ -109,7 +251,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Hypothermia
@@ -120,7 +262,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Blessing of Protection
@@ -134,7 +276,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Blessing of Freedom
@@ -145,7 +287,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Blessing of Sacrifice
@@ -159,7 +301,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Pain Suppression
@@ -170,7 +312,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Cloak of Shadows
@@ -181,7 +323,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Spell reflection
@@ -192,7 +334,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Hunter Silence
@@ -204,7 +346,7 @@ AfflictedSpells = {
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Priest Silence
@@ -216,7 +358,7 @@ AfflictedSpells = {
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Feral Charge
@@ -228,7 +370,7 @@ AfflictedSpells = {
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Spell lock
@@ -241,7 +383,7 @@ AfflictedSpells = {
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Counterspell
@@ -253,7 +395,7 @@ AfflictedSpells = {
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Counterspell - Silenced
@@ -266,7 +408,7 @@ AfflictedSpells = {
 		dontFade = true,
 		showIn = "spells",
 		linkedTo = 2139,
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Kick
@@ -281,7 +423,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Pummel
@@ -293,7 +435,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Shield bash
@@ -307,7 +449,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Earth shock
@@ -326,7 +468,7 @@ AfflictedSpells = {
 		dontFade = true,
 		showIn = "spells",
 		
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Flame shock
@@ -346,7 +488,7 @@ AfflictedSpells = {
 		dontFade = true,
 		showIn = "spells",
 		
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Frost shock
@@ -363,6 +505,6 @@ AfflictedSpells = {
 		dontFade = true,
 		showIn = "spells",
 		
-		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+		TEST = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 }

@@ -165,11 +165,12 @@ AfflictedLocals = {
 	
 	["General damage/misses/resists"] = "General damage/misses/resists",
 	
-	["Group member, gained debuff"] = "Group member, gained debuff",
+	["Group, gained debuff"] = "Group, gained debuff",
 	["Enemy, gained buff"] = "Enemy, gained buff",
 	["Enemy, summons object"] = "Enemy, summons object",
 	["Enemy, creates object"] = "Enemy, creates object",
-	["Group member, interrupted by enemy"] = "Group member, interrupted by enemy",
+	["Group, interrupted by enemy"] = "Group, interrupted by enemy",
+	["Enemy, successfully casts"] = "Enemy, successfully casts",
 	
 	["Custom announcements"] = "Custom announcements",
 	
@@ -186,5 +187,17 @@ AfflictedLocals = {
 	["Allows you to start a new timer when this one is triggered that has the cooldown left on the ability, use this if you want to track both the timer duration and the timer cooldown."] = "Allows you to start a new timer when this one is triggered that has the cooldown left on the ability, use this if you want to track both the timer duration and the timer cooldown.",
 	
 	["How many seconds this cooldown timer should last."] = "How many seconds this cooldown timer should last.",
+	
+	["New spell"] = "New spell",
+	["Spell list"] = "Spell list",
+	["Edit"] = "Edit",
+	["Delete"] = "Delete",
+	["Enable"] = "Enable",
+	["Disable"] = "Disable",
+	
+	["Dur: %d / CD: %d / Anchor: %s"] = "Dur: %d / CD: %d / Anchor: %s",
+	
+	-- Profile options
+	["Profile Options"] = "Profile Options",
 	
 }

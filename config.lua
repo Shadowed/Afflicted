@@ -55,6 +55,19 @@ local function setNumber(info, value)
 	set(info, tonumber(value))
 end
 
+local function setColor(info, r, g, b)
+	set(info, {r = r, g = g, b = b})
+end
+
+local function getColor(info)
+	local value = get(info)
+	if( type(value) == "table" ) then
+		return value.r, value.g, value.b
+	end
+	
+	return value
+end
+
 local function setType(info, value)
 	if( tonumber(value) ) then
 		set(info, tonumber(value))
@@ -231,6 +244,8 @@ function Config:CreateAnchorDisplay(info, value)
 						type = "color",
 						name = L["Text color"],
 						desc = L["Alert text color, only applies to local outputs."],
+						set = setColor,
+						get = getColor,
 						arg = "anchors." .. id .. ".announceColor",
 					},
 					dispelDest = {
@@ -338,7 +353,29 @@ function Config:GetAnchors()
 	return anchors
 end
 
-local checkEvents = { ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group member, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group member, interrupted by enemy"] }
+local function getSpellInfo(info)
+	local data = Afflicted.db.profile.spells[info.arg]
+	local anchorName = data.showIn
+	if( Afflicted.db.profile.anchors[anchorName] ) then
+		anchorName = Afflicted.db.profile.anchors[anchorName].text
+	end
+	
+	return string.format(L["Dur: %d / CD: %d / Anchor: %s"], data.seconds, data.cooldown, anchorName)
+end
+
+local function getSpellStatus(info)
+	if( Afflicted.db.profile.spells[info.arg].disabled ) then
+		return L["Disable"]
+	else
+		return L["Enable"]
+	end
+end
+
+local function toggleSpell(info)
+	Afflicted.db.profile.spells[info.arg].disabled = not Afflicted.db.profile.spells[info.arg].disabled
+end
+
+local checkEvents = { ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
 
 function Config:CreateSpellDisplay(info, value)
 	if( not Afflicted.db.profile.spells[value] ) then
@@ -355,8 +392,34 @@ function Config:CreateSpellDisplay(info, value)
 			text = string.format("#%d", tonumber(value))
 		end
 	end
+	
+	local id = string.gsub(value, " ", "")
+	
+	options.args.spells.args.list.args[id] = {
+		order = 1,
+		type = "group",
+		inline = true,
+		name = text,
+		width = "half",
+		args = {
+			desc = {
+				order = 1,
+				type = "description",
+				name = getSpellInfo,
+				arg = value,
+			},
+			toggle = {
+				order = 2,
+				type = "execute",
+				name = getSpellStatus,
+				width = "half",
+				func = toggleSpell,
+				arg = value,
+			},
+		},
+	}
 
-	options.args.spells.args[string.gsub(value, " ", "")] = {
+	options.args.spells.args[id] = {
 		order = 1,
 		type = "group",
 		name = tostring(text),
@@ -555,7 +618,7 @@ local function loadOptions()
 				name = L["Show anchors"],
 				desc = L["Display timer anchors for moving around."],
 				width = "double",
-				arg = "enabled",
+				arg = "showAnchors",
 			},
 			showIcons = {
 				order = 2,
@@ -626,6 +689,8 @@ local function loadOptions()
 						name = L["Text color"],
 						desc = L["Alert text color, only applies to local outputs."],
 						disabled = "IsDisabled",
+						set = setColor,
+						get = getColor,
 						arg = "dispelColor",
 					},
 					dispelDest = {
@@ -659,6 +724,8 @@ local function loadOptions()
 						name = L["Text color"],
 						desc = L["Alert text color, only applies to local outputs."],
 						disabled = "IsDisabled",
+						set = setColor,
+						get = getColor,
 						arg = "interruptColor",
 					},
 					interruptDest = {
@@ -676,7 +743,7 @@ local function loadOptions()
 	}
 	options.args.anchors = {
 		type = "group",
-		order = 2,
+		order = 3,
 		name = L["Anchors"],
 		get = get,
 		set = set,
@@ -706,25 +773,42 @@ local function loadOptions()
 	
 	options.args.spells = {
 		type = "group",
-		order = 2,
+		order = 4,
 		name = L["Spells"],
 		get = get,
 		set = set,
 		handler = Config,
 		args = {
-			desc = {
-				order = 0,
-				name = L["Allows you to add a new spell that Afflicted should start tracking."],
-				type = "description",
-			},
-			new = {
+			add = {
 				order = 1,
-				type = "input",
-				name = L["Spell name or spell ID"],
-				desc = L["The name of the spell, or the spell ID. This is note always the exact spell name, for example Intercept is actually Intercept Stun."],
-				validate = "ValidateSpell",
-				get = function() return "" end,
-				set = "CreateSpellDisplay",
+				type = "group",
+				inline = true,
+				name = L["New spell"],
+				args = {
+					desc = {
+						order = 0,
+						name = L["Allows you to add a new spell that Afflicted should start tracking."],
+						type = "description",
+						width = "full",
+					},
+					new = {
+						order = 1,
+						type = "input",
+						width = "full",
+						name = L["Spell name or spell ID"],
+						desc = L["The name of the spell, or the spell ID. This is note always the exact spell name, for example Intercept is actually Intercept Stun."],
+						validate = "ValidateSpell",
+						get = function() return "" end,
+						set = "CreateSpellDisplay",
+					},
+				}
+			},
+			list = {
+				order = 2,
+				type = "group",
+				inline = true,
+				name = L["Spell list"],
+				args = {}
 			},
 		},
 	}
@@ -735,6 +819,10 @@ local function loadOptions()
 			Config:CreateSpellDisplay(nil, id)
 		end
 	end
+	
+	-- DB Profiles
+	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(Afflicted.db)
+	options.args.profile.order = 2
 end
 
 -- Slash commands
@@ -753,7 +841,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 
 		local i = 0
 		local addedTypes = {}
-		for spell, data in pairs(AfflictedSpells) do
+		for spell, data in pairs(Afflicted.db.profile.spells) do
 			if( type(data) == "table" ) then
 				i = i + 1
 
@@ -761,9 +849,9 @@ SlashCmdList["AFFLICTED"] = function(msg)
 					addedTypes[data.showIn] = 0
 				end
 
-				if( addedTypes[data.showIn] < 5 and data.icon and data.icon ~= "" ) then
+				if( addedTypes[data.showIn] < 5 and data.icon and data.icon ~= "" and not data.disabled ) then
 					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
-					Afflicted:ProcessAbility("TEST", i, spell, i, GetTime() .. spell, "", "", "")
+					Afflicted:ProcessAbility("TEST", spell, data.text or spell, -1, UnitGUID("player"), UnitName("player"), UnitGUID("player"), UnitName("player"))
 				end
 			end
 		end
@@ -787,3 +875,30 @@ SlashCmdList["AFFLICTED"] = function(msg)
 		DEFAULT_CHAT_FRAME:AddMessage(L["- ui - Opens the configuration for Afflicted."])
 	end
 end
+
+-- Add the general options + profile, we don't add spells/anchors because it doesn't support sub cats
+local register = CreateFrame("Frame", nil, InterfaceOptionsFrame)
+register:SetScript("OnShow", function(self)
+	self:SetScript("OnShow", nil)
+	loadOptions()
+
+	config:RegisterOptionsTable("Afflicted-Bliz", {
+		name = "Afflicted",
+		type = "group",
+		args = {
+			help = {
+				type = "description",
+				name = "Afflicted is a PvP timer tracking mod, for things like spell duration or cool down.",
+			},
+		},
+	})
+	
+	dialog:SetDefaultSize("Afflicted-Bliz", 600, 400)
+	dialog:AddToBlizOptions("Afflicted-Bliz", "Afflicted")
+	
+	config:RegisterOptionsTable("Afflicted-General", options.args.general)
+	dialog:AddToBlizOptions("Afflicted-General", options.args.general.name, "Afflicted")
+
+	config:RegisterOptionsTable("Afflicted-Profile", options.args.profile)
+	dialog:AddToBlizOptions("Afflicted-Profile", options.args.profile.name, "Afflicted")
+end)
