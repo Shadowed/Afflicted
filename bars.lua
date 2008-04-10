@@ -181,7 +181,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 	end
 	
 	-- We can only pass one argument, so we do this to prevent creating and dumping tables and such
-	barData[id] = string.format("%s,%d,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
+	barData[id] = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
 	barData[spellName .. sourceGUID] = true
 
 	anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))

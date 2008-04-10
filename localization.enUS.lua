@@ -54,8 +54,7 @@ AfflictedLocals = {
 	["Prefixes messages with the spell icon if you're using local outputs."] = "Prefixes messages with the spell icon if you're using local outputs.",
 	
 	["Use bar display"] = "Use bar display",
-
-	["Displays timers using a bar format instead of the standard icons."] = "Displays timers using a bar format instead of the standard icons.",
+	["Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect."] = "Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect.",
 	
 	["Bar width"] = "Bar width",
 	["Bar texture"] = "Bar texture",
@@ -74,6 +73,15 @@ AfflictedLocals = {
 	
 	["Enable interrupt alerts"] = "Enable interrupt alerts",
 	["Displays alerts when you interrupt enemies."] = "Displays alerts when you interrupt enemies.",
+		
+	["Everywhere else"] = "Everywhere else",
+	["Battlegrounds"] = "Battlegrounds",
+	["Arenas"] = "Arenas",
+	["Raid instances"] = "Raid instances",
+	["Party instances"] = "Party instances",
+	
+	["Enable Afflicted inside"] = "Enable Afflicted inside",
+	["Allows you to set what scenario's Afflicted should be enabled inside."] = "Allows you to set what scenario's Afflicted should be enabled inside.",
 	
 	-- Anchors
 	["You must enter a name for this anchor."] = "You must enter a name for this anchor.",

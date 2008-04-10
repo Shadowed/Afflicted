@@ -330,8 +330,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 			timerLimits[nameID] = time + spellData.globalLimit
 		end
 	end
-	
-	
+		
 	-- Linked spells mean that while the timer still exists we don't trigger another of it
 	if( spellData.linkedTo and spellData.linkedTo ~= "" and self.visual:TimerExists(spellData, spellID, sourceGUID, destGUID) ) then
 		return

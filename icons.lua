@@ -230,7 +230,7 @@ function Icons:UnitDied(destGUID, destName)
 			for i=#(frame.active), 1, -1 do
 				local row = frame.active[i]
 
-				if( row.sourceGUID == destGUID and not row.dontFade ) then
+				if( row.sourceGUID == destGUID and not row.dontFade and not row.isCooldown ) then
 					row:Hide()
 
 					table.insert(frame.inactive, row)
@@ -250,7 +250,7 @@ function Icons:UnitDied(destGUID, destName)
 end
 
 -- Create a new timer
-local function createTimer(showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, icon, seconds)
+local function createTimer(showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, icon, seconds, isCooldown)
 	local anchorFrame = Icons[showIn]
 	if( not anchorFrame ) then
 		return
@@ -266,6 +266,7 @@ local function createTimer(showIn, eventType, repeating, spellID, spellName, sou
 	frame.id = id
 	frame.eventType = eventType
 	frame.repeatTimer = repeating
+	frame.isCooldown = isCooldown
 	
 	frame.spellID = spellID
 	frame.spellName = spellName
@@ -294,7 +295,7 @@ function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID,
 	createTimer(spellData.showIn, eventType, spellData.repeatTimer, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
 	
 	if( spellData.cooldown > 0 ) then
-		createTimer(spellData.showIn, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown)
+		createTimer(spellData.showIn, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown, true)
 	end
 end
 

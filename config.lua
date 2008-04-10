@@ -202,6 +202,7 @@ function Config:CreateAnchorDisplay(info, value)
 				name = L["Display scale"],
 				desc = L["How big the actual timers should be."],
 				min = 0, max = 2, step = 0.1,
+				set = setNumber,
 				arg = "anchors." .. id .. ".scale",
 			},
 			redirect = {
@@ -283,7 +284,7 @@ function Config:CreateAnchorDisplay(info, value)
 						name = L["Used message"],
 						desc = L["Messages that were triggered due to an ability being used."],
 						width = "full",
-						arg = "anchors." .. id .. ".gainMessage",
+						arg = "anchors." .. id .. ".usedMessage",
 					},
 					fade = {
 						order = 3,
@@ -291,7 +292,7 @@ function Config:CreateAnchorDisplay(info, value)
 						name = L["Fade message"],
 						desc = L["Messages that were triggered by someone gaining a buff, or a debuff that has faded."],
 						width = "full",
-						arg = "anchors." .. id .. ".gainMessage",
+						arg = "anchors." .. id .. ".fadeMessage",
 					},
 					ready = {
 						order = 4,
@@ -299,7 +300,7 @@ function Config:CreateAnchorDisplay(info, value)
 						name = L["Ready message"],
 						desc = L["Messages that were triggered due to an ability being used, and the ability is either over or is ready again."],
 						width = "full",
-						arg = "anchors." .. id .. ".gainMessage",
+						arg = "anchors." .. id .. ".readyMessage",
 					},
 				},
 			},
@@ -365,9 +366,9 @@ end
 
 local function getSpellStatus(info)
 	if( Afflicted.db.profile.spells[info.arg].disabled ) then
-		return L["Disable"]
-	else
 		return L["Enable"]
+	else
+		return L["Disable"]
 	end
 end
 
@@ -378,13 +379,18 @@ end
 local checkEvents = { ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
 
 function Config:CreateSpellDisplay(info, value)
+	-- Do a quick type change
+	if( tonumber(value) ) then
+		value = tonumber(value)
+	end
+	
 	if( not Afflicted.db.profile.spells[value] ) then
 		Afflicted.db.profile.spells[value] = CopyTable(Afflicted.defaults.profile.spellDefault)
 	end
 	
 	-- If it's a spellID, either show the text because we've seen the spell, or show the spellID
 	local text = value
-	if( type(tonumber(value)) == "number" ) then
+	if( type(value) == "number" ) then
 		local data = Afflicted.db.profile.spells[value]
 		if( data.text ) then
 			text = data.text
@@ -598,6 +604,9 @@ function Config:CreateSpellDisplay(info, value)
 	}
 end
 
+-- General options
+local enabledIn = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]}
+
 local function loadOptions()
 	options = {}
 	options.type = "group"
@@ -638,7 +647,7 @@ local function loadOptions()
 						order = 1,
 						type = "toggle",
 						name = L["Use bar display"],
-						desc = L["Displays timers using a bar format instead of the standard icons."],
+						desc = L["Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect."],
 						width = "double",
 						arg = "showBars",
 					},
@@ -647,6 +656,7 @@ local function loadOptions()
 						type = "range",
 						name = L["Bar width"],
 						min = 0, max = 300, step = 1,
+						set = setNumber,
 						disabled = "IsDisabled",
 						arg = "barWidth",
 					},
@@ -660,8 +670,19 @@ local function loadOptions()
 					},
 				},
 			},
-			dispel = {
+			enabledIn = {
 				order = 4,
+				type = "multiselect",
+				name = L["Enable Afflicted inside"],
+				desc = L["Allows you to set what scenario's Afflicted should be enabled inside."],
+				values = enabledIn,
+				set = setMulti,
+				get = getMulti,
+				width = "double",
+				arg = "inside"
+			},
+			dispel = {
+				order = 5,
 				type = "group",
 				inline = true,
 				name = L["Dispels"],
@@ -705,7 +726,7 @@ local function loadOptions()
 				},
 			},
 			interrupt = {
-				order = 4,
+				order = 6,
 				type = "group",
 				inline = true,
 				name = L["Interrupts"],
@@ -849,7 +870,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 					addedTypes[data.showIn] = 0
 				end
 
-				if( addedTypes[data.showIn] < 5 and data.icon and data.icon ~= "" and not data.disabled ) then
+				if( addedTypes[data.showIn] < 5 and not data.disabled ) then
 					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
 					Afflicted:ProcessAbility("TEST", spell, data.text or spell, -1, UnitGUID("player"), UnitName("player"), UnitGUID("player"), UnitName("player"))
 				end
