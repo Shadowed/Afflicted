@@ -7,8 +7,6 @@ local instanceType
 local timerLimits = {}
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
-local LOCKOUT_TIME = 1.75
-
 function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
@@ -26,53 +24,23 @@ function Afflicted:OnInitialize()
 			interruptColor = { r = 1, g = 1, b = 1 },
 			
 			barWidth = 180,
+			barNameOnly = false,
 			barName = "BantoBar",
 			
 			spells = AfflictedSpells,
 			inside = {["arena"] = true, ["pvp"] = true},
-			
-			anchors = {
-				["spells"] = {
-					enabled = true,
-					announce = false,
-					growUp = false,
-					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
-					announceDest = "1",
-					scale = 1.0,
-					text = L["Spells"],
-
-					gainMessage = L["GAINED *spell (*target)"],
-					usedMessage = L["USED *spell (*target)"],
-					fadeMessage = L["FADED *spell (*target)"],
-					readyMessage = L["READY *spell (*target)"],
-				},
-				["buffs"] = {
-					enabled = true,
-					announce = false,
-					growUp = false,
-					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
-					announceDest = "1",
-					scale = 1.0,
-					text = L["Buffs"],
-
-					gainMessage = L["GAINED *spell (*target)"],
-					usedMessage = L["USED *spell (*target)"],
-					fadeMessage = L["FADED *spell (*target)"],
-					readyMessage = L["READY *spell (*target)"],
-				},
-			},
 			anchorDefault = {
-					enabled = true,
-					announce = false,
-					growUp = false,
-					announceColor = { r = 1.0, g = 1.0, b = 1.0 },
-					announceDest = "1",
-					scale = 1.0,
+				enabled = true,
+				announce = false,
+				growUp = false,
+				announceColor = { r = 1.0, g = 1.0, b = 1.0 },
+				announceDest = "1",
+				scale = 1.0,
 
-					gainMessage = L["GAINED *spell (*target)"],
-					usedMessage = L["USED *spell (*target)"],
-					fadeMessage = L["FADED *spell (*target)"],
-					readyMessage = L["READY *spell (*target)"],
+				gainMessage = L["GAINED *spell (*target)"],
+				usedMessage = L["USED *spell (*target)"],
+				fadeMessage = L["FADED *spell (*target)"],
+				readyMessage = L["READY *spell (*target)"],
 			},
 			spellDefault = {
 				seconds = 0,
@@ -90,11 +58,47 @@ function Afflicted:OnInitialize()
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 		
 	-- Upgrade
-	if( self.db.profile.version and self.db.profile.version <= 655 ) then
-		self.db.profile.anchors = CopyTable(self.defaults.profile.anchors)
-		self.db.profile.spells = CopyTable(self.defaults.profile.spells)
-		self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
+	if( self.db.profile.version ) then
+		if( self.db.profile.version <= 655 ) then
+			self.db.profile.anchors = nil
+			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
+			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
+		elseif( self.db.profile.version <= 658 ) then
+			self.db.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
+			self.db.profile.anchors.cooldowns.text = L["Cooldowns"]
+			self.db.profile.spells[19675] = nil
+			
+			for name, data in pairs(Afflicted.db.profile.anchors) do
+				if( name == "spells" ) then
+					data.text = L["Spells"]
+				elseif( name == "buffs" ) then
+					data.text = L["Buffs"]
+				end
+				
+				for k, v in pairs(self.defaults.profile.anchorDefault) do
+					if( not data[k] ) then
+						if( type(v) == "table" ) then
+							data[k] = CopyTable(v)
+						else
+							data[k] = v
+						end
+					end
+				end
+			end
+		end
 	end
+		
+	-- Setup default anchors
+	if( not self.db.profile.anchors ) then
+		self.db.profile.anchors = {}
+		self.db.profile.anchors.buffs = CopyTable(self.defaults.profile.anchorDefault)
+		self.db.profile.anchors.buffs.text = L["Buffs"]
+		self.db.profile.anchors.spells = CopyTable(self.defaults.profile.anchorDefault)
+		self.db.profile.anchors.spells.text = L["Spells"]
+		self.db.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
+		self.db.profile.anchors.cooldowns.text = L["Cooldowns"]
+	end
+	
 	
 	self.db.profile.version = self.revision
 	
@@ -186,18 +190,16 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		-- Group member gained a debuff
 		if( auraType == "DEBUFF" and isDestGroup ) then
 			self:ProcessAbility(eventType .. auraType .. "GROUP", spellID, spellName, spellSchool, destGUID, "", destGUID, destName)
-		
-		-- Enemy gained a buff
-		elseif( auraType == "BUFF" and isDestEnemy ) then
+			
+		-- Enemy gained a buff or debuff
+		elseif( isDestEnemy ) then
 			self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
 		end
 	
 	-- Buff faded from an enemy
 	elseif( eventType == "SPELL_AURA_REMOVED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		if( auraType == "BUFF" ) then
-			self:AbilityEnded(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
-		end
+		self:AbilityEnded(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
 
 	-- Spell casted succesfully
 	elseif( eventType == "SPELL_CAST_SUCCESS" and isSourceEnemy ) then

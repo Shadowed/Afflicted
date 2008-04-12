@@ -1,5 +1,5 @@
 local major = "GTB-Beta1"
-local minor = tonumber(string.match("$Revision: 640 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 660 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 
@@ -567,6 +567,7 @@ function GTB.RegisterBar(group, id, seconds, text, icon, r, g, b)
 	frame:SetStatusBarColor(frame.r, frame.g, frame.b)
 	frame:SetWidth(group.width)
 	frame:SetHeight(group.height)
+	frame:SetScale(group.scale)
 	frame:SetScript("OnUpdate", barOnUpdate)
 	frame:Show()
 	

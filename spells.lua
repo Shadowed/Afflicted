@@ -9,7 +9,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Scare Beast
@@ -57,7 +57,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Frost Nova
@@ -82,10 +82,12 @@ AfflictedSpells = {
 		text = "Disarm",
 		seconds = 10,
 		cooldown = 60,
+		cdEnabled = true,
+		cdInside = "cooldowns",
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 
@@ -98,7 +100,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 2,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Intimidating Shout
@@ -161,7 +163,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Kidney Shot
@@ -201,7 +203,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	--  Evasion
@@ -213,7 +215,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Icy Veins
@@ -224,7 +226,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Berserker Rage
@@ -234,6 +236,8 @@ AfflictedSpells = {
 		disabled = true,
 		seconds = 10,
 		cooldown = 30,
+		cdEnabled = true,
+		cdInside = "cooldowns",
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "spells",
@@ -263,7 +267,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Hypothermia
@@ -274,7 +278,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDDEBUFFENEMY = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = false,
 	},
 	
 	-- Blessing of Protection
@@ -288,7 +292,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Blessing of Freedom
@@ -296,10 +300,12 @@ AfflictedSpells = {
 		text = "Blessing of Freedom",
 		seconds = 14,
 		cooldown = 25,
+		cdEnabled = true,
+		cdInside = "cooldowns",
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Blessing of Sacrifice
@@ -313,7 +319,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Pain Suppression
@@ -324,7 +330,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Cloak of Shadows
@@ -335,7 +341,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Spell reflection
@@ -346,7 +352,7 @@ AfflictedSpells = {
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Hunter Silence
@@ -374,15 +380,31 @@ AfflictedSpells = {
 	},
 
 	-- Feral Charge
-	[19675] = {
-		text = "Feral Charge Effect",
+	[16979] = {
+		text = "Feral Charge",
 		seconds = 15,
 		cooldown = 0,
 		singleLimit = 0,
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = true, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = true, SPELL_CAST_SUCCESS = true,
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Intercept
+	[20252] = 25275,
+	[20616] = 25275,
+	[20617] = 25275,
+	[25272] = 25275,
+	[25275] = {
+		text = "Intercept",
+		seconds = 15,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		dontFade = true,
+		showIn = "spells",
+		TEST = true, SPELL_MISC = false, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = false, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false, SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Spell lock
@@ -494,7 +516,7 @@ AfflictedSpells = {
 	[29228] = {
 		text = "Flame Shock",
 		seconds = 5,
-		cooldown = 5,
+		cooldown = 0,
 		singleLimit = 0,
 		globalLimit = 0,
 		dontFade = true,

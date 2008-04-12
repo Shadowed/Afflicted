@@ -176,9 +176,15 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		
 	local id = spellID .. ":" .. sourceGUID
 	local text = spellName
-	if( sourceName and sourceName ~= "" ) then
+
+	if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
+		text = sourceName
+	elseif( sourceName ~= "" ) then
 		text = string.format("%s - %s", spellName, sourceName)
+	else
+		text = spellName
 	end
+
 	
 	-- We can only pass one argument, so we do this to prevent creating and dumping tables and such
 	barData[id] = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
@@ -189,10 +195,18 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 	anchorFrame.group:SetRepeatingTimer(id, spellData.repeating or false)
 	
 	-- Start a cooldown timer
-	if( spellData.cooldown > 0 ) then
+	if( spellData.cdEnabled and spellData.cooldown > 0 ) then
+		local anchorFrame = Bars[spellData.cdInside]
+		if( not anchorFrame ) then
+			return
+		end
+
 		local id = spellID .. sourceGUID .. "CD"
 		local text
-		if( sourceName ~= "" ) then
+		
+		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
+			text = string.format("[CD] %s", sourceName)
+		elseif( sourceName ~= "" ) then
 			text = string.format("[CD] %s - %s", spellName, sourceName)
 		else
 			text = string.format("[CD] %s", spellName)
@@ -242,6 +256,8 @@ function Bars:ReloadVisual()
 			else
 				frame.group:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
 			end
+			
+			OnShow(frame)
 		
 			if( not Afflicted.db.profile.showAnchors ) then
 				frame:SetAlpha(0)

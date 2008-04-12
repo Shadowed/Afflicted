@@ -294,8 +294,8 @@ end
 function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 	createTimer(spellData.showIn, eventType, spellData.repeatTimer, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
 	
-	if( spellData.cooldown > 0 ) then
-		createTimer(spellData.showIn, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown, true)
+	if( spellData.cdEnabled and spellData.cooldown > 0 ) then
+		createTimer(spellData.cdInside, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown, true)
 	end
 end
 

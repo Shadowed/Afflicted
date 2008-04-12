@@ -376,7 +376,7 @@ local function toggleSpell(info)
 	Afflicted.db.profile.spells[info.arg].disabled = not Afflicted.db.profile.spells[info.arg].disabled
 end
 
-local checkEvents = { ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
+local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
 
 function Config:CreateSpellDisplay(info, value)
 	-- Do a quick type change
@@ -523,8 +523,16 @@ function Config:CreateSpellDisplay(info, value)
 						name = L["Allows you to start a new timer when this one is triggered that has the cooldown left on the ability, use this if you want to track both the timer duration and the timer cooldown."],
 						type = "description",
 					},
-					seconds = {
+					disabled = {
 						order = 1,
+						type = "toggle",
+						name = L["Enable cooldown"],
+						desc = L["While disabled, no cooldown will be started when this timer is triggered."],
+						width = "double",
+						arg = "spells." .. value .. ".cdEnabled",
+					},
+					seconds = {
+						order = 3,
 						type = "input",
 						name = L["Duration"],
 						desc = L["How many seconds this cooldown timer should last."],
@@ -532,6 +540,15 @@ function Config:CreateSpellDisplay(info, value)
 						get = getString,
 						set = setNumber,
 						arg = "spells." .. value .. ".cooldown",
+					},
+					showIn = {
+						order = 3,
+						type = "select",
+						name = L["Show inside anchor"],
+						desc = L["Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown."],
+						values = "GetAnchors",
+						width = "double",
+						arg = "spells." .. value .. ".cdInside",
 					},
 				},
 			},
@@ -651,8 +668,17 @@ local function loadOptions()
 						width = "double",
 						arg = "showBars",
 					},
-					barWidth = {
+					nameOnly = {
 						order = 2,
+						type = "toggle",
+						name = L["Only show triggered name in text"],
+						desc = L["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."],
+						width = "double",
+						disabled = "IsDisabled",
+						arg = "barNameOnly",
+					},
+					barWidth = {
+						order = 3,
 						type = "range",
 						name = L["Bar width"],
 						min = 0, max = 300, step = 1,
@@ -661,7 +687,7 @@ local function loadOptions()
 						arg = "barWidth",
 					},
 					barName = {
-						order = 3,
+						order = 4,
 						type = "select",
 						name = L["Bar texture"],
 						values = "GetTextures",

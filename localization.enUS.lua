@@ -11,7 +11,8 @@ AfflictedLocals = {
 	-- Default frames
 	["Spells"] = "Spells",
 	["Buffs"] = "Buffs",
-
+	["Cooldowns"] = "Cooldowns",
+	
 	-- Schools
 	["Schools"] = "Schools",
 	["School Lockout"] = "School Lockout",
@@ -82,6 +83,9 @@ AfflictedLocals = {
 	
 	["Enable Afflicted inside"] = "Enable Afflicted inside",
 	["Allows you to set what scenario's Afflicted should be enabled inside."] = "Allows you to set what scenario's Afflicted should be enabled inside.",
+	
+	["Only show triggered name in text"] = "Only show triggered name in text",
+	["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."] = "Instead of showing both the spell name and the triggered name, only the name will be shown in the bar.",
 	
 	-- Anchors
 	["You must enter a name for this anchor."] = "You must enter a name for this anchor.",
@@ -179,6 +183,7 @@ AfflictedLocals = {
 	["Enemy, creates object"] = "Enemy, creates object",
 	["Group, interrupted by enemy"] = "Group, interrupted by enemy",
 	["Enemy, successfully casts"] = "Enemy, successfully casts",
+	["Enemy, gained debuff"] = "Enemy, gained debuff",
 	
 	["Custom announcements"] = "Custom announcements",
 	
@@ -204,6 +209,10 @@ AfflictedLocals = {
 	["Disable"] = "Disable",
 	
 	["Dur: %d / CD: %d / Anchor: %s"] = "Dur: %d / CD: %d / Anchor: %s",
+	
+	["Enable cooldown"] = "Enable cooldown",
+	["While disabled, no cooldown will be started when this timer is triggered."] = "While disabled, no cooldown will be started when this timer is triggered.",
+	["Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown."] = "Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown.",
 	
 	-- Profile options
 	["Profile Options"] = "Profile Options",
