@@ -214,6 +214,12 @@ AfflictedLocals = {
 	["While disabled, no cooldown will be started when this timer is triggered."] = "While disabled, no cooldown will be started when this timer is triggered.",
 	["Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown."] = "Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown.",
 	
+	["Delete"] = "Delete",
+	["None"] = "None",
+	
+	["You can delete spells manually added through this, note that spells that are included with Afflicted by default cannot be deleted. All this will do is reset them to the default values."] = "You can delete spells manually added through this, note that spells that are included with Afflicted by default cannot be deleted. All this will do is reset them to the default values.",
+	["Are you REALLY sure you want to delete this spell?"] = "Are you REALLY sure you want to delete this spell?",
+	
 	-- Profile options
 	["Profile Options"] = "Profile Options",
 	

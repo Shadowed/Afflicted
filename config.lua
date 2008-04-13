@@ -361,19 +361,7 @@ local function getSpellInfo(info)
 		anchorName = Afflicted.db.profile.anchors[anchorName].text
 	end
 	
-	return string.format(L["Dur: %d / CD: %d / Anchor: %s"], data.seconds, data.cooldown, anchorName)
-end
-
-local function getSpellStatus(info)
-	if( Afflicted.db.profile.spells[info.arg].disabled ) then
-		return L["Enable"]
-	else
-		return L["Disable"]
-	end
-end
-
-local function toggleSpell(info)
-	Afflicted.db.profile.spells[info.arg].disabled = not Afflicted.db.profile.spells[info.arg].disabled
+	return string.format(L["Dur: %d / CD: %d / Anchor: %s"], data.seconds or 0, data.cooldown or 0, anchorName or L["None"])
 end
 
 local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
@@ -417,9 +405,9 @@ function Config:CreateSpellDisplay(info, value)
 			toggle = {
 				order = 2,
 				type = "execute",
-				name = getSpellStatus,
+				name = function(info) if( Afflicted.db.profile.spells[info.arg].disabled ) then return L["Enable"] else return L["Disable"] end end,
 				width = "half",
-				func = toggleSpell,
+				func = function(info) Afflicted.db.profile.spells[info.arg].disabled = not Afflicted.db.profile.spells[info.arg].disabled end,
 				arg = value,
 			},
 		},
@@ -447,7 +435,6 @@ function Config:CreateSpellDisplay(info, value)
 				name = L["Show inside anchor"],
 				desc = L["Anchor to display this timer inside, if the anchor is disabled then this timer won't show up."],
 				values = "GetAnchors",
-				width = "double",
 				arg = "spells." .. value .. ".showIn",
 			},
 			linkedTo = {
@@ -456,7 +443,6 @@ function Config:CreateSpellDisplay(info, value)
 				name = L["Link spell to"],
 				desc = L["If you link this spell to another, then it means this spell will not trigger a new timer started while the timer is running for the spell it's linked to."],
 				values = "GetSpells",
-				width = "double",
 				get = getString,
 				set = setType,
 				arg = "spells." .. value .. ".linkedTo",
@@ -614,6 +600,34 @@ function Config:CreateSpellDisplay(info, value)
 						desc = L["Custom message to use for when this timer ends, if you leave the message blank and you have custom messages enabled then no message will be given when it's ends."],
 						width = "double",
 						arg = "spells." .. value .. ".fadedMessage",
+					},
+				},
+			},
+			delete = {
+				order = 9,
+				type = "group",
+				inline = true,
+				name = L["Delete"],
+				args = {
+					desc = {
+						order = 1,
+						type = "description",
+						name = L["You can delete spells manually added through this, note that spells that are included with Afflicted by default cannot be deleted. All this will do is reset them to the default values."],
+					},
+					delete = {
+						order = 2,
+						type = "execute",
+						name = L["Delete"],
+						confirm = true,
+						confirmText = L["Are you REALLY sure you want to delete this spell?"],
+						func = function(info)
+							Afflicted.db.profile.spells[info.arg] = nil
+							
+							local id = string.gsub(value, " ", "")
+							options.args.spells.args[id] = nil
+							options.args.spells.args.list.args[id] = nil
+						end,
+						arg = value,
 					},
 				},
 			},

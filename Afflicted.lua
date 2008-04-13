@@ -47,8 +47,10 @@ function Afflicted:OnInitialize()
 				cooldown = 0,
 				singleLimit = 0,
 				globalLimit = 0,
+				showIn = "",
+				linkedTo = "",
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
-				TEST = true, SPELL_CAST_SUCCESS = true, SPELL_MISC = true, SPELL_AURA_APPLIEDDEBUFFGROUP = false, SPELL_AURA_APPLIEDBUFFENEMY = true, SPELL_SUMMON = false, SPELL_CREATE = false, SPELL_INTERRUPT = false,
+				SPELL_CAST_SUCCESS = true
 			},
 		},
 	}
@@ -63,10 +65,9 @@ function Afflicted:OnInitialize()
 			self.db.profile.anchors = nil
 			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
 			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
-		elseif( self.db.profile.version <= 658 ) then
+		elseif( self.db.profile.version <= 660 ) then
 			self.db.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
 			self.db.profile.anchors.cooldowns.text = L["Cooldowns"]
-			self.db.profile.spells[19675] = nil
 			
 			for name, data in pairs(Afflicted.db.profile.anchors) do
 				if( name == "spells" ) then
@@ -83,6 +84,15 @@ function Afflicted:OnInitialize()
 							data[k] = v
 						end
 					end
+				end
+			end
+		end
+		
+		-- Do a quick spell check to see if something was removed from the default list
+		if( self.db.profile.version ~= self.revision ) then
+			for id, data in pairs(self.db.profile.spells) do
+				if( ( type(id) == "number" and not AfflictedSpells[id] ) and ( not data.showIn or not data.seconds ) ) then
+					self.db.profile.spells[id] = nil
 				end
 			end
 		end
@@ -219,7 +229,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- We got interrupted, or we interrupted someone else
 	elseif( eventType == "SPELL_INTERRUPT" ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool = ...
-	
+			
 		-- We interrupted an enemy
 		if( self.db.profile.interruptEnabled and isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
 			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, spellSchools[extraSpellSchool] or ""), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
@@ -296,7 +306,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		spellData = self.db.profile.spells[spellData]
 	end
 	
-	if( not spellData or spellData.disabled or not spellData[eventType] ) then
+	if( not spellData or spellData.disabled or ( eventType ~= "TEST" and not spellData[eventType] ) ) then
 		return
 	end
 	
@@ -369,7 +379,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 				return
 			end
 			
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_REMOVEDENEMY" ) then
+		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" ) then
 			msg = anchor.gainMessage
 		else
 			msg = anchor.usedMessage
@@ -385,6 +395,11 @@ end
 -- Ability ended due to event, or timers up
 function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName, isTimedOut)
 	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
+	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
+	if( type(spellData) == "number" ) then
+		spellData = self.db.profile.spells[spellData]
+	end
+
 	if( not spellData ) then
 		return
 	end
@@ -414,7 +429,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 				return
 			end
 			
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_REMOVED" ) then
+		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" or eventType == "SPELL_AURA_REMOVED" ) then
 			msg = anchor.fadeMessage
 		else
 			msg = anchor.readyMessage

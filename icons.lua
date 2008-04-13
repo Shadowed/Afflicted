@@ -244,7 +244,7 @@ function Icons:UnitDied(destGUID, destName)
 			end
 
 			-- Reposition everything
-			Icons:RepositionTimers(frame)
+			repositionTimers(frame)
 		end
 	end
 end
