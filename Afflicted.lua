@@ -150,7 +150,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	elseif( eventType == "SPELL_DISPEL_FAILED" or eventType == "SPELL_PERIODIC_DISPEL_FAILED" ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
 		
-		if( not isDestEnemy or ( isDestEnemy and not self.db.profile.dispelHostile ) ) then
+		if( not isDestEnemy or ( isDestEnemy and self.db.profile.dispelHostile ) ) then
 			if( bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
 				self:SendMessage(string.format(L["FAILED %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelDest, self.db.profile.dispelColor, extraSpellID)
 			end
@@ -430,5 +430,5 @@ function Afflicted:CombatText(text, color, spellID)
 end
 
 function Afflicted:Print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Afflicted|r: " .. msg)
+	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Afflicted2|r: " .. msg)
 end

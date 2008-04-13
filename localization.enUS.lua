@@ -31,6 +31,7 @@ AfflictedLocals = {
 	["- test - Shows test timers in Afflicted."] = "- test - Shows test timers in Afflicted.",
 	
 	["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."] = "Your configuration has been upgraded to the latest version, anchors and spells have been wiped.",
+	["Your configuration has been reset to the defaults."] = "Your configuration has been reset to the defaults.",
 	
 	-- GUI
 	["General"] = "General",

@@ -13,7 +13,7 @@ end
 -- Reposition the passed frames timers
 local function repositionTimers(type)
 	local frame = Icons[type]
-	if( not frame ) then
+	if( not frame or not Afflicted.db.profile.anchors[type].position ) then
 		return
 	end
 	
@@ -103,7 +103,11 @@ local function OnUpdate(self, elapsed)
 			return
 		end
 
-		Afflicted:AbilityEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName, true)
+		if( not self.isCooldown ) then
+			Afflicted:AbilityEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName, true)
+		else
+			Icons:RemoveTimer(self.type, self.spellID, self.sourceGUID, true)
+		end
 		return
 	end
 	
@@ -303,7 +307,7 @@ function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID,
 end
 
 -- Remove a specific anchors timer by spellID/sourceGUID
-function Icons:RemoveTimer(anchorName, spellID, sourceGUID)
+function Icons:RemoveTimer(anchorName, spellID, sourceGUID, isCooldown)
 	local anchorFrame = Icons[anchorName]
 	if( not anchorFrame ) then
 		return nil
@@ -313,7 +317,7 @@ function Icons:RemoveTimer(anchorName, spellID, sourceGUID)
 	local removed
 	for i=#(anchorFrame.active), 1, -1 do
 		local row = anchorFrame.active[i]
-		if( row.spellID == spellID and row.sourceGUID == sourceGUID ) then
+		if( row.spellID == spellID and row.sourceGUID == sourceGUID and ( ( isCooldown and row.isCooldown ) or ( not isCooldown and not row.isCooldown ) ) ) then
 			row:Hide()
 			
 			table.insert(anchorFrame.inactive, row)

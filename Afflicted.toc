@@ -1,10 +1,10 @@
 ## Interface: 20400
-## Title: Afflicted
-## Notes: Basic PvP skill tracking mod
+## Title: Afflicted2
+## Notes: PvP timer and cool down tracking mod
 ## Author: Mayen
 ## Version: $Revision$
 ## SavedVariables: AfflictedDB
-## OptionalDeps: LibStub, GTB, Ace3, LibSharedMedia-3.0, OptionHouse, HousingAuthority
+## OptionalDeps: LibStub, GTB, Ace3, LibSharedMedia-3.0
 
 libs\LibStub-1.0\LibStub-1.0.xml
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml

@@ -26,7 +26,7 @@ function Config:SetupDB()
 	local self = Afflicted
 	self.defaults = {
 		profile = {
-			showAnchors = true,
+			showAnchors = false,
 			showIcons = true,
 			showBars = true,
 			showTarget = false,
@@ -89,6 +89,9 @@ function Config:SetupDB()
 			self.db.profile.anchors = nil
 			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
 			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
+		elseif( self.db.profile.version <= 619 ) then
+			sellf.db:ResetProfile()
+			self:Print(L["Your configuration has been reset to the defaults."])
 		end
 		
 		-- Do a quick spell check to see if something was removed from the default list
@@ -999,7 +1002,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 		local i = 0
 		local addedTypes = {}
 		for spell, data in pairs(Afflicted.db.profile.spells) do
-			if( type(data) == "table" ) then
+			if( type(data) == "table" and data.showIn ) then
 				i = i + 1
 
 				if( not addedTypes[data.showIn] ) then
@@ -1019,12 +1022,12 @@ SlashCmdList["AFFLICTED"] = function(msg)
 				loadOptions()
 			end
 			
-			config:RegisterOptionsTable("Afflicted", options)
-			dialog:SetDefaultSize("Afflicted", 600, 500)
+			config:RegisterOptionsTable("Afflicted2", options)
+			dialog:SetDefaultSize("Afflicted2", 600, 500)
 			registered = true
 		end
 
-		dialog:Open("Afflicted")
+		dialog:Open("Afflicted2")
 	else
 		DEFAULT_CHAT_FRAME:AddMessage(L["Afflicted slash commands"])
 		DEFAULT_CHAT_FRAME:AddMessage(L["- clear - Clears all running timers."])
@@ -1040,7 +1043,7 @@ register:SetScript("OnShow", function(self)
 	loadOptions()
 
 	config:RegisterOptionsTable("Afflicted-Bliz", {
-		name = "Afflicted",
+		name = "Afflicted2",
 		type = "group",
 		args = {
 			help = {
@@ -1051,11 +1054,11 @@ register:SetScript("OnShow", function(self)
 	})
 	
 	dialog:SetDefaultSize("Afflicted-Bliz", 600, 400)
-	dialog:AddToBlizOptions("Afflicted-Bliz", "Afflicted")
+	dialog:AddToBlizOptions("Afflicted-Bliz", "Afflicted2")
 	
 	config:RegisterOptionsTable("Afflicted-General", options.args.general)
-	dialog:AddToBlizOptions("Afflicted-General", options.args.general.name, "Afflicted")
+	dialog:AddToBlizOptions("Afflicted-General", options.args.general.name, "Afflicted2")
 
 	config:RegisterOptionsTable("Afflicted-Profile", options.args.profile)
-	dialog:AddToBlizOptions("Afflicted-Profile", options.args.profile.name, "Afflicted")
+	dialog:AddToBlizOptions("Afflicted-Profile", options.args.profile.name, "Afflicted2")
 end)
