@@ -13,6 +13,9 @@ end
 -- Reposition the passed frames timers
 local function repositionTimers(type)
 	local frame = Icons[type]
+	if( not frame ) then
+		return
+	end
 	
 	-- Reposition everything
 	for id, icon in pairs(frame.active) do
@@ -244,7 +247,7 @@ function Icons:UnitDied(destGUID, destName)
 			end
 
 			-- Reposition everything
-			repositionTimers(frame)
+			repositionTimers(anhorName)
 		end
 	end
 end

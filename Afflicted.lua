@@ -8,109 +8,9 @@ local timerLimits = {}
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
 function Afflicted:OnInitialize()
-	self.defaults = {
-		profile = {
-			showAnchors = true,
-			showIcons = true,
-			showBars = true,
-			
-			dispelEnabled = true,
-			dispelHostile = true,
-			dispelDest = "party",
-			dispelColor = { r = 1, g = 1, b = 1 },
-			
-			interruptEnabled = true,
-			interruptDest = "party",
-			interruptColor = { r = 1, g = 1, b = 1 },
-			
-			barWidth = 180,
-			barNameOnly = false,
-			barName = "BantoBar",
-			
-			spells = AfflictedSpells,
-			inside = {["arena"] = true, ["pvp"] = true},
-			anchorDefault = {
-				enabled = true,
-				announce = false,
-				growUp = false,
-				announceColor = { r = 1.0, g = 1.0, b = 1.0 },
-				announceDest = "1",
-				scale = 1.0,
-
-				gainMessage = L["GAINED *spell (*target)"],
-				usedMessage = L["USED *spell (*target)"],
-				fadeMessage = L["FADED *spell (*target)"],
-				readyMessage = L["READY *spell (*target)"],
-			},
-			spellDefault = {
-				seconds = 0,
-				cooldown = 0,
-				singleLimit = 0,
-				globalLimit = 0,
-				showIn = "",
-				linkedTo = "",
-				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
-				SPELL_CAST_SUCCESS = true
-			},
-		},
-	}
-
-	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults)
-	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
-		
-	-- Upgrade
-	if( self.db.profile.version ) then
-		if( self.db.profile.version <= 655 ) then
-			self.db.profile.anchors = nil
-			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
-			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
-		elseif( self.db.profile.version <= 660 ) then
-			self.db.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
-			self.db.profile.anchors.cooldowns.text = L["Cooldowns"]
-			
-			for name, data in pairs(Afflicted.db.profile.anchors) do
-				if( name == "spells" ) then
-					data.text = L["Spells"]
-				elseif( name == "buffs" ) then
-					data.text = L["Buffs"]
-				end
-				
-				for k, v in pairs(self.defaults.profile.anchorDefault) do
-					if( not data[k] ) then
-						if( type(v) == "table" ) then
-							data[k] = CopyTable(v)
-						else
-							data[k] = v
-						end
-					end
-				end
-			end
-		end
-		
-		-- Do a quick spell check to see if something was removed from the default list
-		if( self.db.profile.version ~= self.revision ) then
-			for id, data in pairs(self.db.profile.spells) do
-				if( ( type(id) == "number" and not AfflictedSpells[id] ) and ( not data.showIn or not data.seconds ) ) then
-					self.db.profile.spells[id] = nil
-				end
-			end
-		end
-	end
-		
-	-- Setup default anchors
-	if( not self.db.profile.anchors ) then
-		self.db.profile.anchors = {}
-		self.db.profile.anchors.buffs = CopyTable(self.defaults.profile.anchorDefault)
-		self.db.profile.anchors.buffs.text = L["Buffs"]
-		self.db.profile.anchors.spells = CopyTable(self.defaults.profile.anchorDefault)
-		self.db.profile.anchors.spells.text = L["Spells"]
-		self.db.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
-		self.db.profile.anchors.cooldowns.text = L["Cooldowns"]
-	end
-	
-	
-	self.db.profile.version = self.revision
+	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
+	self.modules.Config:SetupDB()
 	
 	-- Setup our visual style
 	if( self.db.profile.showBars and self.modules.Bars ) then
@@ -373,18 +273,16 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		local msg
 		if( spellData.enableCustom ) then
 			msg = spellData.triggeredMessage
-			
-			-- No message given, so just exist
-			if( msg == "" ) then
-				return
-			end
-			
 		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" ) then
 			msg = anchor.gainMessage
 		else
 			msg = anchor.usedMessage
 		end	
-
+		
+		if( not msg or msg == "" ) then
+			return
+		end
+		
 		msg = string.gsub(msg, "*spell", spellName)
 		msg = string.gsub(msg, "*target", self:StripServer(sourceName))
 		
@@ -424,15 +322,14 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 		local msg
 		if( spellData.enableCustom ) then
 			msg = spellData.fadedMessage
-			-- No message, exit quickly
-			if( msg == "" ) then
-				return
-			end
-			
 		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" or eventType == "SPELL_AURA_REMOVED" ) then
 			msg = anchor.fadeMessage
 		else
 			msg = anchor.readyMessage
+		end
+
+		if( not msg or msg == "" ) then
+			return
 		end
 		
 		msg = string.gsub(msg, "*spell", spellName)

@@ -8,6 +8,8 @@ local SML, registered, options, config, dialog
 function Config:OnInitialize()
 	config = LibStub("AceConfig-3.0")
 	dialog = LibStub("AceConfigDialog-3.0")
+	
+
 	SML = Afflicted.SML
 
 	SML:Register(SML.MediaType.STATUSBAR, "BantoBar", "Interface\\Addons\\Afflicted\\images\\banto")
@@ -18,6 +20,88 @@ function Config:OnInitialize()
 	SML:Register(SML.MediaType.STATUSBAR, "Otravi",   "Interface\\Addons\\Afflicted\\images\\otravi")
 	SML:Register(SML.MediaType.STATUSBAR, "Striped",  "Interface\\Addons\\Afflicted\\images\\striped")
 	SML:Register(SML.MediaType.STATUSBAR, "LiteStep", "Interface\\Addons\\Afflicted\\images\\LiteStep")
+end
+
+function Config:SetupDB()
+	local self = Afflicted
+	self.defaults = {
+		profile = {
+			showAnchors = true,
+			showIcons = true,
+			showBars = true,
+			showTarget = false,
+			
+			dispelEnabled = true,
+			dispelHostile = true,
+			dispelDest = "party",
+			dispelColor = { r = 1, g = 1, b = 1 },
+			
+			interruptEnabled = true,
+			interruptDest = "party",
+			interruptColor = { r = 1, g = 1, b = 1 },
+			
+			barWidth = 180,
+			barNameOnly = false,
+			barName = "BantoBar",
+			
+			spells = AfflictedSpells,
+			inside = {["arena"] = true, ["pvp"] = true},
+			anchors = {},
+			
+			anchorDefault = {
+				enabled = true,
+				announce = false,
+				growUp = false,
+				announceColor = { r = 1.0, g = 1.0, b = 1.0 },
+				announceDest = "1",
+				scale = 1.0,
+
+				gainMessage = L["GAINED *spell (*target)"],
+				usedMessage = L["USED *spell (*target)"],
+				fadeMessage = L["FADED *spell (*target)"],
+				readyMessage = L["READY *spell (*target)"],
+			},
+			spellDefault = {
+				seconds = 0,
+				cooldown = 0,
+				singleLimit = 0,
+				globalLimit = 0,
+				showIn = "",
+				linkedTo = "",
+				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
+				SPELL_CAST_SUCCESS = true
+			},
+		},
+	}
+
+	self.defaults.profile.anchors.buffs = CopyTable(self.defaults.profile.anchorDefault)
+	self.defaults.profile.anchors.buffs.text = L["Buffs"]
+	self.defaults.profile.anchors.spells = CopyTable(self.defaults.profile.anchorDefault)
+	self.defaults.profile.anchors.spells.text = L["Spells"]
+	self.defaults.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
+	self.defaults.profile.anchors.cooldowns.text = L["Cooldowns"]
+
+	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults)
+
+	-- Upgrade
+	if( self.db.profile.version ) then
+		if( self.db.profile.version <= 655 ) then
+			self.db.profile.anchors = nil
+			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
+			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
+		end
+		
+		-- Do a quick spell check to see if something was removed from the default list
+		if( self.db.profile.version ~= self.revision ) then
+			for id, data in pairs(self.db.profile.spells) do
+				if( ( type(id) == "number" and not AfflictedSpells[id] ) and ( not data.showIn or not data.seconds ) ) then
+					self.db.profile.spells[id] = nil
+				end
+			end
+		end
+	end	
+	
+	self.db.profile.version = self.revision
 end
 
 -- GUI
@@ -653,7 +737,7 @@ local function loadOptions()
 		handler = Config,
 		args = {
 			enabled = {
-				order = 1,
+				order = 0,
 				type = "toggle",
 				name = L["Show anchors"],
 				desc = L["Display timer anchors for moving around."],
@@ -661,12 +745,20 @@ local function loadOptions()
 				arg = "showAnchors",
 			},
 			showIcons = {
-				order = 2,
+				order = 1,
 				type = "toggle",
 				name = L["Show spell icons"],
 				desc = L["Prefixes messages with the spell icon if you're using local outputs."],   
 				width = "double",
 				arg = "showIcons",
+			},
+			showTarget = {
+				order = 2,
+				type = "toggle",
+				name = L["Only show target/focus timers"],
+				desc = L["Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however."],   
+				width = "double",
+				arg = "showTarget",
 			},
 			bars = {
 				order = 3,
@@ -829,6 +921,10 @@ local function loadOptions()
 	
 	-- Load our created anchors in
 	for id, data in pairs(Afflicted.db.profile.anchors) do
+		if( not data.text ) then
+			data.text = id
+		end
+		
 		Config:CreateAnchorDisplay(nil, data.text)
 	end
 	

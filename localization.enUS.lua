@@ -54,6 +54,9 @@ AfflictedLocals = {
 	["Show spell icons"] = "Show spell icons",
 	["Prefixes messages with the spell icon if you're using local outputs."] = "Prefixes messages with the spell icon if you're using local outputs.",
 	
+	["Only show target/focus timers"] = "Only show target/focus timers",
+	["Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however."] = "Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however.",
+	
 	["Use bar display"] = "Use bar display",
 	["Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect."] = "Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect.",
 	
