@@ -86,7 +86,7 @@ function Config:SetupDB()
 	-- Upgrade
 	if( self.db.profile.version ) then
 		if( self.db.profile.version <= 619 ) then
-			sellf.db:ResetProfile()
+			self.db:ResetProfile()
 			self:Print(L["Your configuration has been reset to the defaults."])
 		elseif( self.db.profile.version <= 655 ) then
 			self.db.profile.anchors = nil
