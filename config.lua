@@ -92,7 +92,7 @@ function Config:SetupDB()
 			self.db.profile.anchors = nil
 			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
 			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
-		elseif( self.db.profile.version <= 666 ) then
+		elseif( self.db.profile.version <= 667 ) then
 			for k, spell in pairs(self.db.profile.spells) do
 				if( type(spell) == "table" ) then
 					spell.SPELL_MISC = nil

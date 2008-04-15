@@ -82,7 +82,7 @@ local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
 local COMBATLOG_OBJECT_REACTION_HOSTILE	= COMBATLOG_OBJECT_REACTION_HOSTILE
 local GROUP_AFFILIATION = bit.bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_AFFILIATION_MINE)
 
-local eventRegistered = {["SPELL_CAST_SUCCESS"] = true, ["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_INTERRUPT"] = true, ["SPELL_MISSED"] = true, ["SPELL_DAMAGE"] = true, ["SPELL_DRAIN"] = true, ["SPELL_LEECH"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_PERIODIC_DISPEL_FAILED"] = true, ["SPELL_AURA_DISPELLED"] = true, ["SPELL_AURA_STOLEN"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true}
+local eventRegistered = {["SPELL_INTERRUPT"] = true, ["SPELL_CAST_SUCCESS"] = true, ["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_PERIODIC_DISPEL_FAILED"] = true, ["SPELL_AURA_DISPELLED"] = true, ["SPELL_AURA_STOLEN"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true}
 function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, ...)
 	if( not eventRegistered[eventType] ) then
 		return
@@ -93,19 +93,11 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 	local isSourceGroup = (bit.band(sourceFlags, GROUP_AFFILIATION) > 0)
 		
-	-- Buff gained on an enemy, or a debuff gained from an enemy from someone in our group
-	if( eventType == "SPELL_AURA_APPLIED" ) then
+	-- Enemy gained a buff or debuff
+	if( eventType == "SPELL_AURA_APPLIED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
-			
-		-- Group member gained a debuff
-		if( auraType == "DEBUFF" and isDestGroup ) then
-			self:ProcessAbility(eventType .. auraType .. "GROUP", spellID, spellName, spellSchool, destGUID, "", destGUID, destName)
-			
-		-- Enemy gained a buff or debuff
-		elseif( isDestEnemy ) then
-			self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
-		end
-	
+		self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
+		
 	-- Buff faded from an enemy
 	elseif( eventType == "SPELL_AURA_REMOVED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
@@ -127,25 +119,10 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, sourceGUID, sourceName)
 	
 	-- We got interrupted, or we interrupted someone else
-	elseif( eventType == "SPELL_INTERRUPT" ) then
+	elseif( eventType == "SPELL_INTERRUPT" and self.db.profile.interruptEnabled and isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool = ...
-			
-		-- We interrupted an enemy
-		if( self.db.profile.interruptEnabled and isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
-			self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, spellSchools[extraSpellSchool] or ""), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
-		
-		-- Someone in our group was interrupted
-		elseif( isSourceEnemy and isDestGroup ) then
-			self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
-		end
+		self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, spellSchools[extraSpellSchool] or ""), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
 
-	-- Basically we can lump all of these into the same category, spell used/drained/leech/missed
-	elseif( eventType == "SPELL_MISSED" or eventType == "SPELL_DAMAGE" or eventType == "SPELL_DRAIN" or eventType == "SPELL_LEECH" ) then
-		local spellID, spellName, spellSchool = ...
-		if( isSourceEnemy and isDestGroup ) then
-			self:ProcessAbility("SPELL_MISC", spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
-		end
-				
 	-- We tried to dispel a buff, and failed
 	elseif( eventType == "SPELL_DISPEL_FAILED" or eventType == "SPELL_PERIODIC_DISPEL_FAILED" ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
@@ -273,7 +250,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		local msg
 		if( spellData.enableCustom ) then
 			msg = spellData.triggeredMessage
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" ) then
+		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" ) then
 			msg = anchor.gainMessage
 		else
 			msg = anchor.usedMessage
@@ -322,7 +299,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 		local msg
 		if( spellData.enableCustom ) then
 			msg = spellData.fadedMessage
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFGROUP" or eventType == "SPELL_AURA_APPLIEDBUFFENEMY" or eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" or eventType == "SPELL_AURA_REMOVED" ) then
+		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" or eventType == "SPELL_AURA_REMOVED" ) then
 			msg = anchor.fadeMessage
 		else
 			msg = anchor.readyMessage
@@ -377,7 +354,6 @@ function Afflicted:SendMessage(msg, dest, color, spellID)
 		return
 	end
 	
-
 	-- We're ungrouped, so redirect it to RWFrame
 	if( dest == "rw" and GetNumRaidMembers() == 0 and GetNumPartyMembers() == 0 ) then
 		dest = "rwframe"
