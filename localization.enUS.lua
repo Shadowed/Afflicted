@@ -192,7 +192,7 @@ AfflictedLocals = {
 	["Custom announcements"] = "Custom announcements",
 	
 	["Enable custom messages"] = "Enable custom messages",
-	["Allows you to override the per-anchor messages for this specific timer."] = "Allows you to override the per-anchor messages for this specific timer.",
+	["Allows you to override the per-anchor messages for this specific timer, if the anchor has announcements disabled then this will do nothing."] = "Allows you to override the per-anchor messages for this specific timer, if the anchor has announcements disabled then this will do nothing.",
 	
 	["Triggered message"] = "Triggered message",
 	["Custom message to use for when this timer starts, if you leave the message blank and you have custom messages enabled then no message will be given when it's triggered."] = "Custom message to use for when this timer starts, if you leave the message blank and you have custom messages enabled then no message will be given when it's triggered.",

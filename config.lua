@@ -85,13 +85,26 @@ function Config:SetupDB()
 
 	-- Upgrade
 	if( self.db.profile.version ) then
-		if( self.db.profile.version <= 655 ) then
+		if( self.db.profile.version <= 619 ) then
+			sellf.db:ResetProfile()
+			self:Print(L["Your configuration has been reset to the defaults."])
+		elseif( self.db.profile.version <= 655 ) then
 			self.db.profile.anchors = nil
 			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
 			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
-		elseif( self.db.profile.version <= 619 ) then
-			sellf.db:ResetProfile()
-			self:Print(L["Your configuration has been reset to the defaults."])
+		elseif( self.db.profile.version <= 666 ) then
+			for k, spell in pairs(self.db.profile.spells) do
+				if( type(spell) == "table" ) then
+					spell.SPELL_MISC = nil
+					spell.SPELL_AURA_APPLIEDDEBUFFGROUP = nil
+					spell.SPELL_AURA_APPLIEDBUFFENEMY = nil
+					spell.SPELL_INTERRUPT = nil
+
+					if( not spell.SPELL_SUMMON and not spell.SPELL_CREATE and not spell.SPELL_AURA_APPLIEDDEBUFFENEMY ) then
+						spell.SPELL_CAST_SUCCESS = true
+					end
+				end
+			end
 		end
 		
 		-- Do a quick spell check to see if something was removed from the default list
@@ -451,7 +464,8 @@ local function getSpellInfo(info)
 	return string.format(L["Dur: %d / CD: %d / Anchor: %s"], data.seconds or 0, data.cooldown or 0, anchorName or L["None"])
 end
 
-local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
+--local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
+local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"]}
 
 function Config:CreateSpellDisplay(info, value)
 	-- Do a quick type change
@@ -668,7 +682,7 @@ function Config:CreateSpellDisplay(info, value)
 						order = 1,
 						type = "toggle",
 						name = L["Enable custom messages"],
-						desc = L["Allows you to override the per-anchor messages for this specific timer."],
+						desc = L["Allows you to override the per-anchor messages for this specific timer, if the anchor has announcements disabled then this will do nothing."],
 						width = "double",
 						arg = "spells." .. value .. ".enableCustom",
 					},
