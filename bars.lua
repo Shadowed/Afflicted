@@ -156,10 +156,11 @@ function Bars:TimerExists(spellData, spellID, sourceGUID, destGUID)
 end
 
 -- Unit died, removed their timers
-function Bars:UnitDied(destGUID, destName)
+function Bars:UnitDied(diedGUID)
 	for id in pairs(barData) do
-		local spellID, barGUID = string.split(":", id)
-		if( destGUID == barGUID ) then
+		local spellID, sourceGUID, destGUID = string.split(":", id)
+		if( destGUID == diedGUID or sourceGUID == diedGUID ) then
+			--ChatFrame1:AddMessage(string.format("Unit died [%s] dest [%s] source [%s]", diedGUID, destGUID, sourceGUID))
 			for key in pairs(Afflicted.db.profile.anchors) do
 				Bars[key].group:UnregisterBar(id)
 			end
@@ -174,7 +175,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		return
 	end
 		
-	local id = spellID .. ":" .. sourceGUID
+	local id = spellID .. ":" .. sourceGUID .. ":" .. destGUID
 	local text = spellName
 
 	if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
@@ -201,7 +202,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 			return
 		end
 
-		local id = spellID .. sourceGUID .. "CD"
+		local id = id .. ":CD"
 		local text
 		
 		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then

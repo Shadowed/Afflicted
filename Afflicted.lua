@@ -5,6 +5,7 @@ local L = AfflictedLocals
 local instanceType
 
 local timerLimits = {}
+local objectSources = {}
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
 function Afflicted:OnInitialize()
@@ -92,7 +93,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	local isDestGroup = (bit.band(destFlags, GROUP_AFFILIATION) > 0)
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 	local isSourceGroup = (bit.band(sourceFlags, GROUP_AFFILIATION) > 0)
-		
+
 	-- Enemy gained a buff or debuff
 	if( eventType == "SPELL_AURA_APPLIED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
@@ -111,12 +112,12 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Check for something being summoned (Pets)
 	elseif( eventType == "SPELL_SUMMON" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool = ...
-		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, sourceGUID, sourceName)
+		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	
 	-- Check for something being created (Traps, ect)
 	elseif( eventType == "SPELL_CREATE" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool = ...
-		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, sourceGUID, sourceName)
+		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	
 	-- We got interrupted, or we interrupted someone else
 	elseif( eventType == "SPELL_INTERRUPT" and self.db.profile.interruptEnabled and isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
@@ -145,11 +146,11 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	
 	-- Check if we should clear timers
 	elseif( eventType == "PARTY_KILL" and isDestEnemy ) then
-		self.visual:UnitDied(destGUID, destName)
+		self.visual:UnitDied(destGUID)
 
 	-- Don't use UNIT_DIED inside arenas due to accuracy issues, outside of arenas we don't care too much
 	elseif( instanceType ~= "arena" and eventType == "UNIT_DIED" and isDestEnemy ) then
-		self.visual:UnitDied(destGUID, destName)
+		self.visual:UnitDied(destGUID)
 	end
 
 end

@@ -228,7 +228,7 @@ function Icons:TimerExists(spellData, spellID, sourceGUID, destGUID)
 end
 
 -- Unit died, remove their timers
-function Icons:UnitDied(destGUID, destName)
+function Icons:UnitDied(destGUID)
 	-- Loop through all created anchors
 	for anchorName in pairs(Afflicted.db.profile.anchors) do
 		local frame = Icons[anchorName]
@@ -237,7 +237,7 @@ function Icons:UnitDied(destGUID, destName)
 			for i=#(frame.active), 1, -1 do
 				local row = frame.active[i]
 
-				if( row.sourceGUID == destGUID and not row.dontFade and not row.isCooldown ) then
+				if( ( row.sourceGUID == destGUID or row.destGUID == destGUID ) and not row.dontFade and not row.isCooldown ) then
 					row:Hide()
 
 					table.insert(frame.inactive, row)

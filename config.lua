@@ -110,7 +110,12 @@ function Config:SetupDB()
 		-- Do a quick spell check to see if something was removed from the default list
 		if( self.db.profile.version ~= self.revision ) then
 			for id, data in pairs(self.db.profile.spells) do
-				if( ( type(id) == "number" and not AfflictedSpells[id] ) and ( not data.showIn or not data.seconds ) ) then
+				-- Type changed, eg we have a number saved and it's actually a table, either way reset it
+				if( AfflictedSpells[id] and type(data) ~= type(AfflictedSpells[id]) ) then
+					self.db.profile.spells[id] = nil
+				
+				-- We're storing a number, but it's not listed anymore. And it doesn't have seconds or showIn set
+				elseif( ( type(id) == "number" and not AfflictedSpells[id] ) and ( not data.showIn or not data.seconds ) ) then
 					self.db.profile.spells[id] = nil
 				end
 			end

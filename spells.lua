@@ -1,5 +1,31 @@
 local L = AfflictedLocals
 AfflictedSpells = { 
+	-- Heroism
+	[32182] = {
+		disabled = true,
+		dontFade = true,
+		text = "Heroism",
+		seconds = 40,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Bloodlust
+	[2825] = {
+		disabled = true,
+		dontFade = true,
+		text = "Bloodlust",
+		seconds = 40,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
 	-- Perception
 	[20600] = {
 		disabled = true,
@@ -10,6 +36,17 @@ AfflictedSpells = {
 		globalLimit = 0,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Water Elemental
+	[31687] = {
+		text = "Water Elemental",
+		seconds = 45,
+		cooldown = 0,
+		singleLimit = 2,
+		globalLimit = 0,
+		showIn = "cooldowns",
+		SPELL_SUMMON = true,
 	},
 
 	-- Scare Beast
@@ -37,6 +74,17 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 
+	-- The Beast Within
+	[19574] = {
+		text = "The Beast Within",
+		seconds = 18,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
 	-- Freeze (Water Elemental)
 	[33395] = {
 		disabled = true,
@@ -54,10 +102,10 @@ AfflictedSpells = {
 		text = "Blink",
 		seconds = 15,
 		cooldown = 0,
-		singleLimit = 0,
+		singleLimit = 2,
 		globalLimit = 0,
 		showIn = "spells",
-		SPELL_AURA_APPLIEDBUFFENEMY = true,
+		SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Frost Nova
@@ -485,6 +533,99 @@ AfflictedSpells = {
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
+
+	-- Grounding Totem
+	[8177] = {
+		disabled = true,
+		text = "Grounding Totem",
+		seconds = 45,
+		cooldown = 15,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "cooldowns",
+		SPELL_SUMMON = true,
+	},
+
+	-- Tremor Totem
+	[8143] = {
+		disabled = true,
+		repeating = true,
+		text = "Tremor Totem",
+		seconds = 3,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "cooldowns",
+		SPELL_SUMMON = true,
+	},
+	
+	-- Fire Nova Totem
+	[1535] = 25547,
+	[8498] = 25547,
+	[8499] = 25547,
+	[11314] = 25547,
+	[11315] = 25547,
+	[25546] = 25547,
+	[25547] = {
+		disabled = true,
+		text = "Fire Nova Totem",
+		seconds = 5,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "cooldowns",
+		SPELL_SUMMON = true,
+	},
+	
+	-- Magma Totem
+	[8190] = 25552,
+	[10585] = 25552,
+	[10586] = 25552,
+	[10587] = 25552, 
+	[25552] = {
+		disabled = true,
+		repeating = true,
+		text = "Magma Totem",
+		seconds = 2,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "cooldowns",
+		SPELL_SUMMON = true,
+	},
+	
+	-- Searing Totem
+	[3599] = 25533,
+	[6363] = 25533,
+	[6364] = 25533,
+	[6365] = 25533,
+	[10437] = 25533,
+	[10438] = 25533,
+	[25533] = {
+		disabled = true,
+		repeating = true,
+		text = "Searing Totem",
+		seconds = 2,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "cooldowns",
+		SPELL_SUMMON = true,
+	},
+	
+	
+	-- Flame shock
+	[8050] = 25454,
+	[8052] = 25454,
+	[8053] = 25454,
+	[10447] = 25454,
+	[10448] = 25454,
+	[10448] = 25454,
+	[25457] = 25454,
+	[29228] = 25454,
+	
+	-- Frost shock
+	[8056] = 25464,
+	[8058] = 25464,
+	[10472] = 25464,
+	[10473] = 25464,
+	[25464] = 25454,
 	
 	-- Earth shock
 	[8042] = 25454,
@@ -501,41 +642,47 @@ AfflictedSpells = {
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Flame shock
-	[8050] = 29228,
-	[8052] = 29228,
-	[8053] = 29228,
-	[10447] = 29228,
-	[10448] = 29228,
-	[10448] = 29228,
-	[25457] = 29228,
-	[29228] = {
-		text = "Flame Shock",
-		seconds = 5,
-		cooldown = 0,
-		singleLimit = 0,
-		globalLimit = 0,
-		dontFade = true,
-		showIn = "spells",
+		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
 		SPELL_CAST_SUCCESS = true,
 	},
 
-	-- Frost shock
-	[8056] = 25464,
-	[8058] = 25464,
-	[10472] = 25464,
-	[10473] = 25464,
-	[25464] = {
-		text = "Frost Shock",
-		seconds = 5,
-		cooldown = 0,
+	-- Explosive Trap
+	[13813] = 34600,
+	[14316] = 34600,
+	[14317] = 34600,
+	[27025] = 34600,
+	
+
+	-- Freezing Trap
+	[1499] = 34600,
+	[14310] = 34600,
+	[14311] = 34600,
+	
+
+	-- Frost Trap
+	[13809] = 34600,
+	
+
+	-- Immolation Trap
+	[13795] = 34600,
+	[14302] = 34600,
+	[14303] = 34600,
+	[14304] = 34600,
+	[14305] = 34600,
+	[27023] = 34600,
+	
+	-- Snake Trap
+	[34600] = {
+		text = "Traps",
+		seconds = 60,
+		cdEnabled = true,
+		cdInside = "cooldowns",
+		cooldown = 30,
 		singleLimit = 0,
 		globalLimit = 0,
 		dontFade = true,
 		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
+		icon = "Interface\\Icons\\Spell_Frost_ChainsOfIce",
+		SPELL_CREATE = true,
+	}
 }
