@@ -1,5 +1,5 @@
 local major = "GTB-Beta1"
-local minor = tonumber(string.match("$Revision: 660 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 676 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 
@@ -129,11 +129,14 @@ end
 local function fadeoutBar(self)
 	local group = groups[self.owner]
 	
-	if( type(group.onFadeHandler) == "table" and type(group.onFadeFunc) == "string" ) then
+	if( type(group.onFadeHandler) == "table" and type(group.onFadeFunc) == "string" and group.onFadeHandler[group.onFadeFunc] ) then
 		group.onFadeHandler[group.onFadeFunc](group.onFadeHandler, self.barID)			
 	elseif( type(group.onFadeFunc) == "string" ) then
-		getglobal(group.onFadeFunc)(self.barID)
-	elseif( type(group.onFadeFunc) == "function" ) then
+		local func = getglobal(group.onFadeFunc)
+		if( func ) then
+			func(self.barID)
+		end
+	elseif( type(group.onFadeFunc) == "function" and group.onFadeFunc ) then
 		group.onFadeFunc(self.barID)
 	end
 	
@@ -451,7 +454,6 @@ end
 function GTB.RegisterOnFade(group, handler, func)
 	argcheck(handler, 2, "table", "function", "string")
 	argcheck(func, 2, "string", "nil")
-	
 
 	if( func ) then
 		group.onFadeHandler = handler
