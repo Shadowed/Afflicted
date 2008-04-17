@@ -90,9 +90,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	end
 	
 	local isDestEnemy = (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
-	local isDestGroup = (bit.band(destFlags, GROUP_AFFILIATION) > 0)
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
-	local isSourceGroup = (bit.band(sourceFlags, GROUP_AFFILIATION) > 0)
 
 	-- Enemy gained a buff or debuff
 	if( eventType == "SPELL_AURA_APPLIED" and isDestEnemy ) then
@@ -113,7 +111,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	elseif( eventType == "SPELL_SUMMON" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool = ...
 		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
-	
+		
 	-- Check for something being created (Traps, ect)
 	elseif( eventType == "SPELL_CREATE" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool = ...
@@ -133,7 +131,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 				self:SendMessage(string.format(L["FAILED %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelDest, self.db.profile.dispelColor, extraSpellID)
 			end
 		end
-	
+			
 	-- Managed to dispel or steal a buff
 	elseif( eventType == "SPELL_AURA_DISPELLED" or eventType == "SPELL_AURA_STOLEN" ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
@@ -210,15 +208,15 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	
 	if( spellData.singleLimit > 0 ) then
 		timerLimits[id] = time + spellData.singleLimit
+
+		-- Handle the special case of things like Shadowstep, where the spellID's are different, but the names are the same.
+		if( eventType == "SPELL_AURA_APPLIEDBUFFENEMY" ) then
+			timerLimits[nameID] = time + spellData.singleLimit
+		end
 	end
 	
 	if( spellData.globalLimit > 0 ) then
 		timerLimits[spellID] = time + spellData.globalLimit
-
-		-- Handle the special case of things like Shadowstep, where the spellID's are different, but the names are the same.
-		if( eventType == "SPELL_AURA_APPLIEDBUFFENEMY" ) then
-			timerLimits[nameID] = time + spellData.globalLimit
-		end
 	end
 		
 	-- Linked spells mean that while the timer still exists we don't trigger another of it

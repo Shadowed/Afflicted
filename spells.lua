@@ -438,6 +438,19 @@ AfflictedSpells = {
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
+
+	-- Shadowstep
+	[36554] = {
+		text = "Shadowstep",
+		seconds = 3,
+		cdEnabled = true,
+		cdInside = "cooldowns",
+		cooldown = 15,
+		singleLimit = 2,
+		globalLimit = 0,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
 	
 	-- Intercept
 	[20252] = 25275,
