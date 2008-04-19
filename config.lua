@@ -1067,7 +1067,7 @@ register:SetScript("OnShow", function(self)
 		args = {
 			help = {
 				type = "description",
-				name = "Afflicted is a PvP timer tracking mod, for things like spell duration or cool down.",
+				name = string.format("Afflicted r%d is a PvP timer tracking mod, for things like spell duration or cool down.", Afflicted.revision or 0),
 			},
 		},
 	})

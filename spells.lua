@@ -374,7 +374,9 @@ AfflictedSpells = {
 	[33206] = {
 		text = "Pain Suppression",
 		seconds = 8,
-		cooldown = 0,
+		cdEnabled = true,
+		cdInside = "cooldowns",
+		cooldown = 120,
 		singleLimit = 0,
 		globalLimit = 0,
 		showIn = "buffs",
@@ -686,6 +688,7 @@ AfflictedSpells = {
 	
 	-- Snake Trap
 	[34600] = {
+		disabled = true,
 		text = "Traps",
 		seconds = 60,
 		cdEnabled = true,
