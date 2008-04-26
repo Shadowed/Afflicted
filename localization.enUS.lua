@@ -3,10 +3,8 @@ AfflictedLocals = {
 	["FAILED %s's %s"] = "FAILED %s's %s",
 	["Removed %s's %s"] = "Removed %s's %s",
 	
-	["GAINED *spell (*target)"] = "GAINED *spell (*target)",
+	["FINISHED *spell (*target)"] = "FINISHED *spell (*target)",
 	["USED *spell (*target)"] = "USED *spell (*target)",
-	["FADED *spell (*target)"] = "FADED *spell (*target)",
-	["READY *spell (*target)"] = "READY *spell (*target)",
 	
 	-- Default frames
 	["Spells"] = "Spells",
@@ -49,6 +47,14 @@ AfflictedLocals = {
 	["None"] = "None",
 
 	-- General
+	["Arena profiles"] = "Arena profiles",
+	
+	["2vs2 profile"] = "2vs2 profile",
+	["3vs3 profile"] = "3vs3 profile",
+	["5vs5 profile"] = "5vs5 profile",
+	
+	["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."] = "Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others.",
+	
 	["Show anchors"] = "Show anchors",
 	["Display timer anchors for moving around."] = "Display timer anchors for moving around.",
 
@@ -113,20 +119,6 @@ AfflictedLocals = {
 	["Enables showing alerts for when timers are triggered to this anchor."] = "Enables showing alerts for when timers are triggered to this anchor.",
 	
 	["Announce text"] = "Announce text",
-	
-	["Gained message"] = "Gained message",
-	["Messages that cause someone to gain a buff, or a debuff."] = "Messages that cause someone to gain a buff, or a debuff.",
-
-	
-	["Used message"] = "Used message",
-	["Messages that were triggered due to an ability being used."] = "Messages that were triggered due to an ability being used.",
-	
-
-	["Ready message"] = "Ready message",
-	["Messages that were triggered due to an ability being used, and the ability is either over or is ready again."] = "Messages that were triggered due to an ability being used, and the ability is either over or is ready again.",
-	
-	["Fade message"] = "Fade message",
-	["Messages that were triggered by someone gaining a buff, or a debuff that has faded."] = "Messages that were triggered by someone gaining a buff, or a debuff that has faded.",
 		
 	["Announcement text for when timers are triggered in this anchor. You can use *spell for the spell name, and *target for the person who triggered it (if any)."] = "Announcement text for when timers are triggered in this anchor. You can use *spell for the spell name, and *target for the person who triggered it (if any).",
 	

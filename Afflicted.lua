@@ -31,7 +31,7 @@ function Afflicted:OnInitialize()
 	-- Monitor for zone change
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
-	
+
 	-- Quick check
 	self:ZONE_CHANGED_NEW_AREA()
 
@@ -92,12 +92,14 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	local isDestEnemy = (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 
-	-- Enemy gained a buff or debuff
+	-- Enemy gained a debuff
 	if( eventType == "SPELL_AURA_APPLIED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
+		if( auraType == "DEBUFF" ) then
+			self:ProcessAbility("SPELL_AURA_APPLIEDDEBUFFENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
+		end
 		
-	-- Buff faded from an enemy
+	-- Buff or debuff faded from an enemy
 	elseif( eventType == "SPELL_AURA_REMOVED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
 		self:AbilityEnded(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
@@ -165,9 +167,28 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 		
 		-- Check if it's supposed to be enabled in this zone
 		if( self.db.profile.inside[type] ) then
+			if( type == "arena" ) then
+				local bracket
+				for i=1, MAX_BATTLEFIELD_QUEUES do
+					local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
+					if( status == "active" and teamSize > 0 and self.db.profile.arenaProfiles[teamSize] ~= "" ) then
+						local oldProfile = self.db:GetCurrentProfile()
+						self.db:SetProfile(self.db.profile.arenaProfiles[teamSize])
+						self.db.profile.originalProfile = oldProfile
+					end
+				end
+			end
+			
 			self:OnEnable()
 		else
 			self:OnDisable()
+		end
+
+		-- No longer in an arena, and we had an original profile set so revert to it
+		if( type ~= "arena" and self.db.profile.originalProfile ) then
+			local originalProfile = self.db.profile.originalProfile
+			self.db.profile.originalProfile = nil
+			self.db:SetProfile(originalProfile)
 		end
 	end
 		
@@ -199,20 +220,14 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	-- Trigger limits
 	local id = spellID .. sourceGUID
 	local debuffID = spellID .. destGUID
-	local nameID = spellName .. sourceGUID
 	local time = GetTime()
 	
-	if( ( timerLimits[nameID] and timerLimits[nameID] >= time ) or ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
+	if( ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
 		return
 	end
 	
 	if( spellData.singleLimit > 0 ) then
 		timerLimits[id] = time + spellData.singleLimit
-
-		-- Handle the special case of things like Shadowstep, where the spellID's are different, but the names are the same.
-		if( eventType == "SPELL_AURA_APPLIEDBUFFENEMY" ) then
-			timerLimits[nameID] = time + spellData.singleLimit
-		end
 	end
 	
 	if( spellData.globalLimit > 0 ) then
@@ -249,8 +264,6 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		local msg
 		if( spellData.enableCustom ) then
 			msg = spellData.triggeredMessage
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" ) then
-			msg = anchor.gainMessage
 		else
 			msg = anchor.usedMessage
 		end	
@@ -298,10 +311,8 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 		local msg
 		if( spellData.enableCustom ) then
 			msg = spellData.fadedMessage
-		elseif( eventType == "SPELL_AURA_APPLIEDDEBUFFENEMY" or eventType == "SPELL_AURA_REMOVED" ) then
-			msg = anchor.fadeMessage
 		else
-			msg = anchor.readyMessage
+			msg = anchor.fadeMessage
 		end
 
 		if( not msg or msg == "" ) then

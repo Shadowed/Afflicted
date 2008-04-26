@@ -48,6 +48,8 @@ function Config:SetupDB()
 			inside = {["arena"] = true, ["pvp"] = true},
 			anchors = {},
 			
+			arenaProfiles = { [2] = "", [3] = "", [5] = "" },
+
 			anchorDefault = {
 				enabled = true,
 				announce = false,
@@ -56,10 +58,8 @@ function Config:SetupDB()
 				announceDest = "1",
 				scale = 1.0,
 
-				gainMessage = L["GAINED *spell (*target)"],
 				usedMessage = L["USED *spell (*target)"],
-				fadeMessage = L["FADED *spell (*target)"],
-				readyMessage = L["READY *spell (*target)"],
+				fadeMessage = L["FINISHED *spell (*target)"],
 			},
 			spellDefault = {
 				seconds = 0,
@@ -82,6 +82,9 @@ function Config:SetupDB()
 	self.defaults.profile.anchors.cooldowns.text = L["Cooldowns"]
 
 	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults)
+	self.db.RegisterCallback(self, "OnProfileChanged", "Reload")
+	self.db.RegisterCallback(self, "OnProfileCopied", "Reload")
+	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
 
 	-- Upgrade
 	if( self.db.profile.version ) then
@@ -230,7 +233,6 @@ end
 local groups = {}
 function Config:GetGroups()
 	for k in pairs(groups) do groups[k] = nil end
-	
 
 	groups[""] = L["None"]
 	for name, data in pairs(Afflicted.modules.Bars.GTB:GetGroups()) do
@@ -238,6 +240,21 @@ function Config:GetGroups()
 	end
 	
 	return groups
+end
+
+-- Return list of profiles
+local dbProfiles = {}
+function Config:GetProfiles()
+	for k in pairs(dbProfiles) do dbProfiles[k] = nil end
+	
+	dbProfiles[""] = L["None"]
+	
+	for _, name in pairs(Afflicted.db:GetProfiles()) do
+		dbProfiles[name] = name
+
+	end
+	
+	return dbProfiles
 end
 
 -- Check if we should disable this option
@@ -375,37 +392,21 @@ function Config:CreateAnchorDisplay(info, value)
 						name = L["Announcement text for when timers are triggered in this anchor. You can use *spell for the spell name, and *target for the person who triggered it (if any)."],
 						type = "description",
 					},
-					gain = {
-						order = 1,
-						type = "input",
-						name = L["Gained message"],
-						desc = L["Messages that cause someone to gain a buff, or a debuff."],
-						width = "full",
-						arg = "anchors." .. id .. ".gainMessage",
-					},
 					used = {
 						order = 2,
 						type = "input",
-						name = L["Used message"],
-						desc = L["Messages that were triggered due to an ability being used."],
+						name = L["Triggered message"],
+						desc = L["Custom message to use for when this timer starts, if you leave the message blank and you have custom messages enabled then no message will be given when it's triggered."],
 						width = "full",
 						arg = "anchors." .. id .. ".usedMessage",
 					},
 					fade = {
 						order = 3,
 						type = "input",
-						name = L["Fade message"],
-						desc = L["Messages that were triggered by someone gaining a buff, or a debuff that has faded."],
+						name = L["Ended message"],
+						desc = L["Custom message to use for when this timer ends, if you leave the message blank and you have custom messages enabled then no message will be given when it's ends."],
 						width = "full",
 						arg = "anchors." .. id .. ".fadeMessage",
-					},
-					ready = {
-						order = 4,
-						type = "input",
-						name = L["Ready message"],
-						desc = L["Messages that were triggered due to an ability being used, and the ability is either over or is ready again."],
-						width = "full",
-						arg = "anchors." .. id .. ".readyMessage",
 					},
 				},
 			},
@@ -835,8 +836,40 @@ local function loadOptions()
 				width = "double",
 				arg = "inside"
 			},
-			dispel = {
+			arenas = {
 				order = 5,
+				type = "group",
+				inline = true,
+				name = L["Arena profiles"],
+				args = {
+					two = {
+						order = 1,
+						type = "select",
+						name = L["2vs2 profile"],
+						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
+						values = "GetProfiles",
+						arg = "arenaProfiles.2",
+					},
+					three = {
+						order = 2,
+						type = "select",
+						name = L["3vs3 profile"],
+						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
+						values = "GetProfiles",
+						arg = "arenaProfiles.3",
+					},
+					five = {
+						order = 3,
+						type = "select",
+						name = L["5vs5 profile"],
+						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
+						values = "GetProfiles",
+						arg = "arenaProfiles.5",
+					},
+				},
+			},
+			dispel = {
+				order = 6,
 				type = "group",
 				inline = true,
 				name = L["Dispels"],
@@ -880,7 +913,7 @@ local function loadOptions()
 				},
 			},
 			interrupt = {
-				order = 6,
+				order = 7,
 				type = "group",
 				inline = true,
 				name = L["Interrupts"],

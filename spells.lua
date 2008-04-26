@@ -1,5 +1,47 @@
 local L = AfflictedLocals
 AfflictedSpells = { 
+	-- Blade Flurry
+	[13877] = {
+		disabled = true,
+		text = "Blade Flurry",
+		seconds = 15,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Adrenaline Rush
+	[13750] = {
+		disabled = true,
+		text = "Adrenaline Rush",
+		seconds = 15,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Devour Magic
+	[19505] = 27277,
+	[19731] = 27277,
+	[19734] = 27277,
+	[19736] = 27277,
+	[27276] = 27277,
+	[27277] = {
+		disabled = true,
+		dontFade = true,
+		text = "Devour Magic",
+		seconds = 8,
+		cooldown = 0,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "cooldowns",
+		SPELL_CAST_SUCCESS = true,
+	},
+
 	-- Heroism
 	[32182] = {
 		disabled = true,
