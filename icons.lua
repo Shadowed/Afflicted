@@ -104,10 +104,10 @@ local function OnUpdate(self, elapsed)
 		end
 
 		if( not self.isCooldown ) then
-			Afflicted:AbilityEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName, true)
-		else
-			Icons:RemoveTimer(self.type, self.spellID, self.sourceGUID, true)
+			Afflicted:AbilityEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName)
 		end
+
+		Icons:RemoveTimer(self.type, self.spellID, self.sourceGUID, self.isCooldown)
 		return
 	end
 	

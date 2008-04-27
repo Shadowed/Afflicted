@@ -222,7 +222,7 @@ end
 function Bars:OnBarFade(barID)
 	if( barID and barData[barID] ) then
 		local eventType, spellID, spellName, sourceGUID, sourceName = string.split(",", barData[barID])
-		Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName, true)
+		Afflicted:AbilityEnded(eventType, tonumber(spellID), spellName, sourceGUID, sourceName, true)
 
 		barData[barID] = nil
 		barData[spellName .. sourceGUID] = nil

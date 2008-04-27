@@ -75,8 +75,6 @@ function Afflicted:Reload()
 	self.visual:ReloadVisual()
 end
 
-local COMBATLOG_OBJECT_TYPE_PLAYER = COMBATLOG_OBJECT_TYPE_PLAYER
-local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY
 local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
 local COMBATLOG_OBJECT_AFFILIATION_PARTY = COMBATLOG_OBJECT_AFFILIATION_PARTY
 local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
@@ -102,7 +100,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Buff or debuff faded from an enemy
 	elseif( eventType == "SPELL_AURA_REMOVED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		self:AbilityEnded(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
+		self:ProcessEnd(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
 
 	-- Spell casted succesfully
 	elseif( eventType == "SPELL_CAST_SUCCESS" and isSourceEnemy ) then
@@ -279,8 +277,28 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 end
 
+-- Need to clean this up later
+function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceName)
+	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
+	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
+	if( type(spellData) == "number" ) then
+		spellData = self.db.profile.spells[spellData]
+	end
+
+	if( not spellData or spellData.disabled or spellData.dontFade ) then
+		return
+	end
+	
+
+	local removed = self.visual:RemoveTimer(spellData.showIn, spellID, sourceGUID)
+	if( removed ) then
+		self:AbilityEnded(eventType, spellId, spellName, sourceGUID, sourceName)
+	end
+end
+
+
 -- Ability ended due to event, or timers up
-function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName, isTimedOut)
+function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName)
 	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
 	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
 	if( type(spellData) == "number" ) then
@@ -292,16 +310,10 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 	end
 	
 	local anchor = self.db.profile.anchors[spellData.showIn]
-	if( not anchor or not anchor.enabled or spellData.disabled or (spellData.dontFade and not isTimedOut) ) then
+	if( not anchor or not anchor.enabled ) then
 		return
 	end
-	
-	-- Remove the timer
-	local removed = self.visual:RemoveTimer(spellData.showIn, spellID, sourceGUID)
-	if( not removed ) then
-		return
-	end
-	
+		
 	-- Unlock the limiter early
 	timerLimits[spellID .. sourceGUID] = nil
 
