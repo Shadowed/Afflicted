@@ -1,5 +1,29 @@
 local L = AfflictedLocals
 AfflictedSpells = { 
+	-- Tremendous Fortitude
+	[44055] = {
+		text = "Tremendous Fortitude",
+		seconds = 15,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Cheat Death
+	[45182] = {
+		disabled = true,
+		text = "Cheating Death",
+		seconds = 3,
+		cdEnabled = false,
+		cdInside = "cooldowns",
+		cooldown = 60,
+		singleLimit = 0,
+		globalLimit = 0,
+		showIn = "buffs",
+		SPELL_AURA_APPLIEDBUFFENEMY = true,
+	},
+	
 	-- Blade Flurry
 	[13877] = {
 		disabled = true,

@@ -1,5 +1,5 @@
 local major = "GTB-Beta1"
-local minor = tonumber(string.match("$Revision: 700$", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 701$", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 
@@ -105,10 +105,20 @@ local function releaseFrame(frame)
 	frame.clickHandler = nil
 	frame.clickFunc = nil
 	frame.args = nil
-	frame.fadingOut = nil
 
 	-- And now readd to the frame pool
 	table.insert(framePool, frame)	
+end
+
+local function triggerFadeCallback(group, barID)
+	if( type(group.onFadeHandler) == "table" and type(group.onFadeFunc) == "string" ) then
+		group.onFadeHandler[group.onFadeFunc](group.onFadeHandler, barID)			
+	elseif( type(group.onFadeFunc) == "string" ) then
+		local func = getglobal(group.onFadeFunc)
+		getglobal(group.onFadeFunc)(barID)
+	elseif( type(group.onFadeFunc) == "function" ) then
+		group.onFadeFunc(barID)
+	end
 end
 
 -- Fadeout OnUpdate
@@ -120,6 +130,8 @@ local function fadeOnUpdate(self, elapsed)
 	-- Done fading, hide
 	if( self.fadeTime <= 0 ) then
 		groups[self.owner]:UnregisterBar(self.barID)
+
+		triggerFadeCallback(groups[self.originalOwner], self.barID)
 		return
 	end
 		
@@ -128,22 +140,12 @@ end
 
 -- Starts to fade out the actual bar
 local function fadeoutBar(self)
-	local group = groups[self.originalOwner]
-	if( type(group.onFadeHandler) == "table" and type(group.onFadeFunc) == "string" ) then
-		group.onFadeHandler[group.onFadeFunc](group.onFadeHandler, self.barID)			
-	elseif( type(group.onFadeFunc) == "string" ) then
-		local func = getglobal(group.onFadeFunc)
-		getglobal(group.onFadeFunc)(self.barID)
-	elseif( type(group.onFadeFunc) == "function" ) then
-		group.onFadeFunc(self.barID)
-	end
+	local group = groups[self.owner]
 	
-	group = groups[self.owner]
-	
-
 	-- Don't fade at all, remove right now
 	if( group.fadeTime <= 0 ) then
 		group:UnregisterBar(self.barID)	
+		triggerFadeCallback(groups[self.originalOwner])
 		return
 	end
 	
@@ -159,7 +161,7 @@ local function barOnUpdate(self)
 	-- Check if times ran out and that we need to start fading it out
 	self.secondsLeft = self.secondsLeft - (time - self.lastUpdate)
 	self.lastUpdate = time
-	if( self.secondsLeft <= 0 and not self.fadingOut ) then
+	if( self.secondsLeft <= 0 ) then
 		-- Check if it's a repeating timer
 		local bar = groups[self.groupName].bars[self.barID]
 		if( bar.repeating ) then
@@ -171,7 +173,6 @@ local function barOnUpdate(self)
 		
 		self:SetValue(0)
 		self.spark:Hide()
-		self.fadingOut = true
 		
 		fadeoutBar(self)
 		return

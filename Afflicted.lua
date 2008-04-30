@@ -1,3 +1,9 @@
+--[[ 
+	Afflicted, Mayen/Amarand (Horde) from Icecrown (US) PvE
+	
+	NTS: 4 Teardrop Crimson Spinels, 2 Mystic Lionseyes, 2 Royal Shadowsong Amethyst
+]]
+
 Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
 
 local L = AfflictedLocals
@@ -5,7 +11,7 @@ local L = AfflictedLocals
 local instanceType
 
 local timerLimits = {}
-local objectSources = {}
+local objectsSummoned = {}
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
 function Afflicted:OnInitialize()
@@ -93,9 +99,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Enemy gained a debuff
 	if( eventType == "SPELL_AURA_APPLIED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		if( auraType == "DEBUFF" ) then
-			self:ProcessAbility("SPELL_AURA_APPLIEDDEBUFFENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
-		end
+		self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
 		
 	-- Buff or debuff faded from an enemy
 	elseif( eventType == "SPELL_AURA_REMOVED" and isDestEnemy ) then
@@ -107,10 +111,18 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		local spellID, spellName, spellSchool, auraType = ...
 		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	
-	-- Check for something being summoned (Pets)
+	-- Check for something being summoned (Pets, totems)
 	elseif( eventType == "SPELL_SUMMON" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool = ...
 		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
+		
+		-- This is a quick fix, basically if we already have an object with this spellID by the same person we kill off the last known one
+		local id = sourceGUID .. spellID
+		if( objectsSummoned[id] ) then
+			self.visual:UnitDied(objectsSummoned[id])
+		end
+		
+		objectsSummoned[id] = destGUID
 		
 	-- Check for something being created (Traps, ect)
 	elseif( eventType == "SPELL_CREATE" and isSourceEnemy ) then
@@ -292,7 +304,7 @@ function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceN
 
 	local removed = self.visual:RemoveTimer(spellData.showIn, spellID, sourceGUID)
 	if( removed ) then
-		self:AbilityEnded(eventType, spellId, spellName, sourceGUID, sourceName)
+		self:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName)
 	end
 end
 
