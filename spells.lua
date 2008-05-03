@@ -106,7 +106,7 @@ AfflictedSpells = {
 
 	-- Water Elemental
 	[31687] = {
-		text = "Water Elemental",
+		text = "Summon Water Elemental",
 		seconds = 45,
 		cooldown = 0,
 		singleLimit = 2,
@@ -140,9 +140,9 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 
-	-- The Beast Within
+	-- Bestial Wrath
 	[19574] = {
-		text = "The Beast Within",
+		text = "Bestial Wrath",
 		seconds = 18,
 		cooldown = 0,
 		singleLimit = 0,
@@ -206,7 +206,7 @@ AfflictedSpells = {
 
 
 	-- Intervene
-	[676] = {
+	[3411] = {
 		disabled = true,
 		text = "Intervene",
 		seconds = 30,
@@ -218,7 +218,7 @@ AfflictedSpells = {
 	},
 
 	-- Intimidating Shout
-	[3411] = {
+	[5246] = {
 		disabled = true,
 		text = "Intimidating Shout",
 		seconds = 180,
@@ -232,7 +232,7 @@ AfflictedSpells = {
 	-- Fear Ward
 	[6346] = {
 		disabled = true,
-		text = "Repentance",
+		text = "Fear Ward",
 		seconds = 180,
 		cooldown = 0,
 		singleLimit = 2,

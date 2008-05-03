@@ -1,7 +1,7 @@
 --[[ 
 	Afflicted, Mayen/Amarand (Horde) from Icecrown (US) PvE
 	
-	NTS: 4 Teardrop Crimson Spinels, 2 Mystic Lionseyes, 2 Royal Shadowsong Amethyst
+	NTS: 3 Teardrop Crimson Spinels, 1 Mystic Lionseyes, 2 Royal Shadowsong Amethyst
 ]]
 
 Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
@@ -441,4 +441,16 @@ end
 
 function Afflicted:Print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Afflicted2|r: " .. msg)
+end
+
+-- Test function that lets me make sure all the spellID's are correct
+function Afflicted:TestSpells()
+	for spellID, data in pairs(AfflictedSpells) do
+		local name = GetSpellInfo(spellID)
+		if( type(data) == "table" and data.text ) then
+			if( data.text ~= name ) then
+				ChatFrame1:AddMessage(string.format("Bad spell, found [%s] [%d] is actually [%s]", data.text, spellID, name))
+			end
+		end
+	end
 end

@@ -251,7 +251,7 @@ function Icons:UnitDied(destGUID)
 			end
 
 			-- Reposition everything
-			repositionTimers(anhorName)
+			repositionTimers(anchorName)
 		end
 	end
 end
