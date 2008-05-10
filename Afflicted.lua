@@ -1,7 +1,5 @@
 --[[ 
 	Afflicted, Mayen/Amarand (Horde) from Icecrown (US) PvE
-	
-	NTS: 3 Teardrop Crimson Spinels, 1 Mystic Lionseyes, 2 Royal Shadowsong Amethyst
 ]]
 
 Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")

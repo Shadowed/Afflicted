@@ -61,15 +61,26 @@ local function OnShow(self)
 	end
 end
 
+local function showTooltip(self)
+	GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+	GameTooltip:SetText(AfflictedLocals["ALT + Drag to move the frame anchor."], nil, nil, nil, nil, 1)
+end
+
+local function hideTooltip(self)
+	GameTooltip:Hide()
+end
+
 -- PUBLIC METHODS
 -- Create our main display frame
 local backdrop = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 0.6,
+		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 0.80,
 		insets = {left = 1, right = 1, top = 1, bottom = 1}}
 
 function Bars:CreateDisplay(type)
 	local anchorData = Afflicted.db.profile.anchors[type]
 	local frame = CreateFrame("Frame", nil, UIParent)
+	frame.type = type
+
 	frame:SetWidth(Afflicted.db.profile.barWidth)
 	frame:SetHeight(12)
 	frame:SetMovable(true)
@@ -83,8 +94,9 @@ function Bars:CreateDisplay(type)
 	frame:SetScript("OnDragStart", OnDragStart)
 	frame:SetScript("OnDragStop", OnDragStop)
 	frame:SetScript("OnShow", OnShow)
+	frame:SetScript("OnEnter", showTooltip)
+	frame:SetScript("OnLeave", hideTooltip)
 	frame:Hide()
-	frame.type = type
 
 	-- Display name
 	frame.text = frame:CreateFontString(nil, "OVERLAY")

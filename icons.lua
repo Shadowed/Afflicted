@@ -135,15 +135,25 @@ local function createRow(parent)
 	
 	frame.text = frame:CreateFontString(nil, "BACKGROUND")
 	frame.text:SetFontObject(GameFontHighlight)
+	--frame.text:SetFont((GameFontHighlight:GetFont()), 12, "OUTLINE")
 	frame.text:SetPoint("LEFT", ICON_SIZE + 2, 0)
 	
 	return frame
 end
 
+local function showTooltip(self)
+	GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+	GameTooltip:SetText(AfflictedLocals["ALT + Drag to move the frame anchor."], nil, nil, nil, nil, 1)
+end
+
+local function hideTooltip(self)
+	GameTooltip:Hide()
+end
+
 -- PUBLIC METHODS
 -- Create our main display frame
 local backdrop = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 0.6,
+		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 0.80,
 		insets = {left = 1, right = 1, top = 1, bottom = 1}}
 
 function Icons:CreateDisplay(type)
@@ -161,6 +171,9 @@ function Icons:CreateDisplay(type)
 	frame:SetScript("OnDragStart", OnDragStart)
 	frame:SetScript("OnDragStop", OnDragStop)
 	frame:SetScript("OnShow", OnShow)
+	frame:SetScript("OnEnter", showTooltip)
+	frame:SetScript("OnHide", hideTooltip)
+
 	frame:Hide()
 	
 	frame.active = {}
