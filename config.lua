@@ -1088,6 +1088,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 	end
 end
 
+--[[
 -- Add the general options + profile, we don't add spells/anchors because it doesn't support sub cats
 local register = CreateFrame("Frame", nil, InterfaceOptionsFrame)
 register:SetScript("OnShow", function(self)
@@ -1114,3 +1115,4 @@ register:SetScript("OnShow", function(self)
 	config:RegisterOptionsTable("Afflicted-Profile", options.args.profile)
 	dialog:AddToBlizOptions("Afflicted-Profile", options.args.profile.name, "Afflicted2")
 end)
+]]
