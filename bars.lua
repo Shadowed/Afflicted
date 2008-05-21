@@ -164,7 +164,11 @@ end
 
 -- Checks if we have a timer running for this person
 function Bars:TimerExists(spellData, spellID, sourceGUID, destGUID)
-	return (barData[spellData.linkedTo .. sourceGUID])
+	if( not spellData.linkedTo or not sourceGUID ) then
+		return nil
+	end
+		
+	return barData[spellData.linkedTo .. sourceGUID]
 end
 
 -- Unit died, removed their timers
@@ -214,15 +218,21 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 			return
 		end
 
-		local id = id .. ":CD"
+		local id = id .. ",CD"
+		local cd = ""
 		local text
 		
+		-- If the timer is being redirected to another anchor, show the CD text
+		if( Afflicted.db.profile.anchors[spellData.cdInside].redirectTo ~= "" ) then
+			cd = "[CD] "
+		end
+		
 		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
-			text = string.format("[CD] %s", sourceName)
+			text = string.format("%s%s", cd, sourceName)
 		elseif( sourceName ~= "" ) then
-			text = string.format("[CD] %s - %s", spellName, sourceName)
+			text = string.format("%s%s - %s", cd, spellName, sourceName)
 		else
-			text = string.format("[CD] %s", spellName)
+			text = string.format("%s%s", cd, spellName)
 		end
 
 		anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
@@ -234,7 +244,7 @@ end
 function Bars:OnBarFade(barID)
 	if( barID and barData[barID] ) then
 		local eventType, spellID, spellName, sourceGUID, sourceName = string.split(",", barData[barID])
-		Afflicted:AbilityEnded(eventType, tonumber(spellID), spellName, sourceGUID, sourceName, true)
+		Afflicted:AbilityEnded(eventType, tonumber(spellID), spellName, sourceGUID, sourceName)
 
 		barData[barID] = nil
 		barData[spellName .. sourceGUID] = nil

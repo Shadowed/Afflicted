@@ -242,10 +242,12 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		timerLimits[spellID] = time + spellData.globalLimit
 	end
 		
+	--[[
 	-- Linked spells mean that while the timer still exists we don't trigger another of it
 	if( spellData.linkedTo and spellData.linkedTo ~= "" and self.visual:TimerExists(spellData, spellID, sourceGUID, destGUID) ) then
 		return
 	end
+	]]
 	
 	-- If we have no icon, or we're using the question mark one then update the SV with the new one
 	local icon = spellData.icon
@@ -299,7 +301,6 @@ function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceN
 		return
 	end
 	
-
 	local removed = self.visual:RemoveTimer(spellData.showIn, spellID, sourceGUID)
 	if( removed ) then
 		self:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName)
@@ -315,7 +316,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 		spellData = self.db.profile.spells[spellData]
 	end
 
-	if( not spellData ) then
+	if( not spellID or not spellData ) then
 		return
 	end
 	
@@ -323,7 +324,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 	if( not anchor or not anchor.enabled ) then
 		return
 	end
-		
+			
 	-- Unlock the limiter early
 	timerLimits[spellID .. sourceGUID] = nil
 

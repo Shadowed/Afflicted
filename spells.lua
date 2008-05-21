@@ -100,7 +100,7 @@ AfflictedSpells = {
 		cooldown = 0,
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "spells",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -320,7 +320,7 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 
-	--  Evasion
+	-- Evasion
 	[5277] = 26669,
 	[26669] = {
 		text = "Evasion",
@@ -339,7 +339,7 @@ AfflictedSpells = {
 		cooldown = 0,
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "spells",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -354,7 +354,7 @@ AfflictedSpells = {
 		cdInside = "cooldowns",
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "spells",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -561,19 +561,6 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- Counterspell - Silenced
-	[18469] = {
-		text = "Counterspell - Silenced",
-		seconds = 24,
-		cooldown = 0,
-		singleLimit = 0,
-		globalLimit = 0,
-		dontFade = true,
-		showIn = "spells",
-		linkedTo = 2139,
-		SPELL_CAST_SUCCESS = true,
-	},
-	
 	-- Kick
 	[1766] = 38768,
 	[1767] = 38768,
@@ -623,7 +610,7 @@ AfflictedSpells = {
 		cooldown = 15,
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "cooldowns",
+		showIn = "totems",
 		SPELL_SUMMON = true,
 	},
 
@@ -635,7 +622,7 @@ AfflictedSpells = {
 		seconds = 3,
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "cooldowns",
+		showIn = "totems",
 		SPELL_SUMMON = true,
 	},
 	
@@ -652,7 +639,7 @@ AfflictedSpells = {
 		seconds = 5,
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "cooldowns",
+		showIn = "totems",
 		SPELL_SUMMON = true,
 	},
 	
@@ -668,7 +655,7 @@ AfflictedSpells = {
 		seconds = 2,
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "cooldowns",
+		showIn = "totems",
 		SPELL_SUMMON = true,
 	},
 	
@@ -686,7 +673,7 @@ AfflictedSpells = {
 		seconds = 2,
 		singleLimit = 0,
 		globalLimit = 0,
-		showIn = "cooldowns",
+		showIn = "totems",
 		SPELL_SUMMON = true,
 	},
 	
@@ -733,17 +720,14 @@ AfflictedSpells = {
 	[14317] = 34600,
 	[27025] = 34600,
 	
-
 	-- Freezing Trap
 	[1499] = 34600,
 	[14310] = 34600,
 	[14311] = 34600,
 	
-
 	-- Frost Trap
 	[13809] = 34600,
 	
-
 	-- Immolation Trap
 	[13795] = 34600,
 	[14302] = 34600,

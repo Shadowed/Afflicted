@@ -57,6 +57,7 @@ function Config:SetupDB()
 				announceColor = { r = 1.0, g = 1.0, b = 1.0 },
 				announceDest = "1",
 				scale = 1.0,
+				redirectTo = "",
 
 				usedMessage = L["USED *spell (*target)"],
 				fadeMessage = L["FINISHED *spell (*target)"],
@@ -67,6 +68,7 @@ function Config:SetupDB()
 				singleLimit = 0,
 				globalLimit = 0,
 				showIn = "",
+				cdInside = "cooldowns",
 				linkedTo = "",
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
 				SPELL_CAST_SUCCESS = true
@@ -78,6 +80,8 @@ function Config:SetupDB()
 	self.defaults.profile.anchors.buffs.text = L["Buffs"]
 	self.defaults.profile.anchors.spells = CopyTable(self.defaults.profile.anchorDefault)
 	self.defaults.profile.anchors.spells.text = L["Spells"]
+	self.defaults.profile.anchors.totems = CopyTable(self.defaults.profile.anchorDefault)
+	self.defaults.profile.anchors.totems.text = L["Totems"]
 	self.defaults.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
 	self.defaults.profile.anchors.cooldowns.text = L["Cooldowns"]
 
@@ -105,6 +109,20 @@ function Config:SetupDB()
 
 					if( not spell.SPELL_SUMMON and not spell.SPELL_CREATE and not spell.SPELL_AURA_APPLIEDDEBUFFENEMY ) then
 						spell.SPELL_CAST_SUCCESS = true
+					end
+				end
+			end
+		elseif( self.db.profile.version <= 702 ) then
+			for k, anchor in pairs(self.db.profile.anchors) do
+				if( not anchor.redirectTo ) then
+					anchor.redirectTo = ""
+				end
+			end
+			
+			for k, spell in pairs(self.db.profile.spells) do
+				if( type(spell) == "table" ) then
+					if( not spell.cdInside ) then
+						spell.cdInside = "cooldowns"
 					end
 				end
 			end
@@ -307,7 +325,7 @@ function Config:CreateAnchorDisplay(info, value)
 				type = "toggle",
 				name = L["Enable anchor"],
 				desc = L["Allows timers to be shown under this anchor, if the anchor is disabled you won't see any timers."],
-				width = "double",
+				width = "full",
 				arg = "anchors." .. id .. ".enabled",
 			},
 			growUp = {
@@ -315,7 +333,7 @@ function Config:CreateAnchorDisplay(info, value)
 				type = "toggle",
 				name = L["Grow display up"],
 				desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
-				width = "double",
+				width = "full",
 				arg = "anchors." .. id .. ".growUp",
 			},
 			scale = {
@@ -359,7 +377,6 @@ function Config:CreateAnchorDisplay(info, value)
 						type = "toggle",
 						name = L["Enable announcements"],
 						desc = L["Enables showing alerts for when timers are triggered to this anchor."],
-						width = "double",
 						arg = "anchors." .. id .. ".announce",
 					},
 					color = {
@@ -544,6 +561,7 @@ function Config:CreateSpellDisplay(info, value)
 				values = "GetAnchors",
 				arg = "spells." .. value .. ".showIn",
 			},
+			--[[
 			linkedTo = {
 				order = 3,
 				type = "select",
@@ -554,6 +572,7 @@ function Config:CreateSpellDisplay(info, value)
 				set = setType,
 				arg = "spells." .. value .. ".linkedTo",
 			},
+			]]
 			icon = {
 				order = 4,
 				type = "input",
@@ -640,7 +659,6 @@ function Config:CreateSpellDisplay(info, value)
 						name = L["Show inside anchor"],
 						desc = L["Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown."],
 						values = "GetAnchors",
-						width = "double",
 						arg = "spells." .. value .. ".cdInside",
 					},
 				},
@@ -697,7 +715,7 @@ function Config:CreateSpellDisplay(info, value)
 						type = "input",
 						name = L["Triggered message"],
 						desc = L["Custom message to use for when this timer starts, if you leave the message blank and you have custom messages enabled then no message will be given when it's triggered."],
-						width = "double",
+						width = "full",
 						arg = "spells." .. value .. ".triggeredMessage",
 					},
 					ended = {
@@ -705,7 +723,7 @@ function Config:CreateSpellDisplay(info, value)
 						type = "input",
 						name = L["Ended message"],
 						desc = L["Custom message to use for when this timer ends, if you leave the message blank and you have custom messages enabled then no message will be given when it's ends."],
-						width = "double",
+						width = "full",
 						arg = "spells." .. value .. ".fadedMessage",
 					},
 				},

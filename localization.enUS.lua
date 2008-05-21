@@ -12,6 +12,7 @@ AfflictedLocals = {
 	["Spells"] = "Spells",
 	["Buffs"] = "Buffs",
 	["Cooldowns"] = "Cooldowns",
+	["Totems"] = "Totems",
 	
 	-- Schools
 	["Schools"] = "Schools",
