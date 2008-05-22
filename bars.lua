@@ -176,9 +176,10 @@ function Bars:UnitDied(diedGUID)
 	for id in pairs(barData) do
 		local spellID, sourceGUID, destGUID = string.split(":", id)
 		if( destGUID == diedGUID or sourceGUID == diedGUID ) then
-			--ChatFrame1:AddMessage(string.format("Unit died [%s] dest [%s] source [%s]", diedGUID, destGUID, sourceGUID))
-			for key in pairs(Afflicted.db.profile.anchors) do
-				Bars[key].group:UnregisterBar(id)
+			for key, data in pairs(Afflicted.db.profile.anchors) do
+				if( data.enabled ) then
+					Bars[key].group:UnregisterBar(id)
+				end
 			end
 		end
 	end
