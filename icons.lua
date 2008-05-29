@@ -4,7 +4,7 @@ local Icons = Afflicted:NewModule("Icons", "AceEvent-3.0")
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "TimerExists", "UnitDied", "ReloadVisual"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "UnitDied", "ReloadVisual"}
 
 function Icons:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -223,21 +223,6 @@ function Icons:ClearTimers(type)
 		table.insert(frame.inactive, frame.active[i])
 		table.remove(frame.active, i)
 	end
-end
-
--- Check if we have a tiemr running for this person
-function Icons:TimerExists(spellData, spellID, sourceGUID, destGUID)
-	local anchorFrame = Icons[spellData.showIn]
-	if( anchorFrame ) then
-		for i=#(anchorFrame.active), 1, -1 do
-			local row = anchorFrame.active[i]
-			if( ( row.spellName == spellData.linkedTo or row.spellID == spellData.linkedTo ) and row.destGUID == destGUID ) then
-				return true
-			end
-		end
-	end
-	
-	return nil
 end
 
 -- Unit died, remove their timers

@@ -211,12 +211,12 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		spellData = self.db.profile.spells[spellData]
 	end
 	
-	if( not spellData or spellData.disabled or ( eventType ~= "TEST" and not spellData[eventType] ) ) then
+	if( not spellData or spellData.disabled or not spellData[eventType] ) then
 		return
 	end
 	
 	-- Check if it matches our target/focus only
-	if( self.db.profile.showTarget and UnitGUID("target") ~= sourceGUID and UnitGUID("focus") ~= sourceGUID and eventType ~= "TEST" ) then
+	if( self.db.profile.showTarget and UnitGUID("target") ~= sourceGUID and UnitGUID("focus") ~= sourceGUID ) then
 		return
 	end
 	
@@ -227,10 +227,9 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	
 	-- Trigger limits
 	local id = spellID .. sourceGUID
-	local debuffID = spellID .. destGUID
 	local time = GetTime()
 	
-	if( ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[debuffID] and timerLimits[debuffID] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
+	if( ( timerLimits[id] and timerLimits[id] >= time ) or ( timerLimits[spellID] and timerLimits[spellID] >= time ) ) then
 		return
 	end
 	
@@ -242,13 +241,6 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		timerLimits[spellID] = time + spellData.globalLimit
 	end
 		
-	--[[
-	-- Linked spells mean that while the timer still exists we don't trigger another of it
-	if( spellData.linkedTo and spellData.linkedTo ~= "" and self.visual:TimerExists(spellData, spellID, sourceGUID, destGUID) ) then
-		return
-	end
-	]]
-	
 	-- If we have no icon, or we're using the question mark one then update the SV with the new one
 	local icon = spellData.icon
 	if( not icon or icon == "" or string.match(icon, "INV_Misc_QuestionMark$") ) then
@@ -269,7 +261,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	self.visual:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 
 	-- Announce it
-	if( anchor.announce and eventType ~= "TEST" ) then
+	if( anchor.announce ) then
 		-- Work out if we should use a custom message, or a default one
 		local msg
 		if( spellData.enableCustom ) then

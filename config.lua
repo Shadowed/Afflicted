@@ -1081,7 +1081,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 
 				if( addedTypes[data.showIn] < 5 and not data.disabled ) then
 					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
-					Afflicted:ProcessAbility("TEST", spell, data.text or spell, -1, UnitGUID("player"), UnitName("player"), UnitGUID("player"), UnitName("player"))
+					Afflicted.visual:CreateTimer(data, "TEST", -1, data.text or spell, i, UnitName("player"), i)
 				end
 			end
 		end

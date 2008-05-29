@@ -1,7 +1,7 @@
 if( not Afflicted ) then return end
 
 local Bars = Afflicted:NewModule("Bars", "AceEvent-3.0")
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual", "UnitDied", "TimerExists"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual", "UnitDied"}
 local SML, GTBLib
 local barData = {}
 
@@ -160,15 +160,6 @@ function Bars:ClearTimers(type)
 	end
 	
 	anchorFrame.group:UnregisterAllBars()
-end
-
--- Checks if we have a timer running for this person
-function Bars:TimerExists(spellData, spellID, sourceGUID, destGUID)
-	if( not spellData.linkedTo or not sourceGUID ) then
-		return nil
-	end
-		
-	return barData[spellData.linkedTo .. sourceGUID]
 end
 
 -- Unit died, removed their timers
