@@ -613,7 +613,7 @@ AfflictedSpells = {
 		showIn = "totems",
 		SPELL_SUMMON = true,
 	},
-
+	
 	-- Tremor Totem
 	[8143] = {
 		disabled = true,

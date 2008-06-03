@@ -663,6 +663,7 @@ function Config:CreateSpellDisplay(info, value)
 					},
 				},
 			},
+			--[[
 			limit = {
 				order = 7,
 				type = "group",
@@ -696,6 +697,7 @@ function Config:CreateSpellDisplay(info, value)
 					},
 				},
 			},
+			]]
 			announce = {
 				order = 8,
 				type = "group",
@@ -837,6 +839,7 @@ local function loadOptions()
 						order = 4,
 						type = "select",
 						name = L["Bar texture"],
+						dialogControl = 'LSM30_Statusbar',
 						values = "GetTextures",
 						disabled = "IsDisabled",
 						arg = "barName",

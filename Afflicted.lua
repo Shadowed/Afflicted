@@ -114,7 +114,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		local spellID, spellName, spellSchool = ...
 		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 		
-		-- This is a quick fix, basically if we already have an object with this spellID by the same person we kill off the last known one
+		-- Fixes an issue with totems not being removed when you redrop them
 		local id = sourceGUID .. spellID
 		if( objectsSummoned[id] ) then
 			self.visual:UnitDied(objectsSummoned[id])
@@ -133,7 +133,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, spellSchools[extraSpellSchool] or ""), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
 
 	-- We tried to dispel a buff, and failed
-	elseif( eventType == "SPELL_DISPEL_FAILED" or eventType == "SPELL_PERIODIC_DISPEL_FAILED" ) then
+	elseif( ( eventType == "SPELL_DISPEL_FAILED" or eventType == "SPELL_PERIODIC_DISPEL_FAILED" ) and self.db.profile.dispelEnabled ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
 		
 		if( not isDestEnemy or ( isDestEnemy and self.db.profile.dispelHostile ) ) then
@@ -143,7 +143,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		end
 			
 	-- Managed to dispel or steal a buff
-	elseif( eventType == "SPELL_AURA_DISPELLED" or eventType == "SPELL_AURA_STOLEN" ) then
+	elseif( ( eventType == "SPELL_AURA_DISPELLED" or eventType == "SPELL_AURA_STOLEN" ) and self.db.profile.dispelEnabled ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
 		
 		if( not isDestEnemy or ( isDestEnemy and self.db.profile.dispelHostile ) ) then
@@ -225,6 +225,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		return
 	end
 	
+	--[[
 	-- Trigger limits
 	local id = spellID .. sourceGUID
 	local time = GetTime()
@@ -240,7 +241,8 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	if( spellData.globalLimit > 0 ) then
 		timerLimits[spellID] = time + spellData.globalLimit
 	end
-		
+	]]
+	
 	-- If we have no icon, or we're using the question mark one then update the SV with the new one
 	local icon = spellData.icon
 	if( not icon or icon == "" or string.match(icon, "INV_Misc_QuestionMark$") ) then
@@ -318,7 +320,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 	end
 			
 	-- Unlock the limiter early
-	timerLimits[spellID .. sourceGUID] = nil
+	--timerLimits[spellID .. sourceGUID] = nil
 
 	-- Announce it
 	if( anchor.announce and eventType ~= "TEST" ) then
@@ -361,14 +363,6 @@ function Afflicted:WrapIcon(msg, dest, spellID)
 	local icon = select(3, GetSpellInfo(spellID))
 	if( not icon ) then
 		return msg
-	end
-	
-	-- CT or RWFrame can be bigger due to more room
-	local size = 12
-	if( dest == "ct" ) then
-		size = 18	
-	elseif( dest == "rwframe" ) then
-		size = select(2, self.alertFrame:GetFont())
 	end
 
 	return string.format("|T%s:0:0|t %s", icon, msg)
