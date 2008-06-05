@@ -5,6 +5,7 @@ local Icons = Afflicted:NewModule("Icons", "AceEvent-3.0")
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
 local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "UnitDied", "ReloadVisual"}
+local savedGroups = {}
 
 function Icons:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -12,7 +13,7 @@ end
 
 -- Reposition the passed frames timers
 local function repositionTimers(type)
-	local frame = Icons[type]
+	local frame = Icons.groups[type]
 	if( not frame or not Afflicted.db.profile.anchors[type].position ) then
 		return
 	end
@@ -26,26 +27,23 @@ local function repositionTimers(type)
 			else
 				icon:SetPoint("BOTTOMLEFT", frame.active[id - 1], "TOPLEFT", 0, 0)
 			end
-		else
-			local scale = frame:GetEffectiveScale()
-			local position = Afflicted.db.profile.anchors[type].position
-			local y = position.y / scale
-			
-			if( Afflicted.db.profile.anchors[type].growUp ) then
-				y = y + ICON_SIZE
-			else
-				y = y - 12
-			end
 		
+		elseif( Afflicted.db.profile.anchors[type].growUp ) then
+			local position = Afflicted.db.profile.anchors[type].position
 			icon:ClearAllPoints()
-			icon:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", position.x / scale, y)
+			icon:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
+
+		else
+			local position = Afflicted.db.profile.anchors[type].position
+			icon:ClearAllPoints()
+			icon:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
 		end
 	end
 end
 
 -- Sort timers by time left
 local function sortTimers(a, b)
-	return a.timeLeft < b.timeLeft
+	return a.endTime < b.endTime
 end
 
 
@@ -68,8 +66,8 @@ local function OnDragStop(self)
 		end
 		
 		local scale = self:GetEffectiveScale()
-		anchor.position.x = self:GetLeft() * scale
-		anchor.position.y = self:GetTop() * scale
+		anchor.position.x = self:GetLeft()
+		anchor.position.y = self:GetTop()
 	end
 end
 
@@ -97,7 +95,7 @@ local function OnUpdate(self, elapsed)
 			self.timeLeft = self.startSeconds
 			self.lastUpdate = time
 			
-			local anchor = Icons[self.type]
+			local anchor = Icons.groups[self.type]
 			table.sort(anchor.active, sortTimers)
 			repositionTimers(anchor.type)
 			return
@@ -172,7 +170,7 @@ function Icons:CreateDisplay(type)
 	frame:SetScript("OnDragStop", OnDragStop)
 	frame:SetScript("OnShow", OnShow)
 	frame:SetScript("OnEnter", showTooltip)
-	frame:SetScript("OnHide", hideTooltip)
+	frame:SetScript("OnLeave", hideTooltip)
 
 	frame:Hide()
 	
@@ -201,9 +199,10 @@ function Icons:LoadVisual()
 	end
 	
 	-- Create anchors
+	Icons.groups = {}
 	for name, data in pairs(Afflicted.db.profile.anchors) do
 		if( data.enabled ) then
-			Icons[name] = obj:CreateDisplay(name)
+			Icons.groups[name] = Icons:CreateDisplay(name)
 		end
 	end
 	
@@ -212,7 +211,7 @@ end
 
 -- Clear all running timers for this anchor type
 function Icons:ClearTimers(type)
-	local frame = Icons[type]
+	local frame = Icons.groups[type]
 	if( not frame ) then
 		return
 	end
@@ -228,35 +227,34 @@ end
 -- Unit died, remove their timers
 function Icons:UnitDied(destGUID)
 	-- Loop through all created anchors
-	for anchorName in pairs(Afflicted.db.profile.anchors) do
-		local frame = Icons[anchorName]
-		if( frame and #(frame.active) > 0 ) then
+	for name, group in pairs(Icons.groups) do
+		if( group and #(group.active) > 0 ) then
 			-- Now through all active timers
-			for i=#(frame.active), 1, -1 do
-				local row = frame.active[i]
+			for i=#(group.active), 1, -1 do
+				local row = group.active[i]
 
 				if( ( row.sourceGUID == destGUID or row.destGUID == destGUID ) and not row.dontFade and not row.isCooldown ) then
 					row:Hide()
 
-					table.insert(frame.inactive, row)
-					table.remove(frame.active, i)
+					table.insert(group.inactive, row)
+					table.remove(group.active, i)
 				end
 			end
 
-			-- No more icons, hide the base frame
-			if( #(frame.active) == 0 ) then
-				frame:Hide()
+			-- No more icons, hide the base group
+			if( #(group.active) == 0 ) then
+				group:Hide()
 			end
 
 			-- Reposition everything
-			repositionTimers(anchorName)
+			repositionTimers(name)
 		end
 	end
 end
 
 -- Create a new timer
 local function createTimer(showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, icon, seconds, isCooldown)
-	local anchorFrame = Icons[showIn]
+	local anchorFrame = Icons.groups[showIn]
 	if( not anchorFrame ) then
 		return
 	end	
@@ -283,6 +281,7 @@ local function createTimer(showIn, eventType, repeating, spellID, spellName, sou
 	frame.startSeconds = seconds
 	frame.timeLeft = seconds
 	frame.lastUpdate = GetTime()
+	frame.endTime = GetTime() + seconds
 	
 	frame.type = anchorFrame.type
 	frame.icon:SetTexture(icon)
@@ -297,7 +296,7 @@ local function createTimer(showIn, eventType, repeating, spellID, spellName, sou
 end
 
 function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
-	createTimer(spellData.showIn, eventType, spellData.repeatTimer, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
+	createTimer(spellData.showIn, eventType, spellData.repeating, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
 	
 	if( spellData.cdEnabled and spellData.cooldown > 0 ) then
 		createTimer(spellData.cdInside, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown, true)
@@ -306,7 +305,7 @@ end
 
 -- Remove a specific anchors timer by spellID/sourceGUID
 function Icons:RemoveTimer(anchorName, spellID, sourceGUID, isCooldown)
-	local anchorFrame = Icons[anchorName]
+	local anchorFrame = Icons.groups[anchorName]
 	if( not anchorFrame ) then
 		return nil
 	end
@@ -338,28 +337,47 @@ function Icons:RemoveTimer(anchorName, spellID, sourceGUID, isCooldown)
 end
 
 function Icons:ReloadVisual()
+	for name, data in pairs(Afflicted.db.profile.anchors) do
+		-- Had a bad anchor that was either enabled recently, or it used to be a bar anchor
+		--if( ( data.enabled or data.displayType == "icon" ) and not Icons.groups[name] ) then
+		if( data.enabled and not Icons.groups[name] ) then
+			Icons.groups[name] = savedGroups[name] or Icons:CreateDisplay(name)
+			savedGroups[name] = nil
+		
+		-- Had a bar anchor that was either disabled recently, or it's not an icon anchor anymore
+		--elseif( ( not data.enabled or data.displayType ~= "icon" ) and Icons.groups[name] ) then
+		elseif( not data.enabled and Icons.groups[name] ) then
+			savedGroups[name] = Icons.groups[name]
+			
+			Icons.groups[name]:SetAlpha(0)
+			Icons.groups[name]:EnableMouse(false)
+			Icons.groups[name] = nil
+		end
+	end
+
 	-- Update anchors and icons inside
-	for key, data in pairs(Afflicted.db.profile.anchors) do
-		local frame = Icons[key]
-		if( frame ) then
-			-- Update frame scale
-			frame:SetScale(data.scale)
+	for name, group in pairs(Icons.groups) do
+		local data = Afflicted.db.profile.anchors[name]
+		
+		-- Update group scale
+		group:SetScale(data.scale)
 
-			-- Update icon scale
-			for _, frame in pairs(frame.active) do
-				frame:SetScale(data.scale)
-			end
+		-- Update icon scale
+		for _, group in pairs(group.active) do
+			group:SetScale(data.scale)
+		end
 
-			for _, frame in pairs(frame.inactive) do
-				frame:SetScale(data.scale)
-			end
+		for _, group in pairs(group.inactive) do
+			group:SetScale(data.scale)
+		end
 
-			-- Annnd make sure it's shown or hidden
-			if( Afflicted.db.profile.showAnchors ) then
-				frame:Show()
-			else
-				frame:Hide()
-			end
+		-- Annnd make sure it's shown or hidden
+		if( Afflicted.db.profile.showAnchors ) then
+			group:SetAlpha(1)
+			group:EnableMouse(true)
+		else
+			group:SetAlpha(0)
+			group:EnableMouse(false)
 		end
 	end
 end

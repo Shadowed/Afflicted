@@ -4,71 +4,8 @@ local Bars = Afflicted:NewModule("Bars", "AceEvent-3.0")
 local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual", "UnitDied"}
 local SML, GTBLib
 local barData = {}
-
-function Bars:OnInitialize()
-	SML = Afflicted.SML
-	GTBLib = LibStub:GetLibrary("GTB-Beta1")
-	self.GTB = GTBLib
-
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-end
-
--- We delay this until PEW to fix UIScale issues
-function Bars:PLAYER_ENTERING_WORLD()
-	for key, data in pairs(Afflicted.db.profile.anchors) do
-		local frame = Bars[key]
-		if( frame ) then
-			frame:Show()
-		end
-	end
-	
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-end
-
--- Dragging functions
-local function OnDragStart(self)
-	if( IsAltKeyDown() ) then
-		self.isMoving = true
-		self:StartMoving()
-	end
-end
-
-local function OnDragStop(self)
-	if( self.isMoving ) then
-		self.isMoving = nil
-		self:StopMovingOrSizing()
-		
-		local anchor = Afflicted.db.profile.anchors[self.type]
-		if( not anchor.position ) then
-			anchor.position = { x = 0, y = 0 }
-		end
-		
-		local scale = self:GetEffectiveScale()
-		anchor.position.x = self:GetLeft() * scale
-		anchor.position.y = self:GetTop() * scale
-	end
-end
-
-local function OnShow(self)
-	local position = Afflicted.db.profile.anchors[self.type].position
-	if( position ) then
-		local scale = self:GetEffectiveScale()
-		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", position.x / scale, position.y / scale)
-	else
-		self:ClearAllPoints()
-		self:SetPoint("CENTER", UIParent, "CENTER")
-	end
-end
-
-local function showTooltip(self)
-	GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-	GameTooltip:SetText(AfflictedLocals["ALT + Drag to move the frame anchor."], nil, nil, nil, nil, 1)
-end
-
-local function hideTooltip(self)
-	GameTooltip:Hide()
-end
+local nameToType = {}
+local savedGroups = {}
 
 -- PUBLIC METHODS
 -- Create our main display frame
@@ -78,62 +15,44 @@ local backdrop = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 
 function Bars:CreateDisplay(type)
 	local anchorData = Afflicted.db.profile.anchors[type]
-	local frame = CreateFrame("Frame", nil, UIParent)
-	frame.type = type
+	nameToType[string.format("Afflicted (%s)", anchorData.text)] = type
+	
+	local group = GTBLib:RegisterGroup(string.format("Afflicted (%s)", anchorData.text), SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
+	group:RegisterOnFade(Bars, "OnBarFade")
+	group:RegisterOnMove(Bars, "OnBarMove")
+	group:SetScale(anchorData.scale)
+	group:SetWidth(Afflicted.db.profile.barWidth)
+	group:SetAnchorVisible(Afflicted.db.profile.showAnchors)
+	group:SetDisplayGroup(anchorData.redirectTo ~= "" and anchorData.redirectTo or nil)
+	group:SetBarGrowth(anchorData.growUp and "UP" or "DOWN")
 
-	frame:SetWidth(Afflicted.db.profile.barWidth)
-	frame:SetHeight(12)
-	frame:SetMovable(true)
-	frame:EnableMouse(true)
-	frame:SetClampedToScreen(true)
-	frame:RegisterForDrag("LeftButton")
-	frame:SetScale(anchorData.scale)
-	frame:SetBackdrop(backdrop)
-	frame:SetBackdropColor(0, 0, 0, 1.0)
-	frame:SetBackdropBorderColor(0.75, 0.75, 0.75, 1.0)
-	frame:SetScript("OnDragStart", OnDragStart)
-	frame:SetScript("OnDragStop", OnDragStop)
-	frame:SetScript("OnShow", OnShow)
-	frame:SetScript("OnEnter", showTooltip)
-	frame:SetScript("OnLeave", hideTooltip)
-	frame:Hide()
-
-	-- Display name
-	frame.text = frame:CreateFontString(nil, "OVERLAY")
-	frame.text:SetPoint("CENTER", frame)
-	frame.text:SetFontObject(GameFontHighlight)
-	frame.text:SetText(anchorData.text)
-
-	-- Visbility
-	if( not Afflicted.db.profile.showAnchors ) then
-		frame:SetAlpha(0)
-		frame:EnableMouse(false)
+	if( anchorData.position ) then
+		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", anchorData.position.x, anchorData.position.y)
 	end
 	
+	return group
+end
 
-	-- Create the group instance for this anchor
-	frame.group = GTBLib:RegisterGroup(string.format("Afflicted (%s)", anchorData.text), SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
-	frame.group:RegisterOnFade(Bars, "OnBarFade")
-	frame.group:SetScale(anchorData.scale)
-	frame.group:SetWidth(Afflicted.db.profile.barWidth)
-	frame.group:SetDisplayGroup(anchorData.redirectTo ~= "" and anchorData.redirectTo or nil)
-	frame.group:SetBarGrowth(anchorData.growUp and "UP" or "DOWN")
-	
+function Bars:OnBarMove(parent, x, y)
+	Afflicted.db.profile.anchors[nameToType[parent.name]].position = { x = x, y = y }
+end
 
-	if( not anchorData.growUp ) then
-		frame.group:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
-	else
-		frame.group:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
+function Bars:TextureRegistered(event, mediaType, key)
+	if( mediaType == SML.MediaType.STATUSBAR and Afflicted.db.profile.barName == key ) then
+
+		for id, group in pairs(Bars.groups) do
+			group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
+		end
 	end
-	
-	return frame
 end
 
 -- Return an object to access our visual style
 function Bars:LoadVisual()
 	if( not GTBLib ) then
 		SML = Afflicted.SML
-		GTBLib = LibStub:GetLibrary("GTB-Beta1")
+		SML.RegisterCallback(Bars, "LibSharedMedia_Registered", "TextureRegistered")
+		
+		GTBLib = LibStub:GetLibrary("GTB-1.0")
 		self.GTB = GTBLib
 	end
 
@@ -142,10 +61,12 @@ function Bars:LoadVisual()
 		obj[func] = self[func]
 	end
 	
+	Bars.groups = {}
+	
 	-- Create anchors
 	for name, data in pairs(Afflicted.db.profile.anchors) do
 		if( data.enabled ) then
-			Bars[name] = obj:CreateDisplay(name)
+			Bars.groups[name] = Bars:CreateDisplay(name)
 		end
 	end
 	
@@ -154,12 +75,9 @@ end
 
 -- Clear all running timers for this anchor type
 function Bars:ClearTimers(type)
-	local anchorFrame = Bars[type]
-	if( not anchorFrame ) then
-		return
+	if( Bars.groups[type] ) then
+		Bars.groups[type]:UnregisterAllBars()
 	end
-	
-	anchorFrame.group:UnregisterAllBars()
 end
 
 -- Unit died, removed their timers
@@ -167,10 +85,8 @@ function Bars:UnitDied(diedGUID)
 	for id in pairs(barData) do
 		local spellID, sourceGUID, destGUID = string.split(":", id)
 		if( destGUID == diedGUID or sourceGUID == diedGUID ) then
-			for key, data in pairs(Afflicted.db.profile.anchors) do
-				if( data.enabled ) then
-					Bars[key].group:UnregisterBar(id)
-				end
+			for _, group in pairs(Bars.groups) do
+				group:UnregisterBar(id)
 			end
 		end
 	end
@@ -178,12 +94,12 @@ end
 
 -- Create a new timer
 function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
-	local anchorFrame = Bars[spellData.showIn]
-	if( not anchorFrame ) then
+	local group = Bars.groups[spellData.showIn]
+	if( not group ) then
 		return
 	end
 		
-	local id = spellID .. ":" .. sourceGUID .. ":" .. destGUID
+	local id = string.format("%s:%s:%s", spellID, sourceGUID, destGUID)
 	local text = spellName
 
 	if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
@@ -199,14 +115,13 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 	barData[id] = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
 	barData[spellName .. sourceGUID] = true
 
-	anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
-	anchorFrame.group:RegisterBar(id, spellData.seconds, text, spellData.icon)
-	anchorFrame.group:SetRepeatingTimer(id, spellData.repeating or false)
+	group:RegisterBar(id, text, spellData.seconds, nil, spellData.icon)
+	group:SetRepeatingTimer(id, spellData.repeating or false)
 	
 	-- Start a cooldown timer
 	if( spellData.cdEnabled and spellData.cooldown > 0 ) then
-		local anchorFrame = Bars[spellData.cdInside]
-		if( not anchorFrame ) then
+		local group = Bars.groups[spellData.cdInside]
+		if( not group ) then
 			return
 		end
 
@@ -227,8 +142,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 			text = string.format("%s%s", cd, spellName)
 		end
 
-		anchorFrame.group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
-		anchorFrame.group:RegisterBar(id, spellData.cooldown, text, spellData.icon)
+		group:RegisterBar(id, text, spellData.cooldown, nil, spellData.icon)
 	end
 end
 
@@ -245,42 +159,40 @@ end
 
 -- Remove a specific anchors timer by spellID/sourceGUID
 function Bars:RemoveTimer(anchorName, spellID, sourceGUID)
-	local anchorFrame = Bars[anchorName]
-	if( not anchorFrame ) then
-		return
+	local group = Bars.groups[anchorName]
+	if( not group ) then
+		return nil
 	end
 
-	return anchorFrame.group:UnregisterBar(spellID .. ":" .. sourceGUID)
+	return group:UnregisterBar(spellID .. ":" .. sourceGUID)
 end
 
 function Bars:ReloadVisual()
-	-- Update anchors and icons inside
-	for key, data in pairs(Afflicted.db.profile.anchors) do
-		local frame = Bars[key]
-		if( frame ) then
-			frame.group:SetScale(data.scale)
-			frame.group:SetDisplayGroup(data.redirectTo ~= "" and data.redirectTo or nil)
-			frame.group:SetBarGrowth(data.growUp and "UP" or "DOWN")
-			frame.group:SetWidth(Afflicted.db.profile.barWidth)
-
-			frame:SetWidth(Afflicted.db.profile.barWidth)
-			frame:SetScale(data.scale)
-
-			if( not data.growUp ) then
-				frame.group:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
-			else
-				frame.group:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
-			end
-			
-			OnShow(frame)
+	for name, data in pairs(Afflicted.db.profile.anchors) do
+		-- Had a bad anchor that was either enabled recently, or it used to be an icon anchor
+		--if( ( data.enabled or data.displayType == "bar" ) and not Bars.groups[name] ) then
+		if( data.enabled and not Bars.groups[name] ) then
+			Bars.groups[name] = savedGroups[name] or Bars:CreateDisplay(name)
+			savedGroups[name] = nil
 		
-			if( not Afflicted.db.profile.showAnchors ) then
-				frame:SetAlpha(0)
-				frame:EnableMouse(false)
-			else
-				frame:SetAlpha(1)
-				frame:EnableMouse(true)
-			end
+		-- Had a bar anchor that was either disabled recently, or it's not a bar anchor anymore
+		--elseif( ( not data.enabled or data.displayType ~= "bar" ) and Bars.groups[name] ) then
+		elseif( not data.enabled and Bars.groups[name] ) then
+			savedGroups[name] = Bars.groups[name]
+			
+			Bars.groups[name]:SetAnchorVisible(false)
+			Bars.groups[name]:UnregisterAllBars()
+			Bars.groups[name] = nil
 		end
+	end
+
+	-- Update!
+	for _, group in pairs(Bars.groups) do
+		local data = Afflicted.db.profile.anchors[nameToType[group.name]]
+		group:SetScale(data.scale)
+		group:SetDisplayGroup(data.redirectTo ~= "" and data.redirectTo or nil)
+		group:SetBarGrowth(data.growUp and "UP" or "DOWN")
+		group:SetWidth(Afflicted.db.profile.barWidth)
+		group:SetAnchorVisible(Afflicted.db.profile.showAnchors)
 	end
 end
