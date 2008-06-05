@@ -13,21 +13,22 @@ local objectsSummoned = {}
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
 function Afflicted:OnInitialize()
+	if( not self.modules.Config ) then
+		return
+
+	end
+	
+
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 	self.modules.Config:SetupDB()
 	
 	-- Setup our visual style
-	if( self.db.profile.showBars and self.modules.Bars ) then
-		self.visual = self.modules.Bars:LoadVisual()
-		self.currentVisual = "bars"
-	elseif( self.modules.Icons ) then
-		self.visual = self.modules.Icons:LoadVisual()
-		self.currentVisual = "icons"
-	end
+	self.icon = self.modules.Icons:LoadVisual()
+	self.bar = self.modules.Bars:LoadVisual()
 	
 	-- Debug, something went wrong
-	if( not self.visual ) then
+	if( not self.icon or not self.bar ) then
 		self:UnregisterAllEvents()
 		return
 	end
@@ -76,7 +77,8 @@ function Afflicted:Reload()
 		self:OnEnable()
 	end
 	
-	self.visual:ReloadVisual()
+	self.icon:ReloadVisual()
+	self.bar:ReloadVisual()
 end
 
 local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
@@ -117,7 +119,8 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		-- Fixes an issue with totems not being removed when you redrop them
 		local id = sourceGUID .. spellID
 		if( objectsSummoned[id] ) then
-			self.visual:UnitDied(objectsSummoned[id])
+			self.icon:UnitDied(objectsSummoned[id])
+			self.bar:UnitDied(objectsSummoned[id])
 		end
 		
 		objectsSummoned[id] = destGUID
@@ -154,11 +157,13 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	
 	-- Check if we should clear timers
 	elseif( eventType == "PARTY_KILL" and isDestEnemy ) then
-		self.visual:UnitDied(destGUID)
+		self.icon:UnitDied(destGUID)
+		self.bar:UnitDied(destGUID)
 
 	-- Don't use UNIT_DIED inside arenas due to accuracy issues, outside of arenas we don't care too much
 	elseif( instanceType ~= "arena" and eventType == "UNIT_DIED" and isDestEnemy ) then
-		self.visual:UnitDied(destGUID)
+		self.icon:UnitDied(destGUID)
+		self.bar:UnitDied(destGUID)
 	end
 
 end
@@ -169,8 +174,8 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 
 	if( type ~= instanceType ) then
 		-- Clear anchors because we changed zones
-		for key in pairs(self.db.profile.anchors) do
-			self.visual:ClearTimers(key)
+		for name, data in pairs(self.db.profile.anchors) do
+			self[data.displayType]:ClearTimers(name)
 		end
 		
 		-- Check if it's supposed to be enabled in this zone
@@ -260,7 +265,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 	
 	-- Start it up
-	self.visual:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
+	self[anchor.displayType]:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 
 	-- Announce it
 	if( anchor.announce ) then
@@ -295,7 +300,12 @@ function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceN
 		return
 	end
 	
-	local removed = self.visual:RemoveTimer(spellData.showIn, spellID, sourceGUID)
+	local anchor = self.db.profile.anchors[spellData.showIn]
+	if( not anchor or not anchor.enabled ) then
+		return
+	end
+
+	local removed = self[anchor.displayType]:RemoveTimer(spellData.showIn, spellID, sourceGUID)
 	if( removed ) then
 		self:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName)
 	end

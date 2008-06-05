@@ -37,6 +37,7 @@ AfflictedLocals = {
 	-- GUI
 	["General"] = "General",
 	["Bars"] = "Bars",
+	["Icons"] = "Icons",
 	["Dispels"] = "Dispels",
 	["Interrupts"] = "Interrupts",
 	["Anchors"] = "Anchors",
@@ -60,21 +61,36 @@ AfflictedLocals = {
 	
 	["Show anchors"] = "Show anchors",
 	["Display timer anchors for moving around."] = "Display timer anchors for moving around.",
-
+	
 	["Show spell icons"] = "Show spell icons",
 	["Prefixes messages with the spell icon if you're using local outputs."] = "Prefixes messages with the spell icon if you're using local outputs.",
 	
 	["Only show target/focus timers"] = "Only show target/focus timers",
 	["Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however."] = "Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however.",
 	
-	["Use bar display"] = "Use bar display",
-	["Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect."] = "Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect.",
+	["Timer display"] = "Timer display",
+
+	["Global display setting, changing these will change all the anchors settings."] = "Global display setting, changing these will change all the anchors settings.",
+	["Display style"] = "Display style",
+	
+	["Max timers"] = "Max timers",
+	["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."] = "Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed.",
+	
+	["Bar only"] = "Bar only",
+	["Configuration that only applies to bar displays."] = "Configuration that only applies to bar displays.",
+
+	["Only show triggered name in text"] = "Only show triggered name in text",
+	["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."] = "Instead of showing both the spell name and the triggered name, only the name will be shown in the bar.",
 	
 	["Bar width"] = "Bar width",
 	["Bar texture"] = "Bar texture",
 	
+	["Per anchor display for how timers should be displayed."] = "Per anchor display for how timers should be displayed.",
+	
 	["Text color"] = "Text color",
 	["Alert text color, only applies to local outputs."] = "Alert text color, only applies to local outputs.",
+	
+	["Alerts"] = "Alerts",
 	
 	["Announce destination"] = "Announce destination",
 	["Location to send announcements for this option to."] = "Location to send announcements for this option to.",
@@ -87,7 +103,9 @@ AfflictedLocals = {
 	
 	["Enable interrupt alerts"] = "Enable interrupt alerts",
 	["Displays alerts when you interrupt enemies."] = "Displays alerts when you interrupt enemies.",
-		
+	
+	["Allows you to quickly enable or disable spells in Afflicted."] = "Allows you to quickly enable or disable spells in Afflicted.",
+	
 	["Everywhere else"] = "Everywhere else",
 	["Battlegrounds"] = "Battlegrounds",
 	["Arenas"] = "Arenas",
@@ -129,7 +147,7 @@ AfflictedLocals = {
 	
 	["Redirection"] = "Redirection",
 	["Redirect bars to group"] = "Redirect bars to group",
-	["Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB."] = "Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB.",
+	["Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB, and the bar display to be enabled for this anchor."] = "Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB, and the bar display to be enabled for this anchor.",
 	
 	-- Spells
 	["You must enter a spell name, or spellID for this."] = "You must enter a spell name, or spellID for this.",
@@ -158,15 +176,6 @@ AfflictedLocals = {
 	
 	["Link spell to"] = "Link spell to",
 	["If you link this spell to another, then it means this spell will not trigger a new timer started while the timer is running for the spell it's linked to."] = "If you link this spell to another, then it means this spell will not trigger a new timer started while the timer is running for the spell it's linked to.",
-	
-	["Trigger limits"] = "Trigger limits",
-	["Lets you prevent timers from trigger too quickly, causing duplicates."] = "Lets you prevent timers from trigger too quickly, causing duplicates.",
-	
-	["Per-player limit"] = "Per-player limit",
-	["How many seconds between the time this timer triggers, and the next one can trigger. This is the per player one, meaning it won't trigger more then the set amount per the player it triggered on/from."] = "How many seconds between the time this timer triggers, and the next one can trigger. This is the per player one, meaning it won't trigger more then the set amount per the player it triggered on/from.",
-	
-	["Per-spell limit"] = "Per-spell limit",
-	["How many seconds between the time this timer triggers, and the next one can trigger. This is the per spell one, meaning it won't trigger more then the set amount per the spellID that triggers it."] = "How many seconds between the time this timer triggers, and the next one can trigger. This is the per spell one, meaning it won't trigger more then the set amount per the spellID that triggers it.",
 	
 	["Icon path"] = "Icon path",
 	["Icon path to use for display, you do not have to specify this option. As long as you leave it blank or using the question mark icon then will auto-detect and save it."] = "Icon path to use for display, you do not have to specify this option. As long as you leave it blank or using the question mark icon then will auto-detect and save it.",
@@ -200,15 +209,20 @@ AfflictedLocals = {
 	
 	["How many seconds this cooldown timer should last."] = "How many seconds this cooldown timer should last.",
 	
+	["Disabled"] = "Disabled",
+	["Enabled"] = "Enabled",
+	
+	["Timer disabled"] = "Timer disabled",
+	["Timer enabled"] = "Timer enabled",
+	
 	["New spell"] = "New spell",
 	["Spell list"] = "Spell list",
 	["Edit"] = "Edit",
 	["Delete"] = "Delete",
 	["Enable"] = "Enable",
 	["Disable"] = "Disable",
-	
-	["Dur: %d / CD: %d / Anchor: %s"] = "Dur: %d / CD: %d / Anchor: %s",
-	
+	["%s\nAnchor: %s\nDuration: %d\nCooldown: %d (%s)"] = "%s\nAnchor: %s\nDuration: %d\nCooldown: %d (%s)",
+
 	["Enable cooldown"] = "Enable cooldown",
 	["While disabled, no cooldown will be started when this timer is triggered."] = "While disabled, no cooldown will be started when this timer is triggered.",
 	["Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown."] = "Anchor to display this cooldown timer inside, if the anchor is disabled nothing will be shown.",

@@ -25,6 +25,7 @@ function Bars:CreateDisplay(type)
 	group:SetAnchorVisible(Afflicted.db.profile.showAnchors)
 	group:SetDisplayGroup(anchorData.redirectTo ~= "" and anchorData.redirectTo or nil)
 	group:SetBarGrowth(anchorData.growUp and "UP" or "DOWN")
+	group:SetMaxBars(anchorData.maxRows)
 
 	if( anchorData.position ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", anchorData.position.x, anchorData.position.y)
@@ -65,7 +66,7 @@ function Bars:LoadVisual()
 	
 	-- Create anchors
 	for name, data in pairs(Afflicted.db.profile.anchors) do
-		if( data.enabled ) then
+		if( data.enabled and data.displayType == "bar" ) then
 			Bars.groups[name] = Bars:CreateDisplay(name)
 		end
 	end
@@ -170,14 +171,12 @@ end
 function Bars:ReloadVisual()
 	for name, data in pairs(Afflicted.db.profile.anchors) do
 		-- Had a bad anchor that was either enabled recently, or it used to be an icon anchor
-		--if( ( data.enabled or data.displayType == "bar" ) and not Bars.groups[name] ) then
-		if( data.enabled and not Bars.groups[name] ) then
+		if( data.enabled and data.displayType == "bar" and not Bars.groups[name] ) then
 			Bars.groups[name] = savedGroups[name] or Bars:CreateDisplay(name)
 			savedGroups[name] = nil
 		
 		-- Had a bar anchor that was either disabled recently, or it's not a bar anchor anymore
-		--elseif( ( not data.enabled or data.displayType ~= "bar" ) and Bars.groups[name] ) then
-		elseif( not data.enabled and Bars.groups[name] ) then
+		elseif( ( not data.enabled or data.displayType ~= "bar" ) and Bars.groups[name] ) then
 			savedGroups[name] = Bars.groups[name]
 			
 			Bars.groups[name]:SetAnchorVisible(false)
@@ -194,5 +193,6 @@ function Bars:ReloadVisual()
 		group:SetBarGrowth(data.growUp and "UP" or "DOWN")
 		group:SetWidth(Afflicted.db.profile.barWidth)
 		group:SetAnchorVisible(Afflicted.db.profile.showAnchors)
+		group:SetMaxBars(data.maxRows)
 	end
 end

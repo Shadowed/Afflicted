@@ -27,7 +27,6 @@ function Config:SetupDB()
 		profile = {
 			showAnchors = false,
 			showIcons = true,
-			showBars = true,
 			showTarget = false,
 			
 			dispelEnabled = true,
@@ -56,7 +55,9 @@ function Config:SetupDB()
 				announceColor = { r = 1.0, g = 1.0, b = 1.0 },
 				announceDest = "1",
 				scale = 1.0,
+				maxRows = 20,
 				redirectTo = "",
+				displayType = "bar",
 
 				usedMessage = L["USED *spell (*target)"],
 				fadeMessage = L["FINISHED *spell (*target)"],
@@ -68,7 +69,6 @@ function Config:SetupDB()
 				globalLimit = 0,
 				showIn = "",
 				cdInside = "cooldowns",
-				linkedTo = "",
 				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
 				SPELL_CAST_SUCCESS = true
 			},
@@ -123,6 +123,16 @@ function Config:SetupDB()
 					if( not spell.cdInside ) then
 						spell.cdInside = "cooldowns"
 					end
+				end
+			end
+		elseif( self.db.profile.version <= 748 ) then
+			for k, anchor in pairs(self.db.profile.anchors) do
+				anchor.maxRows = anchor.maxRows or self.defaults.profile.anchorDefault.maxRows
+				anchor.displayType = anchor.displayType or self.defaults.profile.anchorDefault.displayType
+
+				if( self.db.profile.showBars == false ) then
+					self.db.proifle.showBars = nil
+					anchor.displayType = "icon"
 				end
 			end
 		end
@@ -233,6 +243,21 @@ local function getMulti(info, value)
 	end
 end
 
+local globalOptions = {["displayType"] = "bar", ["scale"] = 1, ["maxRows"] = 10, ["growUp"] = false}
+local function getGlobalOption(info)
+	return globalOptions[info.arg]
+end
+
+local function setGlobalOption(info, value)
+	for name, anchor in pairs(Afflicted.db.profile.anchors) do
+		anchor[info.arg] = value
+	end
+	
+	Afflicted.modules.Bars:ReloadVisual()
+	Afflicted.modules.Icons:ReloadVisual()
+	
+	globalOptions[info.arg] = value
+end
 
 -- Return all registered SML textures
 local textures = {}
@@ -303,6 +328,8 @@ function Config:ValidateAnchor(info, value)
 	return true
 end
 
+local displayTypes = {["bar"] = L["Bars"], ["icon"] = L["Icons"]}
+
 function Config:CreateAnchorDisplay(info, value)
 	local id = string.lower(string.gsub(string.gsub(value, "%.", ""), " ", ""))
 	
@@ -327,41 +354,72 @@ function Config:CreateAnchorDisplay(info, value)
 				width = "full",
 				arg = "anchors." .. id .. ".enabled",
 			},
-			growUp = {
-				order = 2,
-				type = "toggle",
-				name = L["Grow display up"],
-				desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
-				width = "full",
-				arg = "anchors." .. id .. ".growUp",
-			},
-			scale = {
+			display = {
 				order = 3,
-				type = "range",
-				name = L["Display scale"],
-				desc = L["How big the actual timers should be."],
-				min = 0, max = 2, step = 0.1,
-				set = setNumber,
-				arg = "anchors." .. id .. ".scale",
-			},
-			redirect = {
-				order = 4,
 				type = "group",
 				inline = true,
-				name = L["Redirection"],
+				name = L["Timer display"],
 				args = {
 					desc = {
 						order = 0,
-						name = L["Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB."],
+						name = L["Per anchor display for how timers should be displayed."],
 						type = "description",
 					},
-					location = {
+					growUp = {
 						order = 1,
+						type = "toggle",
+						name = L["Grow display up"],
+						desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
+						width = "double",
+						arg = "anchors." .. id .. ".growUp",
+					},
+					displayType = {
+						order = 2,
 						type = "select",
-						name = L["Redirect bars to group"],
-						values = "GetGroups",
-						disabled = "IsDisabled",
-						arg = "anchors." .. id .. ".redirectTo",
+						name = L["Display style"],
+						values = displayTypes,
+						arg = "anchors." .. id .. ".displayType",
+					},
+					sep = {
+						order = 3,
+						name = "",
+						type = "description",
+					},
+					scale = {
+						order = 4,
+						type = "range",
+						name = L["Display scale"],
+						desc = L["How big the actual timers should be."],
+						min = 0, max = 2, step = 0.1,
+						arg = "anchors." .. id .. ".scale",
+					},
+					maxRows = {
+						order = 5,
+						type = "range",
+						name = L["Max timers"],
+						desc = L["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."],
+						min = 1, max = 50, step = 1,
+						arg = "anchors." .. id .. ".maxRows",
+					},
+					redirection = {
+						order = 6,
+						type = "group",
+						inline = true,
+						name = L["Redirection"],
+						args = {
+							desc = {
+								order = 0,
+								name = L["Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB, and the bar display to be enabled for this anchor."],
+								type = "description",
+							},
+							location = {
+								order = 1,
+								type = "select",
+								name = L["Redirect bars to group"],
+								values = "GetGroups",
+								arg = "anchors." .. id .. ".redirectTo",
+							},
+						},
 					},
 				},
 			},
@@ -376,6 +434,7 @@ function Config:CreateAnchorDisplay(info, value)
 						type = "toggle",
 						name = L["Enable announcements"],
 						desc = L["Enables showing alerts for when timers are triggered to this anchor."],
+						width = "full",
 						arg = "anchors." .. id .. ".announce",
 					},
 					color = {
@@ -385,6 +444,7 @@ function Config:CreateAnchorDisplay(info, value)
 						desc = L["Alert text color, only applies to local outputs."],
 						set = setColor,
 						get = getColor,
+						width = "full",
 						arg = "anchors." .. id .. ".announceColor",
 					},
 					dispelDest = {
@@ -477,18 +537,31 @@ function Config:GetAnchors()
 end
 
 local function getSpellInfo(info)
-	local data = Afflicted.db.profile.spells[info.arg]
+	local var = string.match(info.arg, "spells%.(.+)%.disabled")
+	if( tonumber(var) ) then
+
+		var = tonumber(var)
+	end
+	
+	local data = Afflicted.db.profile.spells[var]
 	local anchorName = data.showIn
 	if( Afflicted.db.profile.anchors[anchorName] ) then
 		anchorName = Afflicted.db.profile.anchors[anchorName].text
 	end
 	
-	return string.format(L["Dur: %d / CD: %d / Anchor: %s"], data.seconds or 0, data.cooldown or 0, anchorName or L["None"])
+	return string.format(L["%s\nAnchor: %s\nDuration: %d\nCooldown: %d (%s)"], data.disabled and ( RED_FONT_COLOR_CODE .. L["Timer disabled"] .. FONT_COLOR_CODE_CLOSE ) or ( GREEN_FONT_COLOR_CODE .. L["Timer enabled"] .. FONT_COLOR_CODE_CLOSE ), anchorName or L["None"], data.seconds or 0, data.cooldown or 0, data.cdEnabled and L["Enabled"] or L["Disabled"])
 end
 
---local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_MISC"] = L["General damage/misses/resists"], ["SPELL_AURA_APPLIEDDEBUFFGROUP"] = L["Group, gained debuff"], ["SPELL_AURA_APPLIEDBUFFENEMY"] = L["Enemy, gained buff"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"], ["SPELL_INTERRUPT"] = L["Group, interrupted by enemy"] }
-local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"]}
+-- Quick wrappers, flips the check boxes so we can use it as checked = enabled, unchecked = disabled
+local function setDisabled(info, value)
+	set(info, not value)
+end
 
+local function getDisabled(info)
+	return not get(info)
+end
+
+local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"]}
 function Config:CreateSpellDisplay(info, value)
 	-- Do a quick type change
 	if( tonumber(value) ) then
@@ -511,29 +584,13 @@ function Config:CreateSpellDisplay(info, value)
 	end
 	
 	local id = string.gsub(value, " ", "")
-	
 	options.args.spells.args.list.args[id] = {
-		order = 1,
-		type = "group",
-		inline = true,
+		type = "toggle",
 		name = text,
-		width = "half",
-		args = {
-			desc = {
-				order = 1,
-				type = "description",
-				name = getSpellInfo,
-				arg = value,
-			},
-			toggle = {
-				order = 2,
-				type = "execute",
-				name = function(info) if( Afflicted.db.profile.spells[info.arg].disabled ) then return L["Enable"] else return L["Disable"] end end,
-				width = "half",
-				func = function(info) Afflicted.db.profile.spells[info.arg].disabled = not Afflicted.db.profile.spells[info.arg].disabled end,
-				arg = value,
-			},
-		},
+		desc = getSpellInfo,
+		get = getDisabled,
+		set = setDisabled,
+		arg = "spells." .. value .. ".disabled"
 	}
 
 	options.args.spells.args[id] = {
@@ -560,18 +617,6 @@ function Config:CreateSpellDisplay(info, value)
 				values = "GetAnchors",
 				arg = "spells." .. value .. ".showIn",
 			},
-			--[[
-			linkedTo = {
-				order = 3,
-				type = "select",
-				name = L["Link spell to"],
-				desc = L["If you link this spell to another, then it means this spell will not trigger a new timer started while the timer is running for the spell it's linked to."],
-				values = "GetSpells",
-				get = getString,
-				set = setType,
-				arg = "spells." .. value .. ".linkedTo",
-			},
-			]]
 			icon = {
 				order = 4,
 				type = "input",
@@ -783,65 +828,121 @@ local function loadOptions()
 				type = "toggle",
 				name = L["Show anchors"],
 				desc = L["Display timer anchors for moving around."],
-				width = "double",
+				width = "full",
 				arg = "showAnchors",
 			},
 			showIcons = {
 				order = 1,
 				type = "toggle",
 				name = L["Show spell icons"],
-				desc = L["Prefixes messages with the spell icon if you're using local outputs."],   
-				width = "double",
+				desc = L["Prefixes messages with the spell icon if you're using local outputs."], 
+				width = "full",
 				arg = "showIcons",
 			},
-			showTarget = {
-				order = 2,
-				type = "toggle",
-				name = L["Only show target/focus timers"],
-				desc = L["Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however."],   
-				width = "double",
-				arg = "showTarget",
-			},
-			bars = {
+			display = {
 				order = 3,
 				type = "group",
 				inline = true,
-				name = L["Bars"],
+				name = L["Timer display"],
 				args = {
-					showBars = {
+					desc = {
+						order = 0,
+						name = L["Global display setting, changing these will change all the anchors settings."],
+						type = "description",
+					},
+					growUp = {
 						order = 1,
 						type = "toggle",
-						name = L["Use bar display"],
-						desc = L["Displays timers using a bar format instead of the standard icons.\nRequires a game restart to take effect."],
-						width = "double",
-						arg = "showBars",
+						name = L["Grow display up"],
+						desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
+						get = getGlobalOption,
+						set = setGlobalOption,
+						width = "full",
+						arg = "growUp",
 					},
-					nameOnly = {
+					showTarget = {
 						order = 2,
 						type = "toggle",
-						name = L["Only show triggered name in text"],
-						desc = L["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."],
-						width = "double",
-						disabled = "IsDisabled",
-						arg = "barNameOnly",
+						name = L["Only show target/focus timers"],
+						desc = L["Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however."],   
+						width = "full",
+						arg = "showTarget",
 					},
-					barWidth = {
+					displayType = {
 						order = 3,
-						type = "range",
-						name = L["Bar width"],
-						min = 0, max = 300, step = 1,
-						set = setNumber,
-						disabled = "IsDisabled",
-						arg = "barWidth",
-					},
-					barName = {
-						order = 4,
 						type = "select",
-						name = L["Bar texture"],
-						dialogControl = 'LSM30_Statusbar',
-						values = "GetTextures",
-						disabled = "IsDisabled",
-						arg = "barName",
+						name = L["Display style"],
+						values = displayTypes,
+						get = getGlobalOption,
+						set = setGlobalOption,
+						arg = "displayType",
+					},
+					sep = {
+						order = 4,
+						name = "",
+						type = "description",
+					},
+					scale = {
+						order = 5,
+						type = "range",
+						name = L["Display scale"],
+						desc = L["How big the actual timers should be."],
+						min = 0, max = 2, step = 0.1,
+						get = getGlobalOption,
+						set = setGlobalOption,
+						arg = "scale",
+					},
+					maxRows = {
+						order = 6,
+						type = "range",
+						name = L["Max timers"],
+						desc = L["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."],
+						min = 1, max = 50, step = 1,
+						get = getGlobalOption,
+						set = setGlobalOption,
+						arg = "maxRows",
+					},
+					display = {
+						order = 8,
+						type = "group",
+						inline = true,
+						name = L["Bar only"],
+						args = {
+							desc = {
+								order = 0,
+								name = L["Configuration that only applies to bar displays."],
+								type = "description",
+							},
+							nameOnly = {
+								order = 1,
+								type = "toggle",
+								name = L["Only show triggered name in text"],
+								desc = L["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."],
+								width = "double",
+								arg = "barNameOnly",
+							},
+							barWidth = {
+								order = 2,
+								type = "range",
+								name = L["Bar width"],
+								min = 0, max = 300, step = 1,
+								set = setNumber,
+								arg = "barWidth",
+							},
+							sep = {
+								order = 3,
+								name = "",
+								type = "description",
+							},
+							barName = {
+								order = 4,
+								type = "select",
+								name = L["Bar texture"],
+								dialogControl = 'LSM30_Statusbar',
+								values = "GetTextures",
+								arg = "barName",
+							},
+						},
 					},
 				},
 			},
@@ -870,16 +971,26 @@ local function loadOptions()
 						values = "GetProfiles",
 						arg = "arenaProfiles.2",
 					},
-					three = {
+					oneSep = {
 						order = 2,
+						name = "",
+						type = "description",
+					},
+					three = {
+						order = 3,
 						type = "select",
 						name = L["3vs3 profile"],
 						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
 						values = "GetProfiles",
 						arg = "arenaProfiles.3",
 					},
+					twoSep = {
+						order = 4,
+						name = "",
+						type = "description",
+					},
 					five = {
-						order = 3,
+						order = 5,
 						type = "select",
 						name = L["5vs5 profile"],
 						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
@@ -888,8 +999,19 @@ local function loadOptions()
 					},
 				},
 			},
+		},
+	}
+	
+	options.args.alerts = {
+		type = "group",
+		order = 3,
+		name = L["Alerts"],
+		get = get,
+		set = set,
+		handler = Config,
+		args = {
 			dispel = {
-				order = 6,
+				order = 1,
 				type = "group",
 				inline = true,
 				name = L["Dispels"],
@@ -899,7 +1021,7 @@ local function loadOptions()
 						type = "toggle",
 						name = L["Enable dispel alerts"],
 						desc = L["Displays alerts when you dispel a friendly player, can also be enabled to show alerts for enemies as well."],
-						width = "double",
+						width = "full",
 						arg = "dispelEnabled",
 					},
 					dispelHostile = {
@@ -907,7 +1029,7 @@ local function loadOptions()
 						type = "toggle",
 						name = L["Show alerts for dispelling enemies"],
 						desc = L["Enables showing alerts for when you dispel enemies as well as friendly players."],
-						width = "double",
+						width = "full",
 						disabled = "IsDisabled",
 						arg = "dispelHostile",
 					},
@@ -917,6 +1039,7 @@ local function loadOptions()
 						name = L["Text color"],
 						desc = L["Alert text color, only applies to local outputs."],
 						disabled = "IsDisabled",
+						width = "full",
 						set = setColor,
 						get = getColor,
 						arg = "dispelColor",
@@ -933,7 +1056,7 @@ local function loadOptions()
 				},
 			},
 			interrupt = {
-				order = 7,
+				order = 2,
 				type = "group",
 				inline = true,
 				name = L["Interrupts"],
@@ -943,7 +1066,7 @@ local function loadOptions()
 						type = "toggle",
 						name = L["Enable interrupt alerts"],
 						desc = L["Displays alerts when you interrupt enemies."],
-						width = "double",
+						width = "full",
 						arg = "interruptEnabled",
 					},
 					interruptColor = {
@@ -952,6 +1075,7 @@ local function loadOptions()
 						name = L["Text color"],
 						desc = L["Alert text color, only applies to local outputs."],
 						disabled = "IsDisabled",
+						width = "full",
 						set = setColor,
 						get = getColor,
 						arg = "interruptColor",
@@ -969,9 +1093,10 @@ local function loadOptions()
 			},
 		},
 	}
+	
 	options.args.anchors = {
 		type = "group",
-		order = 3,
+		order = 4,
 		name = L["Anchors"],
 		get = get,
 		set = set,
@@ -1005,7 +1130,7 @@ local function loadOptions()
 	
 	options.args.spells = {
 		type = "group",
-		order = 4,
+		order = 5,
 		name = L["Spells"],
 		get = get,
 		set = set,
@@ -1040,7 +1165,14 @@ local function loadOptions()
 				type = "group",
 				inline = true,
 				name = L["Spell list"],
-				args = {}
+				args = {
+					desc = {
+						order = 0,
+						name = L["Allows you to quickly enable or disable spells in Afflicted."],
+						type = "description",
+						width = "full",
+					},
+				}
 			},
 		},
 	}
@@ -1062,13 +1194,13 @@ SLASH_AFFLICTED1 = "/afflicted"
 SLASH_AFFLICTED2 = "/afflict"
 SlashCmdList["AFFLICTED"] = function(msg)
 	if( msg == "clear" ) then
-		for key in pairs(Afflicted.db.profile.anchors) do
-			Afflicted.visual:ClearTimers(key)
+		for name, data in pairs(Afflicted.db.profile.anchors) do
+			Afflicted[data.displayType]:ClearTimers(name)
 		end
 	elseif( msg == "test" ) then
 		-- Clear out any running timers first
-		for key in pairs(Afflicted.db.profile.anchors) do
-			Afflicted.visual:ClearTimers(key)
+		for name, data in pairs(Afflicted.db.profile.anchors) do
+			Afflicted[data.displayType]:ClearTimers(name)
 		end
 
 		local i = 0
@@ -1083,7 +1215,11 @@ SlashCmdList["AFFLICTED"] = function(msg)
 
 				if( addedTypes[data.showIn] < 5 and not data.disabled ) then
 					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
-					Afflicted.visual:CreateTimer(data, "TEST", -1, data.text or spell, i, UnitName("player"), i)
+					
+					local anchor = Afflicted.db.profile.anchors[data.showIn]
+					if( anchor.enabled ) then
+						Afflicted[anchor.displayType]:CreateTimer(data, "TEST", -1, data.text or spell, i, UnitName("player"), i)
+					end
 				end
 			end
 		end
@@ -1095,7 +1231,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 			end
 			
 			config:RegisterOptionsTable("Afflicted2", options)
-			dialog:SetDefaultSize("Afflicted2", 600, 500)
+			dialog:SetDefaultSize("Afflicted2", 625, 500)
 			registered = true
 		end
 
