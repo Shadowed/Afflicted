@@ -125,13 +125,13 @@ function Config:SetupDB()
 					end
 				end
 			end
-		elseif( self.db.profile.version <= 748 ) then
+		elseif( self.db.profile.version <= 758 ) then
 			for k, anchor in pairs(self.db.profile.anchors) do
 				anchor.maxRows = anchor.maxRows or self.defaults.profile.anchorDefault.maxRows
 				anchor.displayType = anchor.displayType or self.defaults.profile.anchorDefault.displayType
 
 				if( self.db.profile.showBars == false ) then
-					self.db.proifle.showBars = nil
+					self.db.profile.showBars = nil
 					anchor.displayType = "icon"
 				end
 			end

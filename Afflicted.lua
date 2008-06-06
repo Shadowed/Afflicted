@@ -15,10 +15,8 @@ local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8]
 function Afflicted:OnInitialize()
 	if( not self.modules.Config ) then
 		return
-
 	end
 	
-
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 	self.modules.Config:SetupDB()
