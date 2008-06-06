@@ -51,13 +51,13 @@ AfflictedLocals = {
 	["None"] = "None",
 
 	-- General
-	["Arena profiles"] = "Arena profiles",
+	["2 vs 2"] = "2 vs 2",
+	["3 vs 3"] = "3 vs 3",
+	["5 vs 5"] = "5 vs 5",
 	
-	["2vs2 profile"] = "2vs2 profile",
-	["3vs3 profile"] = "3vs3 profile",
-	["5vs5 profile"] = "5vs5 profile",
+	["Spells which should be disabled while inside this arena bracket."] = "Spells which should be disabled while inside this arena bracket.",
 	
-	["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."] = "Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others.",
+	["Arena spells"] = "Arena spells",
 	
 	["Show anchors"] = "Show anchors",
 	["Display timer anchors for moving around."] = "Display timer anchors for moving around.",

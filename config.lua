@@ -46,7 +46,7 @@ function Config:SetupDB()
 			inside = {["arena"] = true, ["pvp"] = true},
 			anchors = {},
 			
-			arenaProfiles = { [2] = "", [3] = "", [5] = "" },
+			disabledSpells = { [2] = {}, [3] = {}, [5] = {} },
 
 			anchorDefault = {
 				enabled = true,
@@ -161,6 +161,7 @@ local announceDest = {["none"] = L["None"], ["ct"] = L["Combat text"], ["party"]
 local function set(info, value)
 	local arg1, arg2, arg3 = string.split(".", info.arg)
 	if( tonumber(arg2) ) then arg2 = tonumber(arg2) end
+	if( tonumber(arg3) ) then arg3 = tonumber(arg3) end
 	
 	if( arg2 and arg3 ) then
 		Afflicted.db.profile[arg1][arg2][arg3] = value
@@ -176,6 +177,7 @@ end
 local function get(info)
 	local arg1, arg2, arg3 = string.split(".", info.arg)
 	if( tonumber(arg2) ) then arg2 = tonumber(arg2) end
+	if( tonumber(arg3) ) then arg3 = tonumber(arg3) end
 	
 	if( arg2 and arg3 ) then
 		return Afflicted.db.profile[arg1][arg2][arg3]
@@ -282,21 +284,6 @@ function Config:GetGroups()
 	end
 	
 	return groups
-end
-
--- Return list of profiles
-local dbProfiles = {}
-function Config:GetProfiles()
-	for k in pairs(dbProfiles) do dbProfiles[k] = nil end
-	
-	dbProfiles[""] = L["None"]
-	
-	for _, name in pairs(Afflicted.db:GetProfiles()) do
-		dbProfiles[name] = name
-
-	end
-	
-	return dbProfiles
 end
 
 -- Check if we should disable this option
@@ -538,8 +525,11 @@ end
 
 local function getSpellInfo(info)
 	local var = string.match(info.arg, "spells%.(.+)%.disabled")
+	if( not var ) then
+		var = string.match(info.arg, "disabledSpells%..+%.(.+)")
+	end
+	
 	if( tonumber(var) ) then
-
 		var = tonumber(var)
 	end
 	
@@ -806,6 +796,52 @@ function Config:CreateSpellDisplay(info, value)
 	}
 end
 
+-- Spell list just for arenas
+function Config:GetArenaSpellList(bracket)
+	local options = {
+		desc = {
+			order = 0,
+			name = L["Spells which should be disabled while inside this arena bracket."],
+			type = "description",
+			width = "full",
+		},
+		list = {
+			order = 2,
+			type = "group",
+			inline = true,
+			name = L["Spell list"],
+			args = {},
+		},
+	}
+
+	local i = 0
+	for id, data in pairs(Afflicted.db.profile.spells) do
+		if( type(data) == "table" ) then
+			i = i + 1
+
+			-- If it's a spellID, either show the text because we've seen the spell, or show the spellID
+			local text = id
+			if( type(id) == "number" ) then
+				if( data.text ) then
+					text = data.text
+				else
+					text = string.format("#%d", tonumber(id))
+				end
+			end
+			
+			options.list.args[tostring(i)] = {
+				order  = i,
+				type = "toggle",
+				name = text,
+				desc = getSpellInfo,
+				arg = "disabledSpells." .. bracket .. "." .. id
+			}
+		end
+	end
+	
+	return options
+end
+
 -- General options
 local enabledIn = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]}
 
@@ -956,48 +992,6 @@ local function loadOptions()
 				get = getMulti,
 				width = "double",
 				arg = "inside"
-			},
-			arenas = {
-				order = 5,
-				type = "group",
-				inline = true,
-				name = L["Arena profiles"],
-				args = {
-					two = {
-						order = 1,
-						type = "select",
-						name = L["2vs2 profile"],
-						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
-						values = "GetProfiles",
-						arg = "arenaProfiles.2",
-					},
-					oneSep = {
-						order = 2,
-						name = "",
-						type = "description",
-					},
-					three = {
-						order = 3,
-						type = "select",
-						name = L["3vs3 profile"],
-						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
-						values = "GetProfiles",
-						arg = "arenaProfiles.3",
-					},
-					twoSep = {
-						order = 4,
-						name = "",
-						type = "description",
-					},
-					five = {
-						order = 5,
-						type = "select",
-						name = L["5vs5 profile"],
-						desc = L["Specified profile to use inside this arena bracket, lets you enable specific timers inside certain arena brackets, but disable them in others."],
-						values = "GetProfiles",
-						arg = "arenaProfiles.5",
-					},
-				},
 			},
 		},
 	}
@@ -1176,6 +1170,36 @@ local function loadOptions()
 			},
 		},
 	}
+
+	options.args.arenaSpells = {
+		type = "group",
+		order = 6,
+		name = L["Arena spells"],
+		get = get,
+		set = set,
+		handler = Config,
+		args = {
+			two = {
+				order = 1,
+				type = "group",
+				name = L["2 vs 2"],
+			},
+			three = {
+				order = 1,
+				type = "group",
+				name = L["3 vs 3"],
+			},
+			five = {
+				order = 1,
+				type = "group",
+				name = L["5 vs 5"],
+			},
+		},
+	}
+	
+	options.args.arenaSpells.args.two.args = Config:GetArenaSpellList(2)
+	options.args.arenaSpells.args.three.args = Config:GetArenaSpellList(3)
+	options.args.arenaSpells.args.five.args = Config:GetArenaSpellList(5)
 	
 	-- Load our created anchors in
 	for id, data in pairs(Afflicted.db.profile.spells) do

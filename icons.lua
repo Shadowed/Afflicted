@@ -253,11 +253,6 @@ function Icons:UnitDied(destGUID)
 				end
 			end
 
-			-- No more icons, hide the base group
-			if( #(group.active) == 0 ) then
-				group:Hide()
-			end
-
 			-- Reposition everything
 			repositionTimers(group)
 		end

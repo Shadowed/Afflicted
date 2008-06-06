@@ -35,7 +35,15 @@ function Bars:CreateDisplay(type)
 end
 
 function Bars:OnBarMove(parent, x, y)
-	Afflicted.db.profile.anchors[nameToType[parent.name]].position = { x = x, y = y }
+	local position = Afflicted.db.profile.anchors[nameToType[parent.name]].position
+	if( not position ) then
+		position = {}
+
+	end
+	
+
+	position.x = x
+	position.y = y
 end
 
 function Bars:TextureRegistered(event, mediaType, key)

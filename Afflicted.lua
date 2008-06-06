@@ -6,7 +6,7 @@ Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
 
 local L = AfflictedLocals
 
-local instanceType
+local instanceType, currentBracket
 
 local timerLimits = {}
 local objectsSummoned = {}
@@ -112,9 +112,8 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Check for something being summoned (Pets, totems)
 	elseif( eventType == "SPELL_SUMMON" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool = ...
-		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 		
-		-- Fixes an issue with totems not being removed when you redrop them
+		-- Fixes an issue with totems not being removed when they get redropped
 		local id = sourceGUID .. spellID
 		if( objectsSummoned[id] ) then
 			self.icon:UnitDied(objectsSummoned[id])
@@ -122,6 +121,9 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		end
 		
 		objectsSummoned[id] = destGUID
+
+
+		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 		
 	-- Check for something being created (Traps, ect)
 	elseif( eventType == "SPELL_CREATE" and isSourceEnemy ) then
@@ -179,27 +181,18 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 		-- Check if it's supposed to be enabled in this zone
 		if( self.db.profile.inside[type] ) then
 			if( type == "arena" ) then
-				local bracket
 				for i=1, MAX_BATTLEFIELD_QUEUES do
 					local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
-					if( status == "active" and teamSize > 0 and self.db.profile.arenaProfiles[teamSize] ~= "" ) then
-						local oldProfile = self.db:GetCurrentProfile()
-						self.db:SetProfile(self.db.profile.arenaProfiles[teamSize])
-						self.db.profile.originalProfile = oldProfile
+					if( status == "active" and teamSize > 0 ) then
+						currentBracket = teamSize
 					end
 				end
 			end
 			
 			self:OnEnable()
 		else
+			currentBracket = nil
 			self:OnDisable()
-		end
-
-		-- No longer in an arena, and we had an original profile set so revert to it
-		if( type ~= "arena" and self.db.profile.originalProfile ) then
-			local originalProfile = self.db.profile.originalProfile
-			self.db.profile.originalProfile = nil
-			self.db:SetProfile(originalProfile)
 		end
 	end
 		
@@ -214,7 +207,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		spellData = self.db.profile.spells[spellData]
 	end
 	
-	if( not spellData or spellData.disabled or not spellData[eventType] ) then
+	if( not spellData or spellData.disabled or not spellData[eventType] or ( currentBracket and self.db.profile.disabledSpells[currentBracket] ) ) then
 		return
 	end
 	
