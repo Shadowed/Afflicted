@@ -15,7 +15,7 @@ end
 -- Reposition the passed groups timers
 local function repositionTimers(group)
 	local data = Afflicted.db.profile.anchors[group.type]
-
+	
 	-- Reposition everything
 	for id, icon in pairs(group.active) do
 		if( id > 1 ) then
@@ -291,7 +291,6 @@ local function createTimer(showIn, eventType, repeating, spellID, spellName, sou
 	frame.icon:SetTexture(icon)
 	frame:SetScript("OnUpdate", OnUpdate)
 	frame:SetScale(Afflicted.db.profile.anchors[group.type].scale)
-	frame:SetParent(group)
 	
 	-- Reposition
 	repositionTimers(group)
