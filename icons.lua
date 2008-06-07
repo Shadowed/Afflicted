@@ -100,14 +100,13 @@ local function OnDragStop(self)
 		self.isMoving = nil
 		self:StopMovingOrSizing()
 		
-		local anchor = Afflicted.db.profile.anchors[self.type]
-		if( not anchor.position ) then
-			anchor.position = { x = 0, y = 0 }
+		if( not Afflicted.db.profile.anchors[self.type].position ) then
+			Afflicted.db.profile.anchors[self.type].position = {}
 		end
 		
 		local scale = self:GetEffectiveScale()
-		anchor.position.x = self:GetLeft() * scale
-		anchor.position.y = self:GetTop() * scale
+		Afflicted.db.profile.anchors[self.type].position.x = self:GetLeft() * scale
+		Afflicted.db.profile.anchors[self.type].position.y = self:GetTop() * scale
 	end
 end
 
