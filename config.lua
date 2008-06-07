@@ -974,7 +974,7 @@ local function loadOptions()
 								order = 4,
 								type = "select",
 								name = L["Bar texture"],
-								dialogControl = 'LSM30_Statusbar',
+								--dialogControl = 'LSM30_Statusbar',
 								values = "GetTextures",
 								arg = "barName",
 							},
