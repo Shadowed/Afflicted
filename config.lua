@@ -91,13 +91,9 @@ function Config:SetupDB()
 
 	-- Upgrade
 	if( self.db.profile.version ) then
-		if( self.db.profile.version <= 619 ) then
+		if( self.db.profile.version <= 655 ) then
 			self.db:ResetProfile()
 			self:Print(L["Your configuration has been reset to the defaults."])
-		elseif( self.db.profile.version <= 655 ) then
-			self.db.profile.anchors = nil
-			self.db.profile.spells = CopyTable(self.defaults.profile.spells)
-			self:Print(L["Your configuration has been upgraded to the latest version, anchors and spells have been wiped."])
 		elseif( self.db.profile.version <= 667 ) then
 			for k, spell in pairs(self.db.profile.spells) do
 				if( type(spell) == "table" ) then
@@ -576,7 +572,7 @@ function Config:CreateSpellDisplay(info, value)
 	local id = string.gsub(value, " ", "")
 	options.args.spells.args.list.args[id] = {
 		type = "toggle",
-		name = text,
+		name = text or value,
 		desc = getSpellInfo,
 		get = getDisabled,
 		set = setDisabled,
@@ -801,7 +797,7 @@ function Config:GetArenaSpellList(bracket)
 	local options = {
 		desc = {
 			order = 0,
-			name = L["Spells which should be disabled while inside this arena bracket."],
+			name = L["Spells that should be DISABLED for this specific arena bracket."],
 			type = "description",
 			width = "full",
 		},

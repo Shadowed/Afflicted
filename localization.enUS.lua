@@ -55,7 +55,7 @@ AfflictedLocals = {
 	["3 vs 3"] = "3 vs 3",
 	["5 vs 5"] = "5 vs 5",
 	
-	["Spells which should be disabled while inside this arena bracket."] = "Spells which should be disabled while inside this arena bracket.",
+	["Spells that should be DISABLED for this specific arena bracket."] = "Spells that should be DISABLED for this specific arena bracket.",
 	
 	["Arena spells"] = "Arena spells",
 	
