@@ -1226,7 +1226,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 		local i = 0
 		local addedTypes = {}
 		for spell, data in pairs(Afflicted.db.profile.spells) do
-			if( type(data) == "table" and data.showIn ) then
+			if( type(data) == "table" ) then
 				i = i + 1
 
 				if( not addedTypes[data.showIn] ) then
@@ -1238,6 +1238,10 @@ SlashCmdList["AFFLICTED"] = function(msg)
 					
 					local anchor = Afflicted.db.profile.anchors[data.showIn]
 					if( anchor.enabled ) then
+						if( not data.icon and type(spell) == "number" ) then
+							data.icon = select(3, GetSpellInfo(spell))
+						end
+						
 						Afflicted[anchor.displayType]:CreateTimer(data, "TEST", -1, data.text or spell, i, UnitName("player"), i)
 					end
 				end

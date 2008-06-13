@@ -8,7 +8,6 @@ local L = AfflictedLocals
 
 local instanceType, currentBracket
 
-local timerLimits = {}
 local objectsSummoned = {}
 local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
@@ -221,19 +220,17 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		return
 	end
 	
+	local text, rank, icon = GetSpellInfo(spellID)
+	
+
 	-- If we have no icon, or we're using the question mark one then update the SV with the new one
-	local icon = spellData.icon
-	if( not icon or icon == "" or string.match(icon, "INV_Misc_QuestionMark$") ) then
-		local spellIcon = select(3, GetSpellInfo(spellID))
-		if( spellIcon ) then
-			icon = spellIcon
-			spellData.icon = icon
-		end
+	if( not spellData.icon or spellData.icon == "" ) then
+		spellData.icon = icon
+
 	end
 	
 	-- Save the spell name if it's a spellID-saved var
-	local text = GetSpellInfo(spellID)
-	if( text ) then
+	if( not spellData.text ) then
 		spellData.text = text
 	end
 	
@@ -302,9 +299,6 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 		return
 	end
 			
-	-- Unlock the limiter early
-	--timerLimits[spellID .. sourceGUID] = nil
-
 	-- Announce it
 	if( anchor.announce and eventType ~= "TEST" ) then
 		-- Work out if we should use a custom message, or a default one
