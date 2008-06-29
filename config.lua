@@ -65,11 +65,10 @@ function Config:SetupDB()
 			spellDefault = {
 				seconds = 0,
 				cooldown = 0,
-				singleLimit = 0,
-				globalLimit = 0,
-				showIn = "",
+				cdEnabled = false,
 				cdInside = "cooldowns",
-				icon = "Interface\\Icons\\INV_Misc_QuestionMark",
+				showIn = "buffs",
+				icon = "",
 				SPELL_CAST_SUCCESS = true
 			},
 		},
@@ -88,6 +87,18 @@ function Config:SetupDB()
 	self.db.RegisterCallback(self, "OnProfileChanged", "Reload")
 	self.db.RegisterCallback(self, "OnProfileCopied", "Reload")
 	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
+	
+	-- Set defaults to have actual values if they're missing
+	for _, spell in pairs(self.defaults.profile.spells) do
+		if( type(spell) == "table" ) then
+			for k, v in pairs(self.defaults.profile.spellDefault) do
+				if( k ~= "SPELL_CAST_SUCCESS" and spell[k] == nil ) then
+					spell[k] = v
+				end
+			end
+		end
+	end
+	
 
 	-- Upgrade
 	if( self.db.profile.version ) then
@@ -114,13 +125,6 @@ function Config:SetupDB()
 				end
 			end
 			
-			for k, spell in pairs(self.db.profile.spells) do
-				if( type(spell) == "table" ) then
-					if( not spell.cdInside ) then
-						spell.cdInside = "cooldowns"
-					end
-				end
-			end
 		elseif( self.db.profile.version <= 758 ) then
 			for k, anchor in pairs(self.db.profile.anchors) do
 				anchor.maxRows = anchor.maxRows or self.defaults.profile.anchorDefault.maxRows

@@ -148,7 +148,10 @@ local function OnUpdate(self, elapsed)
 		return
 	end
 	
-	if( self.timeLeft > 10 ) then
+	if( self.timeLeft > 60 ) then
+		self.text:SetFormattedText("%dm", self.timeLeft / 60)
+
+	elseif( self.timeLeft > 10 ) then
 		self.text:SetFormattedText("%d", self.timeLeft)
 	else
 		self.text:SetFormattedText("%.1f", self.timeLeft)
