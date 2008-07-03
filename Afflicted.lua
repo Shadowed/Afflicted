@@ -302,7 +302,7 @@ function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceN
 
 	local removed = self[anchor.displayType]:RemoveTimer(spellData.showIn, spellID, sourceGUID)
 	if( removed ) then
-		self:AnnouncceEnd(spellData, anchor, spellID, spellName, sourceName)
+		self:AnnounceEnd(spellData, anchor, spellID, spellName, sourceName)
 	end
 end
 
