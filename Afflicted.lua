@@ -15,21 +15,21 @@ function Afflicted:OnInitialize()
 	if( not self.modules.Config ) then
 		return
 	end
-	
+		
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 	self.modules.Config:SetupDB()
 	
-	-- Setup our visual style
-	self.icon = self.modules.Icons:LoadVisual()
-	self.bar = self.modules.Bars:LoadVisual()
-	
-	-- Debug, something went wrong
-	if( not self.icon or not self.bar ) then
+	-- Something went wrong
+	if( not self.modules.Icons or not self.modules.Bars ) then
 		self:UnregisterAllEvents()
 		return
 	end
 	
+	-- Setup our visual style
+	self.icon = self.modules.Icons:LoadVisual()
+	self.bar = self.modules.Bars:LoadVisual()
+		
 	-- Monitor for zone change
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
@@ -96,18 +96,22 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Enemy gained a debuff
 	if( eventType == "SPELL_AURA_APPLIED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		self:ProcessAbility(eventType .. auraType .. "ENEMY", spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
+		self:ProcessAbility(string.format("%s%sENEMY", eventType, auraType), spellID, spellName, spellSchool, destGUID, destName, destGUID, destName)
 		
 	-- Buff or debuff faded from an enemy
 	elseif( eventType == "SPELL_AURA_REMOVED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		self:ProcessEnd(eventType .. auraType .. "ENEMY", spellID, spellName, destGUID, destName)
+		self:ProcessEnd(string.format("%s%sENEMY", eventType, auraType), spellID, spellName, destGUID, destName)
 
 	-- Spell casted succesfully
 	elseif( eventType == "SPELL_CAST_SUCCESS" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
+		if( self.resetSpells[spellID] ) then
+			self:ProcessReset(spellID, spellName, sourceGUID, sourceName)
+		end
+
 		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
-	
+		
 	-- Check for something being summoned (Pets, totems)
 	elseif( eventType == "SPELL_SUMMON" and isSourceEnemy ) then
 		local spellID, spellName, spellSchool = ...
@@ -120,7 +124,6 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		end
 		
 		objectsSummoned[id] = destGUID
-
 
 		self:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 		
@@ -198,6 +201,18 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 	instanceType = type
 end
 
+--[[
+function start()
+	Afflicted:ProcessAbility("SPELL_CAST_SUCCESS", 26889, "Vanish", 0, UnitGUID("player"), UnitName("player"), "TestGUID", "TestName")
+	Afflicted:ProcessAbility("SPELL_CAST_SUCCESS", 36554, "Shadowstep", 0, UnitGUID("player"), UnitName("player"), "TestGUID", "TestName")
+end
+
+function reset()
+	Afflicted:ProcessReset(14185, "Preparation", UnitGUID("player"), UnitName("player"))
+	Afflicted:ProcessAbility("SPELL_CAST_SUCCESS", 14185, "Preparation", 0, UnitGUID("player"), UnitName("player"), "TestGUID", "TestName")
+end
+]]
+
 -- New ability found
 function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
@@ -220,20 +235,13 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		return
 	end
 	
-	local text, rank, icon = GetSpellInfo(spellID)
-	
-
-	-- If we have no icon, or we're using the question mark one then update the SV with the new one
+	-- No icon listed, use our own
+	local rank, icon = select(2, GetSpellInfo(spellID))
 	if( not spellData.icon or spellData.icon == "" ) then
 		spellData.icon = icon
 
 	end
-	
-	-- Save the spell name if it's a spellID-saved var
-	if( not spellData.text ) then
-		spellData.text = text
-	end
-	
+		
 	-- Start it up
 	self[anchor.displayType]:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 
@@ -258,6 +266,23 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 end
 
+
+-- Resets the spells that are listed under this, for things like Cold Snap or Prep
+function Afflicted:ProcessReset(spellID, spellName, sourceGUID, sourceName)
+	for _, resetID in pairs(self.resetSpells[spellID]) do
+		local spellData = self.db.profile.spells[resetID]
+		if( spellData and not spellData.disabled ) then
+			local name = GetSpellInfo(resetID)
+			
+			local anchor = self.db.profile.anchors[spellData.showIn]
+			if( anchor and anchor.enabled ) then
+				self[anchor.displayType]:RemoveCooldownTimer(resetID, sourceGUID, spellData.cdInside)
+			end
+		end
+	end
+end
+
+
 -- Need to clean this up later
 function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceName)
 	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
@@ -277,20 +302,23 @@ function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceN
 
 	local removed = self[anchor.displayType]:RemoveTimer(spellData.showIn, spellID, sourceGUID)
 	if( removed ) then
-		self:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName)
+		self:AnnouncceEnd(spellData, anchor, spellID, spellName, sourceName)
 	end
 end
 
-
 -- Ability ended due to event, or timers up
 function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName)
+	if( eventType == "TEST" ) then
+		return
+	end
+	
 	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
 	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
 	if( type(spellData) == "number" ) then
 		spellData = self.db.profile.spells[spellData]
 	end
 
-	if( not spellID or not spellData ) then
+	if( not spellData or spellData.disabled ) then
 		return
 	end
 	
@@ -298,9 +326,14 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 	if( not anchor or not anchor.enabled ) then
 		return
 	end
-			
+	
+	self:AnnounceEnd(spellData, anchor, spellID, spellName, sourceName)
+end
+
+-- Alert that the timers over
+function Afflicted:AnnounceEnd(spellData, anchor, spellID, spellName, sourceName)
 	-- Announce it
-	if( anchor.announce and eventType ~= "TEST" ) then
+	if( anchor.announce ) then
 		-- Work out if we should use a custom message, or a default one
 		local msg
 		if( spellData.enableCustom ) then
@@ -319,6 +352,7 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 		self:SendMessage(msg, anchor.announceDest, anchor.announceColor, spellID)
 	end
 end
+
 
 -- Strips server name
 function Afflicted:StripServer(text)
@@ -403,16 +437,4 @@ end
 
 function Afflicted:Print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Afflicted2|r: " .. msg)
-end
-
--- Test function that lets me make sure all the spellID's are correct
-function Afflicted:TestSpells()
-	for spellID, data in pairs(AfflictedSpells) do
-		local name = GetSpellInfo(spellID)
-		if( type(data) == "table" and data.text ) then
-			if( data.text ~= name ) then
-				ChatFrame1:AddMessage(string.format("Bad spell, found [%s] [%d] is actually [%s]", data.text, spellID, name))
-			end
-		end
-	end
 end

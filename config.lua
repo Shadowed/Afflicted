@@ -29,7 +29,7 @@ function Config:SetupDB()
 			showIcons = true,
 			showTarget = false,
 			
-			dispelEnabled = true,
+			dispelEnabled = false,
 			dispelHostile = true,
 			dispelDest = "party",
 			dispelColor = { r = 1, g = 1, b = 1 },
@@ -88,13 +88,28 @@ function Config:SetupDB()
 	self.db.RegisterCallback(self, "OnProfileCopied", "Reload")
 	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
 	
+	self.resetSpells = {}
+	
 	-- Set defaults to have actual values if they're missing
-	for _, spell in pairs(self.defaults.profile.spells) do
-		if( type(spell) == "table" ) then
+	for id, spell in pairs(self.defaults.profile.spells) do
+		if( type(id) == "number" and type(spell) == "table" ) then
 			for k, v in pairs(self.defaults.profile.spellDefault) do
 				if( k ~= "SPELL_CAST_SUCCESS" and spell[k] == nil ) then
 					spell[k] = v
 				end
+			end
+			
+			if( spell.resetOn ) then
+				if( not self.resetSpells[spell.resetOn] ) then
+					self.resetSpells[spell.resetOn] = {}
+				end
+				
+				table.insert(self.resetSpells[spell.resetOn], id)
+			end
+			
+			-- Set spell text if we didn't list it already
+			if( AfflictedSpells[id] and not AfflictedSpells[id].text ) then
+				spell.text = (GetSpellInfo(id))
 			end
 		end
 	end
@@ -245,12 +260,16 @@ local function getMulti(info, value)
 	end
 end
 
-local globalOptions = {["displayType"] = "bar", ["scale"] = 1, ["maxRows"] = 10, ["growUp"] = false}
+local globalOptions = {["displayType"] = "", ["scale"] = 1, ["maxRows"] = 10, ["growUp"] = false}
 local function getGlobalOption(info)
 	return globalOptions[info.arg]
 end
 
 local function setGlobalOption(info, value)
+	if( info.arg == "displayType" and value == "" ) then
+		return
+	end
+	
 	for name, anchor in pairs(Afflicted.db.profile.anchors) do
 		anchor[info.arg] = value
 	end
@@ -904,11 +923,12 @@ local function loadOptions()
 						width = "full",
 						arg = "showTarget",
 					},
+
 					displayType = {
 						order = 3,
 						type = "select",
 						name = L["Display style"],
-						values = displayTypes,
+						values = {[""] = "----", ["bar"] = L["Bars"], ["icon"] = L["Icons"]},
 						get = getGlobalOption,
 						set = setGlobalOption,
 						arg = "displayType",
@@ -1242,7 +1262,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 					
 					local anchor = Afflicted.db.profile.anchors[data.showIn]
 					if( anchor.enabled ) then
-						if( not data.icon and type(spell) == "number" ) then
+						if( ( not data.icon or data.icon == "" ) and type(spell) == "number" ) then
 							data.icon = select(3, GetSpellInfo(spell))
 						end
 						

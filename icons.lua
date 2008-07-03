@@ -4,7 +4,7 @@ local Icons = Afflicted:NewModule("Icons", "AceEvent-3.0")
 
 local ICON_SIZE = 20
 local POSITION_SIZE = ICON_SIZE + 2
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "UnitDied", "ReloadVisual"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "RemoveCooldownTimer", "UnitDied", "ReloadVisual"}
 local savedGroups = {}
 local inactiveIcons = {}
 
@@ -144,7 +144,15 @@ local function OnUpdate(self, elapsed)
 			Afflicted:AbilityEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName)
 		end
 
-		Icons:RemoveTimer(self.type, self.spellID, self.sourceGUID, self.isCooldown)
+		local group = Icons.groups[self.type]
+		for id, row in pairs(group.active) do
+			if( row.id == self.id ) then
+				releaseIcon(group, id)
+				repositionTimers(group)
+				break
+			end
+		end
+			
 		return
 	end
 	
@@ -262,7 +270,7 @@ function Icons:UnitDied(destGUID)
 end
 
 -- Create a new timer
-local function createTimer(showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, icon, seconds, isCooldown)
+local function createTimer(id, showIn, eventType, repeating, spellID, spellName, sourceGUID, sourceName, destGUID, icon, seconds, isCooldown)
 	local group = Icons.groups[showIn]
 	if( not group ) then
 		return
@@ -299,15 +307,17 @@ local function createTimer(showIn, eventType, repeating, spellID, spellName, sou
 end
 
 function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
-	createTimer(spellData.showIn, eventType, spellData.repeating, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
+	local id = string.format("%s:%s:%s", spellID, sourceGUID, destGUID)
+	createTimer(id, spellData.showIn, eventType, spellData.repeating, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
 	
 	if( spellData.cdEnabled and spellData.cooldown > 0 ) then
-		createTimer(spellData.cdInside, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown, true)
+		id = id .. ":CD"
+		createTimer(id, spellData.cdInside, eventType, false, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.cooldown, true)
 	end
 end
 
 -- Remove a specific anchors timer by spellID/sourceGUID
-function Icons:RemoveTimer(anchorName, spellID, sourceGUID, isCooldown)
+function Icons:RemoveTimer(anchorName, spellID, sourceGUID)
 	local group = Icons.groups[anchorName]
 	if( not group ) then
 		return nil
@@ -317,7 +327,35 @@ function Icons:RemoveTimer(anchorName, spellID, sourceGUID, isCooldown)
 	local total = #(group.active)
 	for i=#(group.active), 1, -1 do
 		local row = group.active[i]
-		if( row.spellID == spellID and row.sourceGUID == sourceGUID and ( ( isCooldown and row.isCooldown ) or ( not isCooldown and not row.isCooldown ) ) ) then
+		local sID, guid, _, isCooldown = string.split(":", row.id)
+		if( not isCooldown and guid == sourceGUID and tonumber(sID) == spellID ) then
+			releaseIcon(group, i)
+		end
+	end
+	
+	-- Didn't remove anything, nothing to change
+	if( total == #(group.active) ) then
+		return nil
+	end
+	
+	-- Reposition everything
+	repositionTimers(group)
+	return true
+end
+
+-- Removes a cooldown timer
+function Icons:RemoveCooldownTimer(spellID, sourceGUID, anchorName)
+	local group = Icons.groups[anchorName]
+	if( not group ) then
+		return nil
+	end
+	
+	-- Remove the icon timer
+	local total = #(group.active)
+	for i=#(group.active), 1, -1 do
+		local row = group.active[i]
+		local sID, guid, _, isCooldown = string.split(":", row.id)
+		if( isCooldown and guid == sourceGUID and tonumber(sID) == spellID ) then
 			releaseIcon(group, i)
 		end
 	end

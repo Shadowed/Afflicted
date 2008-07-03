@@ -1,44 +1,115 @@
-local L = AfflictedLocals
 AfflictedSpells = { 
-	-- Tremendous Fortitude
-	[44055] = {
-		text = "Tremendous Fortitude",
-		seconds = 15,
+	--[[ DRUIDS ]]--
+	-- Innervate
+	[29166] = {
+		disabled = true,
+		seconds = 20,
+		cooldown = 360,
 		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Feral Charge
+	[16979] = {
+		seconds = 15,
+		dontFade = true,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	--[[ ROGUES ]]--
+	-- Kick
+	[1766] = 38768,
+	[1767] = 38768,
+	[1768] = 38768,
+	[1769] = 38768,
+	[38768] = {
+		seconds = 10,
+		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Cheat Death
 	[45182] = {
 		disabled = true,
-		text = "Cheating Death",
 		seconds = 3,
 		cooldown = 60,
 		showIn = "buffs",
 		SPELL_AURA_APPLIEDBUFFENEMY = true,
 	},
-	
-	-- Sacrifice (Void Walker)
-	[7812] = 27273,
-	[19438] = 27273,
-	[19440] = 27273,
-	[19441] = 27273,
-	[19442] = 27273,
-	[19443] = 27273,
-	[27273] = {
-		disabled = true,
-		text = "Sacrifice",
-		seconds = 30,
+
+	-- Shadowstep
+	[36554] = {
+		seconds = 3,
+		cdEnabled = true,
+		cooldown = 15,
+		resetOn = 14185,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Cloak of Shadows
+	[31224] = {
+		seconds = 5,
 		showIn = "buffs",
-		SPELL_AURA_APPLIEDBUFFENEMY = true,
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Sprint
+	[2983] = 11305,
+	[8696] = 11305,
+	[11305] = {
+		disabled = true,
+		seconds = 15,
+		cooldown = 240,
+		resetOn = 14185,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- Fel Domination
-	[18708] = {
+	-- Preparation
+	[14185] = {
 		disabled = true,
-		text = "Fel Domination",
+		dontFade = true,
+		seconds = 600,
+		showIn = "cooldowns",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Blind
+	[2094] = {
+		cooldown = 90,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Kidney Shot
+	[408] = 8643,
+	[8643] = {
+		disabled = true,
+		seconds = 20,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Evasion
+	[5277] = 26669,
+	[26669] = {
+		disabled = true,
 		seconds = 15,
-		cooldown = 900,
+		cooldown = 210,
+		resetOn = 14185,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	-- Vanish
+	[1856] = 26889,
+	[1857] = 26889,
+	[26889] = {
+		disabled = true,
+		seconds = 10,
+		cooldown = 210,
+		resetOn = 14185,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -46,7 +117,6 @@ AfflictedSpells = {
 	-- Blade Flurry
 	[13877] = {
 		disabled = true,
-		text = "Blade Flurry",
 		seconds = 15,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -55,164 +125,15 @@ AfflictedSpells = {
 	-- Adrenaline Rush
 	[13750] = {
 		disabled = true,
-		text = "Adrenaline Rush",
 		seconds = 15,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-
-	-- Devour Magic
-	[19505] = 27277,
-	[19731] = 27277,
-	[19734] = 27277,
-	[19736] = 27277,
-	[27276] = 27277,
-	[27277] = {
-		disabled = true,
-		dontFade = true,
-		text = "Devour Magic",
-		seconds = 8,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Heroism
-	[32182] = {
-		disabled = true,
-		dontFade = true,
-		text = "Heroism",
-		seconds = 40,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Bloodlust
-	[2825] = {
-		disabled = true,
-		dontFade = true,
-		text = "Bloodlust",
-		seconds = 40,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Perception
-	[20600] = {
-		disabled = true,
-		text = "Perception",
-		seconds = 20,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Water Elemental
-	[31687] = {
-		text = "Summon Water Elemental",
-		seconds = 45,
-		showIn = "cooldowns",
-		SPELL_SUMMON = true,
-	},
-
-	-- Scare Beast
-	[1513] = 14327,
-	[14326] = 14327,
-	[14327] = {
-		disabled = true,
-		text = "Scare Beast",
-		seconds = 30,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Scatter Shot
-	[19503] = {
-		text = "Scatter Shot",
-		seconds = 30,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Bestial Wrath
-	[19574] = {
-		text = "Bestial Wrath",
-		seconds = 18,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Freeze (Water Elemental)
-	[33395] = {
-		disabled = true,
-		text = "Freeze",
-		seconds = 25,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Blink
-	[1953] = {
-		text = "Blink",
-		seconds = 15,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Frost Nova
-	[122] = 27088,
-	[865] = 27088,
-	[6131] = 27088,
-	[10230] = 27088,
-	[27088] = {
-		disabled = true,
-		text = "Frost Nova",
-		seconds = 21,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
 	
-	-- Disarm
-	[676] = {
-		disabled = true,
-		text = "Disarm",
-		seconds = 10,
-		cooldown = 60,
-		cdEnabled = true,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-
-	-- Intervene
-	[3411] = {
-		disabled = true,
-		text = "Intervene",
-		seconds = 30,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Intimidating Shout
-	[5246] = {
-		disabled = true,
-		text = "Intimidating Shout",
-		seconds = 180,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Fear Ward
-	[6346] = {
-		disabled = true,
-		text = "Fear Ward",
-		seconds = 180,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
+	--[[ PALADINS ]]--
 	-- Repentance
 	[20066] = {
 		disabled = true,
-		text = "Repentance",
 		seconds = 60,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -224,7 +145,6 @@ AfflictedSpells = {
 	[5589] = 10308,
 	[10308] = {
 		disabled = true,
-		text = "Hammer of Justice",
 		seconds = 45,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -233,104 +153,15 @@ AfflictedSpells = {
 	-- Divine Shield
 	[642] = 1020,
 	[1020] = {
-		text = "Divine Shield",
 		seconds = 12,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Kidney Shot
-	[408] = 8643,
-	[8643] = {
-		disabled = true,
-		text = "Kidney Shot",
-		disabled = true,
-		seconds = 20,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Psychic Scream
-	[8122] = 10890,
-	[8124] = 10890,
-	[10888] = 10890,
-	[10890] = {
-		text = "Psychic Scream",
-		disabled = true,
-		seconds = 24,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Power Infusion
-	[10060] = {
-		text = "Power Infusion",
-		seconds = 15,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Evasion
-	[5277] = 26669,
-	[26669] = {
-		text = "Evasion",
-		seconds = 15,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Icy Veins
-	[12472] = {
-		text = "Icy Veins",
-		seconds = 20,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Berserker Rage
-	[18499] = {
-		disabled = true,
-		text = "Berserker Rage",
-		seconds = 10,
-		cooldown = 30,
-		cdEnabled = true,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Viper sting
-	[3034] = 27018,
-	[14279] = 27018,
-	[14280] = 27018,
-	[27018] = {
-		text = "Viper Sting",
-		seconds = 15,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	
-	-- Ice Block
-	[45438] = {
-		text = "Ice Block",
-		seconds = 10,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Hypothermia
-	[41425] = {
-		text = "Hypothermia",
-		seconds = 30,
-		showIn = "buffs",
-		SPELL_AURA_APPLIEDDEBUFFENEMY = true,
 	},
 	
 	-- Blessing of Protection
 	[1022] = 10278,
 	[5599] = 10278,
 	[10278] = {
-		text = "Blessing of Protection",
 		seconds = 10,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -338,7 +169,6 @@ AfflictedSpells = {
 	
 	-- Blessing of Freedom
 	[1044] = {
-		text = "Blessing of Freedom",
 		seconds = 14,
 		cooldown = 25,
 		cdEnabled = true,
@@ -351,116 +181,154 @@ AfflictedSpells = {
 	[20729] = 27148,
 	[27147] = 27148,
 	[27148] = {
-		text = "Blessing of Sacrifice",
 		seconds = 30,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
+	
+	--[[ HUNTERS ]]--
+	-- Viper sting
+	[3034] = 27018,
+	[14279] = 27018,
+	[14280] = 27018,
+	[27018] = {
+		dontFade = true,
+		seconds = 15,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Scare Beast
+	[1513] = 14327,
+	[14326] = 14327,
+	[14327] = {
+		dontFade = true,
+		disabled = true,
+		seconds = 30,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Scatter Shot
+	[19503] = {
+		dontFade = true,
+		seconds = 30,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Bestial Wrath
+	[19574] = {
+		seconds = 18,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	
+	-- Silencing Shot
+	[34490] = {
+		seconds = 20,
+		dontFade = true,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Explosive Trap
+	[13813] = 34600,
+	[14316] = 34600,
+	[14317] = 34600,
+	[27025] = 34600,
+	
+	-- Freezing Trap
+	[1499] = 34600,
+	[14310] = 34600,
+	[14311] = 34600,
+	
+	-- Frost Trap
+	[13809] = 34600,
+	
+	-- Immolation Trap
+	[13795] = 34600,
+	[14302] = 34600,
+	[14303] = 34600,
+	[14304] = 34600,
+	[14305] = 34600,
+	[27023] = 34600,
+	
+	-- Snake Trap
+	[34600] = {
+		disabled = true,
+		text = "Traps",
+		seconds = 60,
+		cooldown = 30,
+		dontFade = true,
+		showIn = "spells",
+		icon = "Interface\\Icons\\Spell_Frost_ChainsOfIce",
+		SPELL_CREATE = true,
+	},
+	
+	--[[ PRIESTS ]]--
+	-- Fear Ward
+	[6346] = {
+		disabled = true,
+		dontFade = true,
+		seconds = 180,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+		
+	-- Psychic Scream
+	[8122] = 10890,
+	[8124] = 10890,
+	[10888] = 10890,
+	[10890] = {
+		disabled = true,
+		seconds = 24,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Power Infusion
+	[10060] = {
+		seconds = 15,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 
 	-- Pain Suppression
 	[33206] = {
-		text = "Pain Suppression",
 		seconds = 8,
 		cdEnabled = true,
 		cooldown = 120,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-	
-	-- Cloak of Shadows
-	[31224] = {
-		text = "Cloak of Shadows",
-		seconds = 5,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Spell reflection
-	[23920] = {
-		text = "Spell Reflection",
-		seconds = 5,
-		cooldown = 10,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Hunter Silence
-	[34490] = {
-		text = "Silencing Shot",
-		seconds = 20,
-		dontFade = true,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Priest Silence
+			
+	-- Silence
 	[15487] = {
-		text = "Silence",
 		seconds = 45,
 		dontFade = true,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
-
-	-- Feral Charge
-	[16979] = {
-		text = "Feral Charge",
-		seconds = 15,
-		dontFade = true,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Shadowstep
-	[36554] = {
-		text = "Shadowstep",
-		seconds = 3,
-		cdEnabled = true,
-		cooldown = 15,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Intercept
-	[20252] = 25275,
-	[20616] = 25275,
-	[20617] = 25275,
-	[25272] = 25275,
-	[25275] = {
-		text = "Intercept",
-		seconds = 15,
-		dontFade = true,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Spell lock
-	[19244] = 19647,
-	[19647] = {
-		text = "Spell Lock",
-		seconds = 24,
-		dontFade = true,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Counterspell
-	[2139] = {
-		text = "Counterspell",
-		seconds = 24,
-		dontFade = true,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Kick
-	[1766] = 38768,
-	[1767] = 38768,
-	[1768] = 38768,
-	[1769] = 38768,
-	[38768] = {
-		text = "Kick",
+		
+	--[[ WARRIORS ]]--
+	-- Berserker Rage
+	[18499] = {
+		disabled = true,
 		seconds = 10,
+		cooldown = 30,
+		cdEnabled = true,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Death Wish
+	[12292] = {
+		disabled = true,
+		seconds = 30,
+		cooldown = 180,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -468,7 +336,6 @@ AfflictedSpells = {
 	-- Pummel
 	[6552] = 6554,
 	[6554] = {
-		text = "Pummel",
 		seconds = 10,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -479,16 +346,127 @@ AfflictedSpells = {
 	[1671] = 29704,
 	[1672] = 29704,
 	[29704] = {
-		text = "Shield Bash",
 		seconds = 12,
 		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Intercept
+	[20252] = 25275,
+	[20616] = 25275,
+	[20617] = 25275,
+	[25272] = 25275,
+	[25275] = {
+		seconds = 15,
+		dontFade = true,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Spell Reflection
+	[23920] = {
+		disabled = true,
+		seconds = 5,
+		cooldown = 10,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Disarm
+	[676] = {
+		disabled = true,
+		seconds = 10,
+		cooldown = 60,
+		cdEnabled = true,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Intervene
+	[3411] = {
+		disabled = true,
+		seconds = 30,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Intimidating Shout
+	[5246] = {
+		disabled = true,
+		seconds = 180,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	--[[ WARLOCKS ]]--
+	-- Spell lock
+	[19244] = 19647,
+	[19647] = {
+		dontFade = true,
+		seconds = 24,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Sacrifice (Void Walker)
+	[7812] = 27273,
+	[19438] = 27273,
+	[19440] = 27273,
+	[19441] = 27273,
+	[19442] = 27273,
+	[19443] = 27273,
+	[27273] = {
+		disabled = true,
+		seconds = 30,
+		showIn = "buffs",
+		SPELL_AURA_APPLIEDBUFFENEMY = true,
+	},
+	
+	-- Fel Domination
+	[18708] = {
+		disabled = true,
+		seconds = 15,
+		cooldown = 900,
+		showIn = "buffs",
+		SPELL_AURA_APPLIEDBUFFENEMY = true,
+	},
+	
+	-- Devour Magic
+	[19505] = 27277,
+	[19731] = 27277,
+	[19734] = 27277,
+	[19736] = 27277,
+	[27276] = 27277,
+	[27277] = {
+		disabled = true,
+		dontFade = true,
+		seconds = 8,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	--[[ SHAMANS ]]--
+	-- Heroism
+	[32182] = {
+		disabled = true,
+		dontFade = true,
+		seconds = 40,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Bloodlust
+	[2825] = {
+		disabled = true,
+		dontFade = true,
+		seconds = 40,
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Grounding Totem
 	[8177] = {
 		disabled = true,
-		text = "Grounding Totem",
 		seconds = 45,
 		cooldown = 15,
 		showIn = "totems",
@@ -499,53 +477,7 @@ AfflictedSpells = {
 	[8143] = {
 		disabled = true,
 		repeating = true,
-		text = "Tremor Totem",
 		seconds = 3,
-		showIn = "totems",
-		SPELL_SUMMON = true,
-	},
-	
-	-- Fire Nova Totem
-	[1535] = 25547,
-	[8498] = 25547,
-	[8499] = 25547,
-	[11314] = 25547,
-	[11315] = 25547,
-	[25546] = 25547,
-	[25547] = {
-		disabled = true,
-		text = "Fire Nova Totem",
-		seconds = 5,
-		showIn = "totems",
-		SPELL_SUMMON = true,
-	},
-	
-	-- Magma Totem
-	[8190] = 25552,
-	[10585] = 25552,
-	[10586] = 25552,
-	[10587] = 25552, 
-	[25552] = {
-		disabled = true,
-		repeating = true,
-		text = "Magma Totem",
-		seconds = 2,
-		showIn = "totems",
-		SPELL_SUMMON = true,
-	},
-	
-	-- Searing Totem
-	[3599] = 25533,
-	[6363] = 25533,
-	[6364] = 25533,
-	[6365] = 25533,
-	[10437] = 25533,
-	[10438] = 25533,
-	[25533] = {
-		disabled = true,
-		repeating = true,
-		text = "Searing Totem",
-		seconds = 2,
 		showIn = "totems",
 		SPELL_SUMMON = true,
 	},
@@ -553,7 +485,6 @@ AfflictedSpells = {
 	-- Mana Tide Totem
 	[16190] = {
 		disabled = true,
-		text = "Mana Tide Totem",
 		seconds = 12,
 		showIn = "totems",
 		SPELL_SUMMON = true,
@@ -591,39 +522,127 @@ AfflictedSpells = {
 		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
 		SPELL_CAST_SUCCESS = true,
 	},
-
-	-- Explosive Trap
-	[13813] = 34600,
-	[14316] = 34600,
-	[14317] = 34600,
-	[27025] = 34600,
 	
-	-- Freezing Trap
-	[1499] = 34600,
-	[14310] = 34600,
-	[14311] = 34600,
-	
-	-- Frost Trap
-	[13809] = 34600,
-	
-	-- Immolation Trap
-	[13795] = 34600,
-	[14302] = 34600,
-	[14303] = 34600,
-	[14304] = 34600,
-	[14305] = 34600,
-	[27023] = 34600,
-	
-	-- Snake Trap
-	[34600] = {
-		disabled = true,
-		text = "Traps",
-		seconds = 60,
-		cdEnabled = true,
-		cooldown = 30,
+	--[[ MAGES ]]--
+	-- Counterspell
+	[2139] = {
 		dontFade = true,
+		seconds = 24,
 		showIn = "spells",
-		icon = "Interface\\Icons\\Spell_Frost_ChainsOfIce",
-		SPELL_CREATE = true,
-	}
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Ice Block
+	[45438] = {
+		seconds = 10,
+		cooldown = 240,
+		resetOn = 11958,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Cold Snap
+	[11958] = {
+		disabled = true,
+		dontFade = true,
+		seconds = 480,
+		showIn = "cooldowns",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Hypothermia
+	[41425] = {
+		disabled = true,
+		seconds = 30,
+		showIn = "buffs",
+		SPELL_AURA_APPLIEDDEBUFFENEMY = true,
+	},
+	
+	-- Water Elemental
+	[31687] = {
+		disabled = true,
+		seconds = 45,
+		resetOn = 11958,
+		showIn = "cooldowns",
+		SPELL_SUMMON = true,
+	},
+
+	-- Freeze (Water Elemental)
+	[33395] = {
+		disabled = true,
+		seconds = 25,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Blink
+	[1953] = {
+		seconds = 15,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Frost Nova
+	[122] = 27088,
+	[865] = 27088,
+	[6131] = 27088,
+	[10230] = 27088,
+	[27088] = {
+		disabled = true,
+		seconds = 21,
+		resetOn = 11958,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Icy Veins
+	[12472] = {
+		seconds = 20,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	
+	--[[ RACIALS ]]--
+	-- Perception
+	[20600] = {
+		disabled = true,
+		seconds = 20,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Escape Artist
+	[20589] = {
+		disabled = true,
+		seconds = 105,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	--[[ TRINKETS ]]--
+	-- Tremendous Fortitude
+	[44055] = {
+		seconds = 15,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Berserker's Call
+	[43716] = {
+		disabled = true,
+		seconds = 20,
+		cooldown = 120,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Bloodlust Brooch
+	[35166] = {
+		disabled = true,
+		seconds = 20,
+		cooldown = 120,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
 }

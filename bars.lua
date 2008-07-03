@@ -1,7 +1,7 @@
 if( not Afflicted ) then return end
 
 local Bars = Afflicted:NewModule("Bars", "AceEvent-3.0")
-local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "ReloadVisual", "UnitDied"}
+local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimer", "RemoveCooldownTimer", "ReloadVisual", "UnitDied"}
 local SML, GTBLib
 local barData = {}
 local nameToType = {}
@@ -131,9 +131,11 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 			return
 		end
 
-		local id = id .. ",CD"
+		local id = id .. ":CD"
 		local cd = ""
 		local text
+		
+		barData[id] = true
 		
 		-- If the timer is being redirected to another anchor, show the CD text
 		if( Afflicted.db.profile.anchors[spellData.cdInside].redirectTo ~= "" ) then
@@ -154,7 +156,7 @@ end
 
 -- Bar timer ran out
 function Bars:OnBarFade(barID)
-	if( barID and barData[barID] ) then
+	if( type(barData[barID]) == "string" ) then
 		local eventType, spellID, spellName, sourceGUID, sourceName = string.split(",", barData[barID])
 		Afflicted:AbilityEnded(eventType, tonumber(spellID), spellName, sourceGUID, sourceName)
 
@@ -169,8 +171,28 @@ function Bars:RemoveTimer(anchorName, spellID, sourceGUID)
 	if( not group ) then
 		return nil
 	end
+	
+	for id in pairs(barData) do
+		local sID, guid, _, isCooldown = string.split(":", id)
+		if( guid == sourceGUID and tonumber(sID) == spellID and not isCooldown ) then
+			return group:UnregisterBar(id)
+		end
+	end
+end
 
-	return group:UnregisterBar(spellID .. ":" .. sourceGUID)
+-- Removes a cooldown timer
+function Bars:RemoveCooldownTimer(spellID, sourceGUID, anchorName)
+	local group = Bars.groups[anchorName]
+	if( not group ) then
+		return nil
+	end
+	
+	for id, groupName in pairs(barData) do
+ 		local sID, guid, _, isCooldown = string.split(":", id)
+		if( guid == sourceGUID and tonumber(sID) == spellID and isCooldown ) then
+			return group:UnregisterBar(id)
+		end
+	end	
 end
 
 function Bars:ReloadVisual()
