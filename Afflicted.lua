@@ -67,12 +67,7 @@ end
 
 function Afflicted:Reload()
 	self:OnDisable()
-
-	-- Check to see if we should enable it
-	local type = select(2, IsInInstance())
-	if( self.db.profile.inside[type] ) then
-		self:OnEnable()
-	end
+	self:OnEnable()
 	
 	self.icon:ReloadVisual()
 	self.bar:ReloadVisual()
@@ -236,7 +231,7 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 	
 	-- No icon listed, use our own
-	local rank, icon = select(2, GetSpellInfo(spellID))
+	local icon = select(3, GetSpellInfo(spellID))
 	if( not spellData.icon or spellData.icon == "" ) then
 		spellData.icon = icon
 
@@ -246,24 +241,22 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	self[anchor.displayType]:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 
 	-- Announce it
-	if( anchor.announce ) then
-		-- Work out if we should use a custom message, or a default one
-		local msg
-		if( spellData.enableCustom ) then
-			msg = spellData.triggeredMessage
-		else
-			msg = anchor.usedMessage
-		end	
-		
-		if( not msg or msg == "" ) then
-			return
-		end
-		
-		msg = string.gsub(msg, "*spell", spellName)
-		msg = string.gsub(msg, "*target", self:StripServer(sourceName))
-		
-		self:SendMessage(msg, anchor.announceDest, anchor.announceColor, spellID)
+	-- Work out if we should use a custom message, or a default one
+	local msg
+	if( spellData.enableCustom ) then
+		msg = spellData.triggeredMessage
+	elseif( anchor.announce ) then
+		msg = anchor.usedMessage
+	end	
+
+	if( not msg or msg == "" ) then
+		return
 	end
+
+	msg = string.gsub(msg, "*spell", spellName)
+	msg = string.gsub(msg, "*target", self:StripServer(sourceName))
+
+	self:SendMessage(msg, anchor.announceDest, anchor.announceColor, spellID)
 end
 
 
@@ -333,24 +326,23 @@ end
 -- Alert that the timers over
 function Afflicted:AnnounceEnd(spellData, anchor, spellID, spellName, sourceName)
 	-- Announce it
-	if( anchor.announce ) then
-		-- Work out if we should use a custom message, or a default one
-		local msg
-		if( spellData.enableCustom ) then
-			msg = spellData.fadedMessage
-		else
-			msg = anchor.fadeMessage
-		end
 
-		if( not msg or msg == "" ) then
-			return
-		end
-		
-		msg = string.gsub(msg, "*spell", spellName)
-		msg = string.gsub(msg, "*target", self:StripServer(sourceName))
-		
-		self:SendMessage(msg, anchor.announceDest, anchor.announceColor, spellID)
+	-- Work out if we should use a custom message, or a default one
+	local msg
+	if( spellData.enableCustom ) then
+		msg = spellData.fadedMessage
+	elseif( anchor.announce ) then
+		msg = anchor.fadeMessage
 	end
+
+	if( not msg or msg == "" ) then
+		return
+	end
+
+	msg = string.gsub(msg, "*spell", spellName)
+	msg = string.gsub(msg, "*target", self:StripServer(sourceName))
+
+	self:SendMessage(msg, anchor.announceDest, anchor.announceColor, spellID)
 end
 
 

@@ -11,8 +11,27 @@ AfflictedSpells = {
 
 	-- Feral Charge
 	[16979] = {
-		seconds = 15,
 		dontFade = true,
+		seconds = 15,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Bash
+	[5211] = 8983,
+	[6798] = 8983,
+	[8983] = {
+		disabled = true,
+		dontFade = true,
+		seconds = 60,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Maim
+	[22570] = {
+		dontFade = true,
+		seconds = 10,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -54,14 +73,14 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-
+	
 	-- Sprint
 	[2983] = 11305,
 	[8696] = 11305,
 	[11305] = {
 		disabled = true,
 		seconds = 15,
-		cooldown = 240,
+		cooldown = 210,
 		resetOn = 14185,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -87,6 +106,7 @@ AfflictedSpells = {
 	[408] = 8643,
 	[8643] = {
 		disabled = true,
+		dontFade = true,
 		seconds = 20,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -134,6 +154,7 @@ AfflictedSpells = {
 	-- Repentance
 	[20066] = {
 		disabled = true,
+		dontFade = true,
 		seconds = 60,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -145,6 +166,7 @@ AfflictedSpells = {
 	[5589] = 10308,
 	[10308] = {
 		disabled = true,
+		dontFade = true,
 		seconds = 45,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -163,6 +185,7 @@ AfflictedSpells = {
 	[5599] = 10278,
 	[10278] = {
 		seconds = 10,
+		cooldown = 180,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -227,8 +250,8 @@ AfflictedSpells = {
 	
 	-- Silencing Shot
 	[34490] = {
-		seconds = 20,
 		dontFade = true,
+		seconds = 20,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -259,6 +282,7 @@ AfflictedSpells = {
 	[34600] = {
 		disabled = true,
 		text = "Traps",
+		resetOn = 23989,
 		seconds = 60,
 		cooldown = 30,
 		dontFade = true,
@@ -268,6 +292,16 @@ AfflictedSpells = {
 	},
 	
 	--[[ PRIESTS ]]--
+	-- Shadow Word: Death
+	[32379] = 32996,
+	[32996] = {
+		disabled = true,
+		dontFade = true,
+		seconds = 12,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Fear Ward
 	[6346] = {
 		disabled = true,
@@ -283,7 +317,7 @@ AfflictedSpells = {
 	[10888] = 10890,
 	[10890] = {
 		disabled = true,
-		seconds = 24,
+		seconds = 23,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -341,7 +375,7 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- Shield bash
+	-- Shield Bash
 	[72] = 29704,
 	[1671] = 29704,
 	[1672] = 29704,
@@ -384,6 +418,7 @@ AfflictedSpells = {
 
 	-- Intervene
 	[3411] = {
+		dontFade = true,
 		disabled = true,
 		seconds = 30,
 		showIn = "spells",
@@ -589,7 +624,7 @@ AfflictedSpells = {
 	[10230] = 27088,
 	[27088] = {
 		disabled = true,
-		seconds = 21,
+		cooldown = 21,
 		resetOn = 11958,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -598,6 +633,8 @@ AfflictedSpells = {
 	-- Icy Veins
 	[12472] = {
 		seconds = 20,
+		resetOn = 11958,
+		cooldown = 180,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -624,6 +661,7 @@ AfflictedSpells = {
 	-- Tremendous Fortitude
 	[44055] = {
 		seconds = 15,
+		cooldown = 180,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -643,6 +681,34 @@ AfflictedSpells = {
 		seconds = 20,
 		cooldown = 120,
 		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- The Skull of Gul'dan
+	[40396] = {
+		disabled = true,
+		seconds = 20,
+		cooldown = 120,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	--[[ ENGINEERING BULLSHIT ]]--
+	-- Rocket Boots
+	[30452] = {
+		disabled = true,
+		seconds = 3,
+		cooldown = 300,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Nigh Invulnerability Belt
+	[30458] = {
+		disabled = true,
+		seconds = 8,
+		cooldown = 300,
+		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 }
