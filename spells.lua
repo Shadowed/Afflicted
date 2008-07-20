@@ -692,6 +692,15 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
+
+	-- Figurine - Shadowsong Panther
+	[46784] = {
+		disabled = true,
+		seconds = 15,
+		cooldown = 90,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
 	
 	--[[ ENGINEERING BULLSHIT ]]--
 	-- Rocket Boots

@@ -543,22 +543,39 @@ function Config:GetAnchors()
 end
 
 local function getSpellInfo(info)
-	local var = string.match(info.arg, "spells%.(.+)%.disabled")
-	if( not var ) then
-		var = string.match(info.arg, "disabledSpells%..+%.(.+)")
+	local spellID = string.match(info.arg, "spells%.(.+)%.disabled")
+	if( tonumber(spellID) ) then
+		spellID = tonumber(spellID)
 	end
 	
-	if( tonumber(var) ) then
-		var = tonumber(var)
-	end
-	
-	local data = Afflicted.db.profile.spells[var]
+	local data = Afflicted.db.profile.spells[spellID]
 	local anchorName = data.showIn
 	if( Afflicted.db.profile.anchors[anchorName] ) then
 		anchorName = Afflicted.db.profile.anchors[anchorName].text
 	end
 	
 	return string.format(L["%s\nAnchor: %s\nDuration: %d\nCooldown: %d (%s)"], data.disabled and ( RED_FONT_COLOR_CODE .. L["Timer disabled"] .. FONT_COLOR_CODE_CLOSE ) or ( GREEN_FONT_COLOR_CODE .. L["Timer enabled"] .. FONT_COLOR_CODE_CLOSE ), anchorName or L["None"], data.seconds or 0, data.cooldown or 0, data.cdEnabled and L["Enabled"] or L["Disabled"])
+end
+
+local function getArenaSpellInfo(info)
+	local bracket, spellID = string.match(info.arg, "disabledSpells%.(.+)%.(.+)")
+	bracket = tonumber(bracket)
+	
+	if( tonumber(spellID) ) then
+		spellID = tonumber(spellID)
+	end
+	
+	local data = Afflicted.db.profile.spells[spellID]
+	if( type(data) == "number" ) then
+		data = Afflicted.db.profile.spells[data]
+	end
+	
+	local anchorName = data.showIn
+	if( Afflicted.db.profile.anchors[anchorName] ) then
+		anchorName = Afflicted.db.profile.anchors[anchorName].text
+	end
+	
+	return string.format(L["%s in %dvs%d\nAnchor: %s\nDuration: %d\nCooldown: %d (%s)"], Afflicted.db.profile.disabledSpells[bracket][spellID] and ( RED_FONT_COLOR_CODE .. L["Timer disabled"] .. FONT_COLOR_CODE_CLOSE ) or ( GREEN_FONT_COLOR_CODE .. L["Timer enabled"] .. FONT_COLOR_CODE_CLOSE ), bracket, bracket, anchorName or L["None"], data.seconds or 0, data.cooldown or 0, data.cdEnabled and L["Enabled"] or L["Disabled"])
 end
 
 -- Quick wrappers, flips the check boxes so we can use it as checked = enabled, unchecked = disabled
@@ -820,7 +837,7 @@ function Config:GetArenaSpellList(bracket)
 	local options = {
 		desc = {
 			order = 0,
-			name = L["Spells that should be DISABLED for this specific arena bracket."],
+			name = L["Spells that should be DISABLED for this specific arena bracket.\nThis means do not check everything and then complain that it's broken."],
 			type = "description",
 			width = "full",
 		},
@@ -852,7 +869,7 @@ function Config:GetArenaSpellList(bracket)
 				order  = i,
 				type = "toggle",
 				name = text,
-				desc = getSpellInfo,
+				desc = getArenaSpellInfo,
 				arg = "disabledSpells." .. bracket .. "." .. id
 			}
 		end
