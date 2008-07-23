@@ -1,4 +1,65 @@
 AfflictedSpells = { 
+	-- DEATH KNIGHTS ]]--
+	--[[
+	-- Strangulate
+	[47476] = 49916,
+	[49913] = 49916,
+	[49914] = 49916,
+	[49915] = 49916,
+	[49916] = {
+		dontFade = true,
+		cooldown = 30,
+		type = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Death Pact
+	[48743] = {
+		disabled = true,
+		cooldown = 120,
+		type = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Anti-Magic Shell
+	[48707] = {
+		disabled = true,
+		seconds = 3,
+		cooldown = 15,
+		cdEnabled = true,
+		type = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Lichborne
+	[49039] = {
+		disabled = true,
+		seconds = 30,
+		cooldown = 300,
+		type = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Mind Freeze
+	[47528] = 49912,
+	[49910] = 49912,
+	[49911] = 49912,
+	[49912] = {
+		dontFade = true,
+		cooldown = 10,
+		type = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Icebound Fortitude
+	[48792] = {
+		seconds = 12,
+		cooldown = 60,
+		type = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
 	--[[ DRUIDS ]]--
 	-- Innervate
 	[29166] = {
@@ -8,14 +69,46 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-
+	
+	-- Swiftmend
+	[18562] = {
+		disabled = true,
+		cooldown = 13,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true
+	},
+	
 	-- Feral Charge
 	[16979] = {
 		dontFade = true,
+		cooldown = 15,
+		cdEnabled = true,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- [WOTLK] Berserk
+	--[[
+	[50334] = {
 		seconds = 15,
+		cooldown = 300,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
+	-- [WOTLK] Feral Charge (Cat)
+	--[[
+	[49376] = {
+		dontFade = true,
+		cooldown = 30,
+		cdEnabled = true,
+		cdInside = "spells",
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
+	]]
+	
 	
 	-- Bash
 	[5211] = 8983,
@@ -23,16 +116,18 @@ AfflictedSpells = {
 	[8983] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 60,
-		showIn = "spells",
+		cooldown = 60,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Maim
+	[49802] = 22570,
 	[22570] = {
+		disabled = true,
 		dontFade = true,
-		seconds = 10,
-		showIn = "spells",
+		cooldown = 10,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -43,8 +138,9 @@ AfflictedSpells = {
 	[1768] = 38768,
 	[1769] = 38768,
 	[38768] = {
-		seconds = 10,
-		showIn = "spells",
+		cooldown = 10,
+		cdEnabled = true,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -60,16 +156,17 @@ AfflictedSpells = {
 	-- Shadowstep
 	[36554] = {
 		seconds = 3,
-		cdEnabled = true,
 		cooldown = 30,
 		resetOn = 14185,
 		showIn = "spells",
+		cdEnabled = true,
 		SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Cloak of Shadows
 	[31224] = {
 		seconds = 5,
+		cooldown = 60,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -90,8 +187,7 @@ AfflictedSpells = {
 	[14185] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 600,
-		showIn = "cooldowns",
+		cooldown = 600,
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -107,8 +203,8 @@ AfflictedSpells = {
 	[8643] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 20,
-		showIn = "spells",
+		cooldown = 20,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -138,6 +234,7 @@ AfflictedSpells = {
 	[13877] = {
 		disabled = true,
 		seconds = 15,
+		cooldown = 120,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -146,17 +243,28 @@ AfflictedSpells = {
 	[13750] = {
 		disabled = true,
 		seconds = 15,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
+	
+	-- [WOTLK] Dismantle
+	--[[
+	[51722] = {
+		disabled = true,
+		cooldown = 60,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
 	
 	--[[ PALADINS ]]--
 	-- Repentance
 	[20066] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 60,
-		showIn = "spells",
+		cooldown = 60,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -167,8 +275,8 @@ AfflictedSpells = {
 	[10308] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 45,
-		showIn = "spells",
+		cooldown = 45,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -176,6 +284,7 @@ AfflictedSpells = {
 	[642] = 1020,
 	[1020] = {
 		seconds = 12,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -190,6 +299,29 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
+	-- [[WOTLK] Hand of Protection
+	--[[
+	[1022] = {
+		seconds = 6,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	[5599] = {
+		seconds = 8,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	[10278] = {
+		seconds = 10,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
+	
 	-- Blessing of Freedom
 	[1044] = {
 		seconds = 14,
@@ -198,6 +330,17 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
+	
+	-- [WOTLK] Hand of Freedom
+	--[[
+	[1044] = {
+		seconds = 14,
+		cooldown = 25,
+		cdEnabled = true,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
 	
 	-- Blessing of Sacrifice
 	[6940] = 27148,
@@ -209,15 +352,26 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
+	-- [WOTLK] Hand of Sacrifice
+	--[[
+	[6940] = {
+		seconds = 12,
+		cooldown = 120,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
 	--[[ HUNTERS ]]--
 	-- Viper sting
 	[3034] = 27018,
 	[14279] = 27018,
 	[14280] = 27018,
+	[49008] = 27018,
 	[27018] = {
 		dontFade = true,
-		seconds = 15,
-		showIn = "spells",
+		cooldown = 15,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -235,15 +389,17 @@ AfflictedSpells = {
 	-- Scatter Shot
 	[19503] = {
 		dontFade = true,
-		seconds = 30,
-		showIn = "spells",
+		cooldown = 30,
+		cdEnabled = true,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Bestial Wrath
 	[19574] = {
-		seconds = 18,
-		showIn = "buffs",
+		cooldown = 18,
+		cdEnabled = true,
+		cdInside = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -251,8 +407,8 @@ AfflictedSpells = {
 	-- Silencing Shot
 	[34490] = {
 		dontFade = true,
-		seconds = 20,
-		showIn = "spells",
+		cooldown = 20,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -261,6 +417,8 @@ AfflictedSpells = {
 	[14316] = 34600,
 	[14317] = 34600,
 	[27025] = 34600,
+	[49066] = 34600,
+	[49067] = 34600,
 	
 	-- Freezing Trap
 	[1499] = 34600,
@@ -277,6 +435,8 @@ AfflictedSpells = {
 	[14304] = 34600,
 	[14305] = 34600,
 	[27023] = 34600,
+	[49055] = 34600,
+	[49056] = 34600,
 	
 	-- Snake Trap
 	[34600] = {
@@ -294,11 +454,13 @@ AfflictedSpells = {
 	--[[ PRIESTS ]]--
 	-- Shadow Word: Death
 	[32379] = 32996,
+	[48157] = 32996,
+	[48158] = 32996,
 	[32996] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 12,
-		showIn = "spells",
+		cooldown = 12,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -306,8 +468,8 @@ AfflictedSpells = {
 	[6346] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 180,
-		showIn = "spells",
+		cooldown = 180,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 		
@@ -317,14 +479,15 @@ AfflictedSpells = {
 	[10888] = 10890,
 	[10890] = {
 		disabled = true,
-		seconds = 23,
-		showIn = "spells",
+		cooldown = 23,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Power Infusion
 	[10060] = {
 		seconds = 15,
+		cooldown = 120,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -341,12 +504,33 @@ AfflictedSpells = {
 			
 	-- Silence
 	[15487] = {
-		seconds = 45,
 		dontFade = true,
-		showIn = "spells",
+		cooldown = 45,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
-		
+	
+	-- [WOTLK] Guardian Spirit
+	--[[
+	[47788] = {
+		seconds = 10,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
+	-- [WOTLK] Dispersion
+	--[[
+	[47585] = {
+		seconds = 6,
+		cooldown = 300,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
+	
 	--[[ WARRIORS ]]--
 	-- Berserker Rage
 	[18499] = {
@@ -370,8 +554,9 @@ AfflictedSpells = {
 	-- Pummel
 	[6552] = 6554,
 	[6554] = {
-		seconds = 10,
-		showIn = "spells",
+		cooldown = 10,
+		cdEnabled = true,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -380,8 +565,9 @@ AfflictedSpells = {
 	[1671] = 29704,
 	[1672] = 29704,
 	[29704] = {
-		seconds = 12,
-		showIn = "spells",
+		cooldown = 12,
+		cdEnabled = true,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -390,10 +576,11 @@ AfflictedSpells = {
 	[20616] = 25275,
 	[20617] = 25275,
 	[25272] = 25275,
+	[47996] = 25275,
 	[25275] = {
-		seconds = 15,
-		dontFade = true,
-		showIn = "spells",
+		cooldown = 15,
+		cdEnabled = true,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -418,18 +605,17 @@ AfflictedSpells = {
 
 	-- Intervene
 	[3411] = {
-		dontFade = true,
 		disabled = true,
-		seconds = 30,
-		showIn = "spells",
+		cooldown = 30,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Intimidating Shout
 	[5246] = {
 		disabled = true,
-		seconds = 180,
-		showIn = "spells",
+		cooldown = 180,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -438,8 +624,9 @@ AfflictedSpells = {
 	[19244] = 19647,
 	[19647] = {
 		dontFade = true,
-		seconds = 24,
-		showIn = "spells",
+		cdEnabled = true,
+		cooldown = 24,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -450,6 +637,8 @@ AfflictedSpells = {
 	[19441] = 27273,
 	[19442] = 27273,
 	[19443] = 27273,
+	[47985] = 27273,
+	[47986] = 27273,
 	[27273] = {
 		disabled = true,
 		seconds = 30,
@@ -475,7 +664,7 @@ AfflictedSpells = {
 	[27277] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 8,
+		cooldown = 8,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -486,6 +675,7 @@ AfflictedSpells = {
 		disabled = true,
 		dontFade = true,
 		seconds = 40,
+		cooldown = 600,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -495,6 +685,7 @@ AfflictedSpells = {
 		disabled = true,
 		dontFade = true,
 		seconds = 40,
+		cooldown = 600,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -534,6 +725,8 @@ AfflictedSpells = {
 	[10448] = 25454,
 	[25457] = 25454,
 	[29228] = 25454,
+	[49232] = 25454,
+	[49233] = 25454,
 	
 	-- Frost shock
 	[8056] = 25454,
@@ -541,6 +734,8 @@ AfflictedSpells = {
 	[10472] = 25454,
 	[10473] = 25454,
 	[25464] = 25454,
+	[49235] = 25454,
+	[49236] = 25454,
 	
 	-- Earth shock
 	[8042] = 25454,
@@ -549,6 +744,8 @@ AfflictedSpells = {
 	[10412] = 25454,
 	[10413] = 25454,
 	[10414] = 25454,
+	[49230] = 25454,
+	[49231] = 25454,
 	[25454] = {
 		text = "Earth Shock",
 		seconds = 5,
@@ -561,9 +758,9 @@ AfflictedSpells = {
 	--[[ MAGES ]]--
 	-- Counterspell
 	[2139] = {
-		dontFade = true,
-		seconds = 24,
-		showIn = "spells",
+		cooldown = 24,
+		cdEnabled = true,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -580,8 +777,7 @@ AfflictedSpells = {
 	[11958] = {
 		disabled = true,
 		dontFade = true,
-		seconds = 480,
-		showIn = "cooldowns",
+		cooldown = 480,
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -605,28 +801,58 @@ AfflictedSpells = {
 	-- Freeze (Water Elemental)
 	[33395] = {
 		disabled = true,
-		seconds = 25,
-		showIn = "spells",
+		cooldown = 25,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
 	-- Blink
 	[1953] = {
-		seconds = 15,
-		showIn = "spells",
+		cooldown = 15,
+		cdEnabled = true,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
+	
+	-- Invisibility
+	[66] = {
+		disabled = true,
+		seconds = 23,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- [WOTLK] Shatter Shield
+	--[[
+	[44745] = {
+		seconds = 8,
+		cooldown = 30,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
+	-- [WOTLK] Deep Freeze
+	--[[
+	[44572] = {
+		seconds = 30,
+		showIn = "spells",,
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
 
 	-- Frost Nova
 	[122] = 27088,
 	[865] = 27088,
 	[6131] = 27088,
 	[10230] = 27088,
+	[42917] = 27088,
 	[27088] = {
 		disabled = true,
 		cooldown = 21,
 		resetOn = 11958,
-		showIn = "spells",
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -639,12 +865,12 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	
 	--[[ RACIALS ]]--
 	-- Perception
 	[20600] = {
 		disabled = true,
 		seconds = 20,
+		cooldown = 180,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -652,8 +878,22 @@ AfflictedSpells = {
 	-- Escape Artist
 	[20589] = {
 		disabled = true,
-		seconds = 105,
-		showIn = "buffs",
+		cooldown = 105,
+		cdInside = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Chastise
+	[44041] = 44047,
+	[44043] = 44047,
+	[44044] = 44047,
+	[44045] = 44047,
+	[44046] = 44047,
+	[48174] = 44047,
+	[44047] = {
+		disabled = true,
+		cooldown = 30,
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -703,15 +943,6 @@ AfflictedSpells = {
 	},
 	
 	--[[ ENGINEERING BULLSHIT ]]--
-	-- Rocket Boots
-	[30452] = {
-		disabled = true,
-		seconds = 3,
-		cooldown = 300,
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
 	-- Nigh Invulnerability Belt
 	[30458] = {
 		disabled = true,

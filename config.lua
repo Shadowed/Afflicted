@@ -1296,7 +1296,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 			end
 			
 			config:RegisterOptionsTable("Afflicted2", options)
-			dialog:SetDefaultSize("Afflicted2", 625, 500)
+			dialog:SetDefaultSize("Afflicted2", 625, 590)
 			registered = true
 		end
 
