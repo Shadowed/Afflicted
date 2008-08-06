@@ -1,5 +1,5 @@
 --[[ 
-	Afflicted, Mayen/Amarand (Horde) from Icecrown (US) PvE
+	Afflicted, Mayen/Amarand/Dayliss from Icecrown (US) PvE
 ]]
 
 Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
@@ -92,7 +92,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	
 	local isDestEnemy = (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
 	local isSourceEnemy = (bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE)
-
+		
 	-- Enemy gained a debuff
 	if( eventType == "SPELL_AURA_APPLIED" and isDestEnemy ) then
 		local spellID, spellName, spellSchool, auraType = ...
@@ -135,8 +135,15 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- We got interrupted, or we interrupted someone else
 	elseif( eventType == "SPELL_INTERRUPT" and self.db.profile.interruptEnabled and isDestEnemy and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool = ...
-		self:SendMessage(string.format(L["Interrupted %s's %s (%s)"], destName, extraSpellName, spellSchools[extraSpellSchool] or ""), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
-
+		
+		-- Local output, use a shorttened version, because we already know who we interrupted (Or, hope we do)
+		if( self.db.profile.interruptDest == "ct" or tonumber(self.db.profile.interruptDest) ) then
+			self:SendMessage(string.format(L["Interrupted %s"], extraSpellName), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
+		else
+			self:SendMessage(string.format(L["Interrupted %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.interruptDest, self.db.profile.interruptColor, extraSpellID)
+		end
+		
+		
 	-- We tried to dispel a buff, and failed
 	elseif( ( eventType == "SPELL_DISPEL_FAILED" or eventType == "SPELL_PERIODIC_DISPEL_FAILED" ) and self.db.profile.dispelEnabled ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
@@ -380,7 +387,7 @@ function Afflicted:SendMessage(msg, dest, color, spellID)
 	if( dest == "none" ) then
 		return
 	end
-	
+			
 	-- We're ungrouped, so redirect it to RWFrame
 	if( dest == "rw" and GetNumRaidMembers() == 0 and GetNumPartyMembers() == 0 ) then
 		dest = "rwframe"

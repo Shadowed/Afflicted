@@ -1,5 +1,7 @@
 AfflictedLocals = {
-	["Interrupted %s's %s (%s)"] = "Interrupted %s's %s (%s)",
+	["Interrupted %s's %s"] = "Interrupted %s's %s",
+	["Interrupted %s"] = "Interrupted %s",
+	
 	["FAILED %s's %s"] = "FAILED %s's %s",
 	["Removed %s's %s"] = "Removed %s's %s",
 	
