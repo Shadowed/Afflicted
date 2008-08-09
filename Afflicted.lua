@@ -216,9 +216,9 @@ end
 ]]
 
 local function getSpellData(spellID, spellName)
-	local data = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
+	local data = Afflicted.db.profile.spells[spellID] or Afflicted.db.profile.spells[spellName]
 	if( type(data) == "number" ) then
-		data = self.db.profile.spells[data]
+		data = Afflicted.db.profile.spells[data]
 	end
 	
 	return data
