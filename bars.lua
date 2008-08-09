@@ -45,7 +45,6 @@ end
 
 function Bars:TextureRegistered(event, mediaType, key)
 	if( mediaType == SML.MediaType.STATUSBAR and Afflicted.db.profile.barName == key ) then
-
 		for id, group in pairs(Bars.groups) do
 			group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
 		end
@@ -67,9 +66,8 @@ function Bars:LoadVisual()
 		obj[func] = self[func]
 	end
 	
-	Bars.groups = {}
-	
 	-- Create anchors
+	Bars.groups = {}
 	for name, data in pairs(Afflicted.db.profile.anchors) do
 		if( data.enabled and data.displayType == "bar" ) then
 			Bars.groups[name] = Bars:CreateDisplay(name)
@@ -118,7 +116,8 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 
 	
 	-- We can only pass one argument, so we do this to prevent creating and dumping tables and such
-	barData[id] = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
+	local data = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
+	barData[id] = data
 	barData[spellName .. sourceGUID] = true
 
 	group:RegisterBar(id, text, spellData.seconds, nil, spellData.icon)
@@ -135,7 +134,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		local cd = ""
 		local text
 		
-		barData[id] = true
+		barData[id] = data .. ",cd"
 		
 		-- If the timer is being redirected to another anchor, show the CD text
 		if( Afflicted.db.profile.anchors[spellData.cdInside].redirectTo ~= "" ) then
@@ -156,12 +155,14 @@ end
 
 -- Bar timer ran out
 function Bars:OnBarFade(barID)
-	if( type(barData[barID]) == "string" ) then
-		local eventType, spellID, spellName, sourceGUID, sourceName = string.split(",", barData[barID])
+	local eventType, spellID, spellName, sourceGUID, sourceName, type = string.split(",", barData[barID])
+	barData[barID] = nil
+	
+	if( not type ) then
 		Afflicted:AbilityEnded(eventType, tonumber(spellID), spellName, sourceGUID, sourceName)
-
-		barData[barID] = nil
 		barData[spellName .. sourceGUID] = nil
+	else
+		Afflicted:CooldownEnded(eventType, tonumber(spellID), spellName, sourceGUID, sourceName)
 	end
 end
 

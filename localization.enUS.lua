@@ -8,6 +8,8 @@ AfflictedLocals = {
 	["FINISHED *spell (*target)"] = "FINISHED *spell (*target)",
 	["USED *spell (*target)"] = "USED *spell (*target)",
 	
+	["READY *spell (*target)"] = "READY *spell (*target)",
+	
 	["ALT + Drag to move the frame anchor."] = "ALT + Drag to move the frame anchor.",
 	
 	-- Default frames

@@ -9,7 +9,7 @@ local L = AfflictedLocals
 local instanceType, currentBracket
 
 local objectsSummoned = {}
-local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
+--local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
 function Afflicted:OnInitialize()
 	if( not self.modules.Config ) then
@@ -20,7 +20,7 @@ function Afflicted:OnInitialize()
 	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 	self.modules.Config:SetupDB()
 	
-	-- Something went wrong
+	-- Something went wrong, pretty much debug code
 	if( not self.modules.Icons or not self.modules.Bars ) then
 		self:UnregisterAllEvents()
 		return
@@ -68,14 +68,9 @@ end
 function Afflicted:Reload()
 	self:OnDisable()
 	self:OnEnable()
-	
-	if( self.icon ) then
-		self.icon:ReloadVisual()
-	end
-	
-	if( self.bar ) then
-		self.bar:ReloadVisual()
-	end
+
+	self.icon:ReloadVisual()
+	self.bar:ReloadVisual()
 end
 
 local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
@@ -220,14 +215,18 @@ function reset()
 end
 ]]
 
--- New ability found
-function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
-	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
-	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
-	if( type(spellData) == "number" ) then
-		spellData = self.db.profile.spells[spellData]
+local function getSpellData(spellID, spellName)
+	local data = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
+	if( type(data) == "number" ) then
+		data = self.db.profile.spells[data]
 	end
 	
+	return data
+end
+
+-- New ability found
+function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
+	local spellData = getSpellData(spellID, spellName)
 	if( not spellData or spellData.disabled or not spellData[eventType] or ( currentBracket and self.db.profile.disabledSpells[currentBracket][spellID] ) ) then
 		return
 	end
@@ -241,7 +240,8 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	if( not anchor or not anchor.enabled ) then
 		return
 	end
-	
+
+	
 	-- No icon listed, use our own
 	local icon = select(3, GetSpellInfo(spellID))
 	if( not spellData.icon or spellData.icon == "" ) then
@@ -287,15 +287,9 @@ function Afflicted:ProcessReset(spellID, spellName, sourceGUID, sourceName)
 	end
 end
 
-
--- Need to clean this up later
+-- An ability was ended early via the combat log
 function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceName)
-	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
-	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
-	if( type(spellData) == "number" ) then
-		spellData = self.db.profile.spells[spellData]
-	end
-
+	local spellData = getSpellData(spellID, spellName)
 	if( not spellData or spellData.disabled or spellData.dontFade ) then
 		return
 	end
@@ -311,18 +305,13 @@ function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceN
 	end
 end
 
--- Ability ended due to event, or timers up
+-- Ability ended due due to the timer running out, and it was removed from the bar
 function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourceName)
 	if( eventType == "TEST" ) then
 		return
 	end
-	
-	local spellData = self.db.profile.spells[spellID] or self.db.profile.spells[spellName]
-	-- If it's a number, it means it's a lower ranked spell we want to actually link with the max rank one
-	if( type(spellData) == "number" ) then
-		spellData = self.db.profile.spells[spellData]
-	end
 
+	local spellData = getSpellData(spellID, spellName)
 	if( not spellData or spellData.disabled ) then
 		return
 	end
@@ -335,10 +324,26 @@ function Afflicted:AbilityEnded(eventType, spellID, spellName, sourceGUID, sourc
 	self:AnnounceEnd(spellData, anchor, spellID, spellName, sourceName)
 end
 
+function Afflicted:CooldownEnded(eventType, spellID, spellName, sourceGUID, sourceName)
+	if( eventType == "TEST" ) then
+		return
+	end
+	
+	local spellData = getSpellData(spellID, spellName)
+	if( not spellData or not spellData.cdEnabled ) then
+		return
+	end
+	
+	local anchor = self.db.profile.anchors[spellData.cdInside]
+	if( not anchor or not anchor.enabled ) then
+		return
+	end
+	
+	self:AnnounceEnd(spellData, anchor, spellID, spellName, sourceName)
+end
+
 -- Alert that the timers over
 function Afflicted:AnnounceEnd(spellData, anchor, spellID, spellName, sourceName)
-	-- Announce it
-
 	-- Work out if we should use a custom message, or a default one
 	local msg
 	if( spellData.enableCustom ) then

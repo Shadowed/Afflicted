@@ -76,12 +76,17 @@ function Config:SetupDB()
 
 	self.defaults.profile.anchors.buffs = CopyTable(self.defaults.profile.anchorDefault)
 	self.defaults.profile.anchors.buffs.text = L["Buffs"]
+	
 	self.defaults.profile.anchors.spells = CopyTable(self.defaults.profile.anchorDefault)
 	self.defaults.profile.anchors.spells.text = L["Spells"]
+	
 	self.defaults.profile.anchors.totems = CopyTable(self.defaults.profile.anchorDefault)
 	self.defaults.profile.anchors.totems.text = L["Totems"]
+	
 	self.defaults.profile.anchors.cooldowns = CopyTable(self.defaults.profile.anchorDefault)
 	self.defaults.profile.anchors.cooldowns.text = L["Cooldowns"]
+	self.defaults.profile.anchors.cooldowns.usedMessage = ""
+	self.defaults.profile.anchors.cooldowns.fadeLessage = L["READY *spell (*target)"]
 
 	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "Reload")
@@ -149,6 +154,11 @@ function Config:SetupDB()
 					self.db.profile.showBars = nil
 					anchor.displayType = "icon"
 				end
+			end
+		
+		elseif( self.db.profile.version <= 838 ) then
+			if( self.db.profile.anchors.cooldowns.fadeMessage == L["FINISHED *spell (*target)"] ) then
+				self.db.profile.anchors.cooldowns.fadeMessage = L["READY *spell (*target)"]
 			end
 		end
 		

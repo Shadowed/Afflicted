@@ -1,5 +1,5 @@
 AfflictedSpells = { 
-	-- DEATH KNIGHTS ]]--
+	--[[ DEATH KNIGHTS ]]--
 	--[[
 	-- Strangulate
 	[47476] = 49916,
@@ -643,7 +643,7 @@ AfflictedSpells = {
 		disabled = true,
 		seconds = 30,
 		showIn = "buffs",
-		SPELL_AURA_APPLIEDBUFFENEMY = true,
+		SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Fel Domination
@@ -652,7 +652,7 @@ AfflictedSpells = {
 		seconds = 15,
 		cooldown = 900,
 		showIn = "buffs",
-		SPELL_AURA_APPLIEDBUFFENEMY = true,
+		SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Devour Magic

@@ -142,6 +142,8 @@ local function OnUpdate(self, elapsed)
 
 		if( not self.isCooldown ) then
 			Afflicted:AbilityEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName)
+		else
+			Afflicted:CooldownEnded(self.eventType, self.spellID, self.spellName, self.sourceGUID, self.sourceName)
 		end
 
 		local group = Icons.groups[self.type]
