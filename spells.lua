@@ -445,9 +445,9 @@ AfflictedSpells = {
 		resetOn = 23989,
 		seconds = 60,
 		cooldown = 30,
-		dontFade = true,
 		showIn = "spells",
-		icon = "Interface\\Icons\\Spell_Frost_ChainsOfIce",
+		dontFade = true,
+		dontSave = true,
 		SPELL_CREATE = true,
 	},
 	

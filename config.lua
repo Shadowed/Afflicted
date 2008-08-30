@@ -25,7 +25,7 @@ function Config:SetupDB()
 	local self = Afflicted
 	self.defaults = {
 		profile = {
-			showAnchors = false,
+			showAnchors = true,
 			showIcons = true,
 			showTarget = false,
 			
@@ -1319,31 +1319,70 @@ SlashCmdList["AFFLICTED"] = function(msg)
 	end
 end
 
---[[
--- Add the general options + profile, we don't add spells/anchors because it doesn't support sub cats
-local register = CreateFrame("Frame", nil, InterfaceOptionsFrame)
-register:SetScript("OnShow", function(self)
-	self:SetScript("OnShow", nil)
-	loadOptions()
-
-	config:RegisterOptionsTable("Afflicted-Bliz", {
-		name = "Afflicted2",
-		type = "group",
-		args = {
-			help = {
-				type = "description",
-				name = string.format("Afflicted r%d is a PvP timer tracking mod, for things like spell duration or cool down.", Afflicted.revision or 0),
-			},
-		},
-	})
+-- CONFIGURATION SYNCING WITH BAZAAR
+function Config:Receive(data, categories)
+	local self = Afflicted
 	
-	dialog:SetDefaultSize("Afflicted-Bliz", 600, 400)
-	dialog:AddToBlizOptions("Afflicted-Bliz", "Afflicted2")
+	if( categories.general ) then
+		for key, value in pairs(data.general) do
+			self.db.profile[key] = value
+		end
+	end
 	
-	config:RegisterOptionsTable("Afflicted-General", options.args.general)
-	dialog:AddToBlizOptions("Afflicted-General", options.args.general.name, "Afflicted2")
+	if( categories.spells ) then
+		self.db.profile.spells = data.spells
+	end
+	
+	if( categories.arenaSpells ) then
+		self.db.profile.arenaSpells = data.arenaSpells
+	end
+	
+	if( categories.anchors ) then
+		self.db.profile.anchors = data.anchors
+	end
+	
+	Afflicted:Reload()
+end
 
-	config:RegisterOptionsTable("Afflicted-Profile", options.args.profile)
-	dialog:AddToBlizOptions("Afflicted-Profile", options.args.profile.name, "Afflicted2")
-end)
-]]
+local blacklist = {["anchorDefault"] = true, ["disabledSpells"] = true, ["anchors"] = true, ["spellDefault"] = true}
+function Config:Send(categories)
+	local config = {}
+	local self = Afflicted
+	if( categories.general ) then
+		config.general = {}
+		for key, value in pairs(self.db.profile) do
+			if( not blacklist[key] ) then
+				if( type(value) == "table" ) then
+					config.general[key] = CopyTable(value)
+				else
+					config.general[key] = value
+				end
+			end
+		end
+	end
+	
+	if( categories.spells ) then
+		config.spells = CopyTable(self.db.profile.spells)
+	end
+	
+	if( categories.arenaSpells ) then
+		config.arenaSpells = CopyTable(self.db.profile.disabledSpells)
+	end
+	
+	if( categories.anchors ) then
+		config.anchors = CopyTable(self.db.profile.anchors)
+	end
+	
+	return config
+end
+
+if( IsAddOnLoaded("Bazaar") ) then
+	local obj = Bazaar:RegisterAddOn("Afflicted")
+	obj:RegisterCategory("general", "General")
+	obj:RegisterCategory("spells", "Spells")
+	obj:RegisterCategory("arenaSpells", "Arena only spells")
+	obj:RegisterCategory("anchors", "Anchors")
+	
+	obj:RegisterReceiveHandler(Config, "Receive")
+	obj:RegisterSendHandler(Config, "Send")
+end

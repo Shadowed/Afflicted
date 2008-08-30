@@ -4,7 +4,7 @@
 ## Author: Mayen
 ## Version: $Revision$
 ## SavedVariables: AfflictedDB
-## OptionalDeps: LibStub, GTB, Ace3, LibSharedMedia-3.0
+## OptionalDeps: LibStub, GTB, Ace3, LibSharedMedia-3.0, Bazaar
 
 libs\LibStub-1.0\LibStub-1.0.xml
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml

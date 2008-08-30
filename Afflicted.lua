@@ -244,9 +244,8 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	
 	-- No icon listed, use our own
 	local icon = select(3, GetSpellInfo(spellID))
-	if( not spellData.icon or spellData.icon == "" ) then
+	if( spellData.dontSave or not spellData.icon or spellData.icon == "" ) then
 		spellData.icon = icon
-
 	end
 		
 	-- Start it up
