@@ -24,7 +24,7 @@ AfflictedSpells = {
 	-- Anti-Magic Shell
 	[48707] = {
 		disabled = true,
-		seconds = 3,
+		seconds = 5,
 		cooldown = 15,
 		cdEnabled = true,
 		type = "buffs",
@@ -255,6 +255,17 @@ AfflictedSpells = {
 		cooldown = 60,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
+	},
+	]]
+	
+	-- [WOTLK] Shadow Dance
+	--[[
+	[51713] = {
+		disabled = true,
+		seconds = 9,
+		cooldown = 120,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true
 	},
 	]]
 	
@@ -755,6 +766,16 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
+	-- [WOTLK] Hex
+	--[[
+	[51514] = {
+		disabled = true,
+		cooldown = 45,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]--
+	
 	--[[ MAGES ]]--
 	-- Counterspell
 	[2139] = {
@@ -823,21 +844,14 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- [WOTLK] Shatter Shield
-	--[[
-	[44745] = {
-		seconds = 8,
-		cooldown = 30,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	]]
-	
 	-- [WOTLK] Deep Freeze
 	--[[
-	[44572] = {
-		seconds = 30,
-		showIn = "spells",,
+	[44572] = 54778,
+	[54776] = 54778,
+	[54777] = 54778,
+	[54778] = {
+		cooldown = 30,
+		cdInside = "spells",,
 		SPELL_CAST_SUCCESS = true,
 	},
 	]]
@@ -941,6 +955,15 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
+	
+	-- [WOTLK] PVP Trinket (2m)
+	--[[
+	[42292] = {
+		cooldown = 120,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	]]
 	
 	--[[ ENGINEERING BULLSHIT ]]--
 	-- Nigh Invulnerability Belt
