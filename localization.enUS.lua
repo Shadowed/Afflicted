@@ -65,8 +65,8 @@ AfflictedLocals = {
 	
 	["Arena spells"] = "Arena spells",
 	
-	["Show anchors"] = "Show anchors",
-	["Display timer anchors for moving around."] = "Display timer anchors for moving around.",
+	["Hide timer anchors"] = "Hide timer anchors",
+	["Hides the anchors that lets you drag timer groups around."] = "Hides the anchors that lets you drag timer groups around.",
 	
 	["Show spell icons"] = "Show spell icons",
 	["Prefixes messages with the spell icon if you're using local outputs."] = "Prefixes messages with the spell icon if you're using local outputs.",
@@ -131,7 +131,7 @@ AfflictedLocals = {
 	["Anchor name"] = "Anchor name",
 	["Name of the new anchor to create that timers can be shown under."] = "Name of the new anchor to create that timers can be shown under.",
 	
-	["Enable anchor"] = "Enable anchor",
+	["Enable showing timers in this anchor"] = "Enable showing timers in this anchor",
 	["Allows timers to be shown under this anchor, if the anchor is disabled you won't see any timers."] = "Allows timers to be shown under this anchor, if the anchor is disabled you won't see any timers.",
 	
 	["Grow display up"] = "Grow display up",

@@ -365,7 +365,7 @@ function Config:CreateAnchorDisplay(info, value)
 			enabled = {
 				order = 1,
 				type = "toggle",
-				name = L["Enable anchor"],
+				name = L["Enable showing timers in this anchor"],
 				desc = L["Allows timers to be shown under this anchor, if the anchor is disabled you won't see any timers."],
 				width = "full",
 				arg = "anchors." .. id .. ".enabled",
@@ -450,7 +450,6 @@ function Config:CreateAnchorDisplay(info, value)
 						type = "toggle",
 						name = L["Enable announcements"],
 						desc = L["Enables showing alerts for when timers are triggered to this anchor."],
-						width = "full",
 						arg = "anchors." .. id .. ".announce",
 					},
 					color = {
@@ -460,7 +459,6 @@ function Config:CreateAnchorDisplay(info, value)
 						desc = L["Alert text color, only applies to local outputs."],
 						set = setColor,
 						get = getColor,
-						width = "full",
 						arg = "anchors." .. id .. ".announceColor",
 					},
 					dispelDest = {
@@ -668,7 +666,7 @@ function Config:CreateSpellDisplay(info, value)
 				name = L["Timer"],
 				args = {
 					seconds = {
-						order = 1,
+						order = 0,
 						type = "input",
 						name = L["Duration"],
 						desc = L["How many seconds this timer should last."],
@@ -676,6 +674,12 @@ function Config:CreateSpellDisplay(info, value)
 						get = getString,
 						set = setNumber,
 						arg = "spells." .. value .. ".seconds",
+					},
+					desc = {
+						order = 1,
+						name = "",
+						width = "full",
+						type = "description",
 					},
 					repeating = {
 						order = 2,
@@ -908,9 +912,10 @@ local function loadOptions()
 			enabled = {
 				order = 0,
 				type = "toggle",
-				name = L["Show anchors"],
-				desc = L["Display timer anchors for moving around."],
-				width = "full",
+				name = L["Hide timer anchors"],
+				desc = L["Hides the anchors that lets you drag timer groups around."],
+				set = function(info, value) Afflicted.db.profile.showAnchors = not value; Afflicted:Reload(); end,
+				get = function() return not Afflicted.db.profile.showAnchors end,
 				arg = "showAnchors",
 			},
 			showIcons = {
@@ -918,7 +923,6 @@ local function loadOptions()
 				type = "toggle",
 				name = L["Show spell icons"],
 				desc = L["Prefixes messages with the spell icon if you're using local outputs."], 
-				width = "full",
 				arg = "showIcons",
 			},
 			display = {
@@ -1062,28 +1066,26 @@ local function loadOptions()
 						type = "toggle",
 						name = L["Enable dispel alerts"],
 						desc = L["Displays alerts when you dispel a friendly player, can also be enabled to show alerts for enemies as well."],
-						width = "full",
 						arg = "dispelEnabled",
 					},
-					dispelHostile = {
+					dispelColor = {
 						order = 2,
+						type = "color",
+						name = L["Text color"],
+						desc = L["Alert text color, only applies to local outputs."],
+						disabled = "IsDisabled",
+						set = setColor,
+						get = getColor,
+						arg = "dispelColor",
+					},
+					dispelHostile = {
+						order = 3,
 						type = "toggle",
 						name = L["Show alerts for dispelling enemies"],
 						desc = L["Enables showing alerts for when you dispel enemies as well as friendly players."],
 						width = "full",
 						disabled = "IsDisabled",
 						arg = "dispelHostile",
-					},
-					dispelColor = {
-						order = 3,
-						type = "color",
-						name = L["Text color"],
-						desc = L["Alert text color, only applies to local outputs."],
-						disabled = "IsDisabled",
-						width = "full",
-						set = setColor,
-						get = getColor,
-						arg = "dispelColor",
 					},
 					dispelDest = {
 						order = 4,
@@ -1107,7 +1109,6 @@ local function loadOptions()
 						type = "toggle",
 						name = L["Enable interrupt alerts"],
 						desc = L["Displays alerts when you interrupt enemies."],
-						width = "full",
 						arg = "interruptEnabled",
 					},
 					interruptColor = {
@@ -1116,7 +1117,6 @@ local function loadOptions()
 						name = L["Text color"],
 						desc = L["Alert text color, only applies to local outputs."],
 						disabled = "IsDisabled",
-						width = "full",
 						set = setColor,
 						get = getColor,
 						arg = "interruptColor",
@@ -1376,7 +1376,7 @@ function Config:Send(categories)
 	return config
 end
 
-if( IsAddOnLoaded("Bazaar") ) then
+if( Bazaar ) then
 	local obj = Bazaar:RegisterAddOn("Afflicted")
 	obj:RegisterCategory("general", "General")
 	obj:RegisterCategory("spells", "Spells")

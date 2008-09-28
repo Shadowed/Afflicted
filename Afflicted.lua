@@ -9,7 +9,6 @@ local L = AfflictedLocals
 local instanceType, currentBracket
 
 local objectsSummoned = {}
---local spellSchools = {[1] = L["Physical"], [2] = L["Holy"], [4] = L["Fire"], [8] = L["Nature"], [16] = L["Frost"], [32] = L["Shadow"], [64] = L["Arcane"]}
 
 function Afflicted:OnInitialize()
 	if( not self.modules.Config ) then
@@ -169,7 +168,6 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		self.icon:UnitDied(destGUID)
 		self.bar:UnitDied(destGUID)
 	end
-
 end
 
 -- See if we should enable Afflicted in this zone
