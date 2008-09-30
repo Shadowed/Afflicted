@@ -310,7 +310,7 @@ end
 
 function Icons:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 	local id = string.format("%s:%s:%s", spellID, sourceGUID, destGUID)
-	createTimer(id, spellData.showIn, eventType, spellData.repeating, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, spellData.seconds)
+	createTimer(id, spellData.showIn, eventType, spellData.repeating, spellID, spellName, sourceGUID, sourceName, destGUID, spellData.icon, self:GetSpellDuration(sourceGUID, spellName, spellID, spellData.seconds))
 	
 	if( spellData.cdEnabled and spellData.cooldown > 0 ) then
 		id = id .. ":CD"

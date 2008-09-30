@@ -48,16 +48,11 @@ function Afflicted:OnInitialize()
 	self.alertFrame:SetPoint("CENTER", 0, 60)
 end
 
-function Afflicted:OnEnable()
-	local type = select(2, IsInInstance())
-	if( not self.db.profile.inside[type] ) then
-		return
-	end
-	
+function Afflicted:Enable()
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
-function Afflicted:OnDisable()
+function Afflicted:Disable()
 	self:UnregisterAllEvents()
 	
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
@@ -65,8 +60,10 @@ function Afflicted:OnDisable()
 end
 
 function Afflicted:Reload()
-	self:OnDisable()
-	self:OnEnable()
+	self:Disable()
+	if( self.db.profile.inside[select(2, IsInInstance())] ) then
+		self:Enable()
+	end
 
 	self.icon:ReloadVisual()
 	self.bar:ReloadVisual()
@@ -191,27 +188,15 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 				end
 			end
 			
-			self:OnEnable()
+			self:Enable()
 		else
 			currentBracket = nil
-			self:OnDisable()
+			self:Disable()
 		end
 	end
 		
 	instanceType = type
 end
-
---[[
-function start()
-	Afflicted:ProcessAbility("SPELL_CAST_SUCCESS", 26889, "Vanish", 0, UnitGUID("player"), UnitName("player"), "TestGUID", "TestName")
-	Afflicted:ProcessAbility("SPELL_CAST_SUCCESS", 36554, "Shadowstep", 0, UnitGUID("player"), UnitName("player"), "TestGUID", "TestName")
-end
-
-function reset()
-	Afflicted:ProcessReset(14185, "Preparation", UnitGUID("player"), UnitName("player"))
-	Afflicted:ProcessAbility("SPELL_CAST_SUCCESS", 14185, "Preparation", 0, UnitGUID("player"), UnitName("player"), "TestGUID", "TestName")
-end
-]]
 
 local function getSpellData(spellID, spellName)
 	local data = Afflicted.db.profile.spells[spellID] or Afflicted.db.profile.spells[spellName]
@@ -220,6 +205,11 @@ local function getSpellData(spellID, spellName)
 	end
 	
 	return data
+end
+
+-- This lets me modify the duration of spells without having to mess with the variable, mostly for WoTLK
+function Afflicted:GetSpellDuration(sourceGUID, spellName, spellID, seconds)
+	return seconds
 end
 
 -- New ability found

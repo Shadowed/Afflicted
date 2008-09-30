@@ -111,10 +111,10 @@ function Config:SetupDB()
 				
 				table.insert(self.resetSpells[spell.resetOn], id)
 			end
-			
+						
 			-- Set spell text if we didn't list it already
 			if( AfflictedSpells[id] and not AfflictedSpells[id].text ) then
-				spell.text = (GetSpellInfo(id))
+				spell.text = GetSpellInfo(id)
 			end
 		end
 	end
