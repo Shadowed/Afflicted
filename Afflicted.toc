@@ -1,10 +1,10 @@
-## Interface: 20400
+## Interface: 30000
 ## Title: Afflicted2
 ## Notes: PvP timer and cool down tracking mod
 ## Author: Mayen
 ## Version: $Revision$
 ## SavedVariables: AfflictedDB
-## OptionalDeps: LibStub, GTB, Ace3, LibSharedMedia-3.0, Bazaar
+## OptionalDeps: LibStub, Bazaar
 
 libs\LibStub-1.0\LibStub-1.0.xml
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
