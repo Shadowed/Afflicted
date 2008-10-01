@@ -893,21 +893,21 @@ local wrath = {
 	-- Hand of Protection
 	[1022] = {
 		seconds = 6,
-		cooldown = 180,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
 	[5599] = {
 		seconds = 8,
-		cooldown = 180,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
 	[10278] = {
 		seconds = 10,
-		cooldown = 180,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -939,6 +939,14 @@ local wrath = {
 	},
 	
 	--[[DRUID]]--
+	-- Survival Instincts
+	[61336] = {
+		seconds = 20,
+		cooldown = 300,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Berserk
 	[50334] = {
 		seconds = 15,
