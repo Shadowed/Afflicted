@@ -120,7 +120,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 	barData[id] = data
 	barData[spellName .. sourceGUID] = true
 
-	group:RegisterBar(id, text, self:GetSpellDuration(sourceGUID, spellName, spellID, spellData.seconds), nil, spellData.icon)
+	group:RegisterBar(id, text, Afflicted:GetSpellDuration(sourceGUID, spellName, spellID, spellData.seconds), nil, spellData.icon)
 	group:SetRepeatingTimer(id, spellData.repeating or false)
 	
 	-- Start a cooldown timer
