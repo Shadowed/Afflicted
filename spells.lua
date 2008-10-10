@@ -1,4 +1,75 @@
 AfflictedSpells = { 
+	--[[ DEATH KNIGHTS ]]--
+	-- Strangulate
+	[47476] = 49916,
+	[49913] = 49916,
+	[49914] = 49916,
+	[49915] = 49916,
+	[49916] = {
+		disabled = true,
+		dontFade = true,
+		cooldown = 120,
+		type = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Death Pact
+	[48743] = {
+		disabled = true,
+		cooldown = 120,
+		type = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Anti-Magic Shell
+	[48707] = {
+		disabled = true,
+		seconds = 5,
+		cooldown = 60,
+		cdEnabled = true,
+		type = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
+	-- Anti-Magic Zone
+	[51052] = {
+		disabled = true,
+		seconds = 30,
+		cooldown = 120,
+		cdEnabled = true,
+		type = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Lichborne
+	[49039] = {
+		disabled = true,
+		seconds = 30,
+		cooldown = 300,
+		type = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Mind Freeze
+	[47528] = 49912,
+	[49910] = 49912,
+	[49911] = 49912,
+	[49912] = {
+		dontFade = true,
+		cooldown = 10,
+		type = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Icebound Fortitude
+	[48792] = {
+		disabled = true,
+		seconds = 12,
+		cooldown = 60,
+		type = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+
 	--[[ DRUIDS ]]--
 	-- Innervate
 	[29166] = {
@@ -16,8 +87,24 @@ AfflictedSpells = {
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true
 	},
+		
+	-- Survival Instincts
+	[61336] = {
+		seconds = 20,
+		cooldown = 300,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
 	
-	-- Feral Charge
+	-- Berserk
+	[50334] = {
+		seconds = 15,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Feral Charge - Bear
 	[16979] = {
 		dontFade = true,
 		cooldown = 15,
@@ -25,7 +112,18 @@ AfflictedSpells = {
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
-		
+
+	-- Feral Charge (Cat)
+	[49376] = {
+		disabled = true,
+		dontFade = true,
+		cooldown = 30,
+		cdEnabled = true,
+		cdInside = "spells",
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Bash
 	[5211] = 8983,
 	[6798] = 8983,
@@ -48,6 +146,23 @@ AfflictedSpells = {
 	},
 	
 	--[[ ROGUES ]]--
+	-- Dismantle
+	[51722] = {
+		disabled = true,
+		cooldown = 60,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Shadow Dance
+	[51713] = {
+		disabled = true,
+		seconds = 10,
+		cooldown = 120,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true
+	},
+
 	-- Kick
 	[1766] = 38768,
 	[1767] = 38768,
@@ -195,17 +310,15 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- Blessing of Protection
-	[1022] = 10278,
-	[5599] = 10278,
-	[10278] = {
-		seconds = 10,
-		cooldown = 180,
+	-- Hand of Sacrifice
+	[6940] = {
+		seconds = 12,
+		cooldown = 120,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
-	},	
+	},
 	
-	-- Blessing of Freedom
+	-- Hand of Freedom
 	[1044] = {
 		seconds = 14,
 		cooldown = 25,
@@ -213,13 +326,25 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-
-	-- Blessing of Sacrifice
-	[6940] = 27148,
-	[20729] = 27148,
-	[27147] = 27148,
-	[27148] = {
-		seconds = 30,
+	
+	-- Hand of Protection
+	[1022] = {
+		seconds = 6,
+		cooldown = 300,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	[5599] = {
+		seconds = 8,
+		cooldown = 300,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	[10278] = {
+		seconds = 10,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -314,6 +439,22 @@ AfflictedSpells = {
 	},
 	
 	--[[ PRIESTS ]]--
+	-- Guardian Spirit
+	[47788] = {
+		seconds = 10,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Dispersion
+	[47585] = {
+		seconds = 6,
+		cooldown = 300,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Shadow Word: Death
 	[32379] = 32996,
 	[48157] = 32996,
@@ -353,7 +494,6 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-	
 
 	-- Pain Suppression
 	[33206] = {
@@ -462,7 +602,7 @@ AfflictedSpells = {
 	},
 	
 	--[[ WARLOCKS ]]--
-	-- Spell lock
+	-- Spell Lock
 	[19244] = 19647,
 	[19647] = {
 		dontFade = true,
@@ -512,6 +652,14 @@ AfflictedSpells = {
 	},
 
 	--[[ SHAMANS ]]--
+	-- Hex
+	[51514] = {
+		disabled = true,
+		cooldown = 45,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Heroism
 	[32182] = {
 		disabled = true,
@@ -558,7 +706,7 @@ AfflictedSpells = {
 		SPELL_SUMMON = true,
 	},
 	
-	-- Flame shock
+	-- Flame Shock
 	[8050] = 25454,
 	[8052] = 25454,
 	[8053] = 25454,
@@ -570,7 +718,7 @@ AfflictedSpells = {
 	[49232] = 25454,
 	[49233] = 25454,
 	
-	-- Frost shock
+	-- Frost Shock
 	[8056] = 25454,
 	[8058] = 25454,
 	[10472] = 25454,
@@ -579,7 +727,10 @@ AfflictedSpells = {
 	[49235] = 25454,
 	[49236] = 25454,
 	
-	-- Earth shock
+	-- Wind Shock
+	[57994] = 25454,
+	
+	-- Earth Shock
 	[8042] = 25454,
 	[8044] = 25454,
 	[8045] = 25454,
@@ -598,6 +749,16 @@ AfflictedSpells = {
 	},
 		
 	--[[ MAGES ]]--
+	-- Deep Freeze
+	[44572] = 54778,
+	[54776] = 54778,
+	[54777] = 54778,
+	[54778] = {
+		cooldown = 30,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
 	-- Counterspell
 	[2139] = {
 		cooldown = 24,
@@ -621,14 +782,6 @@ AfflictedSpells = {
 		dontFade = true,
 		cooldown = 480,
 		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Hypothermia
-	[41425] = {
-		disabled = true,
-		seconds = 30,
-		showIn = "buffs",
-		SPELL_AURA_APPLIEDDEBUFFENEMY = true,
 	},
 	
 	-- Water Elemental
@@ -721,6 +874,13 @@ AfflictedSpells = {
 	},
 	
 	--[[ TRINKETS ]]--
+	-- PVP Trinket (2m)
+	[42292] = {
+		cooldown = 120,
+		cdInside = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+
 	-- Tremendous Fortitude
 	[44055] = {
 		seconds = 15,
@@ -775,216 +935,3 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 }
-
-if( IS_WRATH_BUILD == nil ) then IS_WRATH_BUILD = (select(4, GetBuildInfo()) >= 30000) end
-
-if( not IS_WRATH_BUILD ) then
-	return
-end
-
--- WOTLK
-local wrath = {
-	--[[ DEATH KNIGHTS ]]--
-	-- Strangulate
-	[47476] = 49916,
-	[49913] = 49916,
-	[49914] = 49916,
-	[49915] = 49916,
-	[49916] = {
-		dontFade = true,
-		cooldown = 120,
-		type = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Death Pact
-	[48743] = {
-		disabled = true,
-		cooldown = 120,
-		type = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Anti-Magic Shell
-	[48707] = {
-		disabled = true,
-		seconds = 5,
-		cooldown = 60,
-		cdEnabled = true,
-		type = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Anti-Magic Zone
-	[51052] = {
-		disabled = true,
-		seconds = 30,
-		cooldown = 120,
-		cdEnabled = true,
-		type = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Lichborne
-	[49039] = {
-		disabled = true,
-		seconds = 30,
-		cooldown = 300,
-		type = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Mind Freeze
-	[47528] = 49912,
-	[49910] = 49912,
-	[49911] = 49912,
-	[49912] = {
-		dontFade = true,
-		cooldown = 10,
-		type = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Icebound Fortitude
-	[48792] = {
-		seconds = 12,
-		cooldown = 60,
-		type = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	--[[TRINKETS]]--
-	-- PVP Trinket (2m)
-	[42292] = {
-		cooldown = 120,
-		cdInside = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	--[[MAGE]]--
-	-- Deep Freeze
-	[44572] = 54778,
-	[54776] = 54778,
-	[54777] = 54778,
-	[54778] = {
-		cooldown = 30,
-		cdInside = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	--[[PALADIN]]--
-	-- Hand of Sacrifice
-	[6940] = {
-		seconds = 12,
-		cooldown = 120,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Hand of Freedom
-	[1044] = {
-		seconds = 14,
-		cooldown = 25,
-		cdEnabled = true,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Hand of Protection
-	[1022] = {
-		seconds = 6,
-		cooldown = 300,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	[5599] = {
-		seconds = 8,
-		cooldown = 300,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	[10278] = {
-		seconds = 10,
-		cooldown = 300,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	--[[SHAMAN]]--
-	-- Hex
-	[51514] = {
-		disabled = true,
-		cooldown = 45,
-		cdInside = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	--[[PRIEST]]--
-	-- Guardian Spirit
-	[47788] = {
-		seconds = 10,
-		cooldown = 180,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Dispersion
-	[47585] = {
-		seconds = 6,
-		cooldown = 300,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	--[[DRUID]]--
-	-- Survival Instincts
-	[61336] = {
-		seconds = 20,
-		cooldown = 300,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Berserk
-	[50334] = {
-		seconds = 15,
-		cooldown = 180,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Feral Charge (Cat)
-	[49376] = {
-		dontFade = true,
-		cooldown = 30,
-		cdEnabled = true,
-		cdInside = "spells",
-		showIn = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	--[[ROGUE]]--
-	-- Dismantle
-	[51722] = {
-		disabled = true,
-		cooldown = 60,
-		cdInside = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Shadow Dance
-	[51713] = {
-		disabled = true,
-		seconds = 10,
-		cooldown = 120,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true
-	},
-}
-
--- Merge in the WoTLK spells
-for key, data in pairs(wotlk) do
-	AfflictedSpells[key] = data
-end
