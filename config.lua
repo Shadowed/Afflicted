@@ -180,6 +180,13 @@ function Config:SetupDB()
 	self.db.profile.version = self.revision
 end
 
+-- Force deletes all modified default spells
+function Config:Purge()
+	for id in pairs(AfflictedSpells) do
+		self.db.profile.spells[id] = nil
+	end
+end
+
 -- GUI
 local announceDest = {["none"] = L["None"], ["ct"] = L["Combat text"], ["party"] = L["Party"], ["raid"] = L["Raid"], ["rw"] = L["Raid warning"], ["rwframe"] = L["Middle of screen"], ["1"] = string.format(L["Chat frame #%d"], 1), ["2"] = string.format(L["Chat frame #%d"], 2), ["3"] = string.format(L["Chat frame #%d"], 3), ["4"] = string.format(L["Chat frame #%d"], 4), ["5"] = string.format(L["Chat frame #%d"], 5), ["6"] = string.format(L["Chat frame #%d"], 6), ["7"] = string.format(L["Chat frame #%d"], 7)}
 

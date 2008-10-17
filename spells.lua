@@ -9,7 +9,7 @@ AfflictedSpells = {
 		disabled = true,
 		dontFade = true,
 		cooldown = 120,
-		type = "spells",
+		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -17,7 +17,7 @@ AfflictedSpells = {
 	[48743] = {
 		disabled = true,
 		cooldown = 120,
-		type = "spells",
+		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -27,7 +27,7 @@ AfflictedSpells = {
 		seconds = 5,
 		cooldown = 60,
 		cdEnabled = true,
-		type = "buffs",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -37,7 +37,7 @@ AfflictedSpells = {
 		seconds = 30,
 		cooldown = 120,
 		cdEnabled = true,
-		type = "buffs",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -46,18 +46,15 @@ AfflictedSpells = {
 		disabled = true,
 		seconds = 30,
 		cooldown = 300,
-		type = "buffs",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
 	-- Mind Freeze
-	[47528] = 49912,
-	[49910] = 49912,
-	[49911] = 49912,
-	[49912] = {
+	[47528] = {
 		dontFade = true,
 		cooldown = 10,
-		type = "spells",
+		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -66,7 +63,7 @@ AfflictedSpells = {
 		disabled = true,
 		seconds = 12,
 		cooldown = 60,
-		type = "buffs",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 
@@ -302,8 +299,7 @@ AfflictedSpells = {
 	},
 
 	-- Divine Shield
-	[642] = 1020,
-	[1020] = {
+	[642] = {
 		seconds = 12,
 		cooldown = 300,
 		showIn = "buffs",
@@ -750,10 +746,7 @@ AfflictedSpells = {
 		
 	--[[ MAGES ]]--
 	-- Deep Freeze
-	[44572] = 54778,
-	[54776] = 54778,
-	[54777] = 54778,
-	[54778] = {
+	[44572] = {
 		cooldown = 30,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -856,20 +849,6 @@ AfflictedSpells = {
 		disabled = true,
 		cooldown = 105,
 		cdInside = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- Chastise
-	[44041] = 44047,
-	[44043] = 44047,
-	[44044] = 44047,
-	[44045] = 44047,
-	[44046] = 44047,
-	[48174] = 44047,
-	[44047] = {
-		disabled = true,
-		cooldown = 30,
-		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
