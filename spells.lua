@@ -856,6 +856,7 @@ AfflictedSpells = {
 	-- PVP Trinket (2m)
 	[42292] = {
 		cooldown = 120,
+		cdEnabled = true,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},

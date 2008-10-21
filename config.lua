@@ -602,6 +602,8 @@ local function getDisabled(info)
 	return not get(info)
 end
 
+local hasDuplicate = {}
+
 local checkEvents = { ["SPELL_AURA_APPLIEDDEBUFFENEMY"] = L["Enemy, gained debuff"], ["SPELL_CAST_SUCCESS"] = L["Enemy, successfully casts"], ["SPELL_SUMMON"] = L["Enemy, summons object"], ["SPELL_CREATE"] = L["Enemy, creates object"]}
 function Config:CreateSpellDisplay(info, value)
 	-- Do a quick type change
@@ -617,7 +619,14 @@ function Config:CreateSpellDisplay(info, value)
 	local text = value
 	if( type(value) == "number" ) then
 		local data = Afflicted.db.profile.spells[value]
-		if( data.text ) then
+		if( data.text and hasDuplicate[data.text] ) then
+			local rank = select(2, GetSpellInfo(value))
+			if( rank ~= "" ) then
+				text = string.format("%s (%s)", data.text, rank)
+			else
+				text = data.text
+			end
+		elseif( data.text ) then
 			text = data.text
 		else
 			text = string.format("#%d", tonumber(value))
@@ -647,7 +656,7 @@ function Config:CreateSpellDisplay(info, value)
 				type = "toggle",
 				name = L["Disable spell"],
 				desc = L["While disabled, this spell will be completely ignored and no timer will be started for it."],
-				width = "double",
+				width = "full",
 				arg = "spells." .. value .. ".disabled",
 			},
 			showIn = {
@@ -663,7 +672,6 @@ function Config:CreateSpellDisplay(info, value)
 				type = "input",
 				name = L["Icon path"],
 				desc = L["Icon path to use for display, you do not have to specify this option. As long as you leave it blank or using the question mark icon then will auto-detect and save it."],
-				width = "double",
 				arg = "spells." .. value .. ".icon",
 			},
 			timer = {
@@ -940,7 +948,7 @@ local function loadOptions()
 				args = {
 					desc = {
 						order = 0,
-						name = L["Global display setting, changing these will change all the anchors settings."],
+						name = L["Global display setting, changing these will change all the anchors settings.\nNOTE: These values do not always reflect each anchors configuration, this is just a quick way to set all of them to the same thing."],
 						type = "description",
 					},
 					growUp = {
@@ -1254,6 +1262,18 @@ local function loadOptions()
 	options.args.arenaSpells.args.two.args = Config:GetArenaSpellList(2)
 	options.args.arenaSpells.args.three.args = Config:GetArenaSpellList(3)
 	options.args.arenaSpells.args.five.args = Config:GetArenaSpellList(5)
+	
+	-- Quick check, find all spells with the same name
+	local alreadyFound = {}
+	for _, data in pairs(Afflicted.db.profile.spells) do
+		if( type(data) == "table" and data.text ) then
+			if( alreadyFound[data.text] ) then
+				hasDuplicate[data.text] = true	
+			else
+				alreadyFound[data.text] = true
+			end
+		end
+	end
 	
 	-- Load our created anchors in
 	for id, data in pairs(Afflicted.db.profile.spells) do

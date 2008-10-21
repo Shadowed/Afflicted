@@ -76,7 +76,7 @@ AfflictedLocals = {
 	
 	["Timer display"] = "Timer display",
 
-	["Global display setting, changing these will change all the anchors settings."] = "Global display setting, changing these will change all the anchors settings.",
+	["Global display setting, changing these will change all the anchors settings.\nNOTE: These values do not always reflect each anchors configuration, this is just a quick way to set all of them to the same thing."] = "Global display setting, changing these will change all the anchors settings.\nNOTE: These values do not always reflect each anchors configuration, this is just a quick way to set all of them to the same thing.",
 	["Display style"] = "Display style",
 	
 	["Max timers"] = "Max timers",

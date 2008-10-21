@@ -137,7 +137,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		barData[id] = data .. ",cd"
 		
 		-- If the timer is being redirected to another anchor, show the CD text
-		if( Afflicted.db.profile.anchors[spellData.cdInside].redirectTo ~= "" ) then
+		if( spellData.cdInside ~= "cooldowns" or Afflicted.db.profile.anchors[spellData.cdInside].redirectTo ~= "" ) then
 			cd = "[CD] "
 		end
 		
