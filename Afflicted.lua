@@ -215,7 +215,7 @@ end
 -- New ability found
 function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, sourceGUID, sourceName, destGUID, destName)
 	local spellData = getSpellData(spellID, spellName)
-	if( not spellData or spellData.disabled or not spellData[eventType] or ( currentBracket and self.db.profile.disabledSpells[currentBracket][spellID] ) ) then
+	if( not spellData or spellData.disabled or not spellData[eventType] or not self.db.profile.anchors[spellData.showIn] or ( currentBracket and self.db.profile.disabledSpells[currentBracket][spellID] ) ) then
 		return
 	end
 		
@@ -225,10 +225,6 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 	end
 	
 	local anchor = self.db.profile.anchors[spellData.showIn]
-	if( not anchor or not anchor.enabled ) then
-		return
-	end
-
 	
 	-- No icon listed, use our own
 	local icon = select(3, GetSpellInfo(spellID))
@@ -236,10 +232,14 @@ function Afflicted:ProcessAbility(eventType, spellID, spellName, spellSchool, so
 		spellData.icon = icon
 	end
 		
-	-- Start it up
+	-- Trigger a timer if we can
 	self[anchor.displayType]:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 
-	-- Announce it
+	-- Don't announce it since the anchors supposed to be disabled
+	if( not anchor.enabled ) then
+		return
+	end
+	
 	-- Work out if we should use a custom message, or a default one
 	local msg
 	if( spellData.enableCustom ) then

@@ -99,29 +99,27 @@ end
 -- Create a new timer
 function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
 	local group = Bars.groups[spellData.showIn]
-	if( not group ) then
-		return
+	if( group ) then
+		local anchor = Afflicted.db.profile.anchors[spellData.showIn]
+		local id = string.format("%s:%s:%s", spellID, sourceGUID, destGUID)
+		local text = spellName
+
+		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
+			text = sourceName
+		elseif( sourceName ~= "" ) then
+			text = string.format("%s - %s", spellName, sourceName)
+		else
+			text = spellName
+		end
+
+		-- We can only pass one argument, so we do this to prevent creating and dumping tables and such
+		local data = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
+		barData[id] = data
+		barData[spellName .. sourceGUID] = true
+
+		group:RegisterBar(id, text, Afflicted:GetSpellDuration(sourceGUID, spellName, spellID, spellData.seconds), nil, spellData.icon)
+		group:SetRepeatingTimer(id, spellData.repeating or false)
 	end
-		
-	local id = string.format("%s:%s:%s", spellID, sourceGUID, destGUID)
-	local text = spellName
-
-	if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
-		text = sourceName
-	elseif( sourceName ~= "" ) then
-		text = string.format("%s - %s", spellName, sourceName)
-	else
-		text = spellName
-	end
-
-	
-	-- We can only pass one argument, so we do this to prevent creating and dumping tables and such
-	local data = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
-	barData[id] = data
-	barData[spellName .. sourceGUID] = true
-
-	group:RegisterBar(id, text, Afflicted:GetSpellDuration(sourceGUID, spellName, spellID, spellData.seconds), nil, spellData.icon)
-	group:SetRepeatingTimer(id, spellData.repeating or false)
 	
 	-- Start a cooldown timer
 	if( spellData.cdEnabled and spellData.cooldown > 0 ) then
@@ -134,6 +132,7 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		local cd = ""
 		local text
 		
+		data = data or string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
 		barData[id] = data .. ",cd"
 		
 		-- If the timer is being redirected to another anchor, show the CD text
