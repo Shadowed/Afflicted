@@ -98,12 +98,12 @@ end
 
 -- Create a new timer
 function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, sourceName, destGUID)
+	local id, data
+	
 	local group = Bars.groups[spellData.showIn]
 	if( group ) then
 		local anchor = Afflicted.db.profile.anchors[spellData.showIn]
-		local id = string.format("%s:%s:%s", spellID, sourceGUID, destGUID)
 		local text = spellName
-
 		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
 			text = sourceName
 		elseif( sourceName ~= "" ) then
@@ -113,7 +113,8 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		end
 
 		-- We can only pass one argument, so we do this to prevent creating and dumping tables and such
-		local data = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
+		id = string.format("%s:%s:%s", spellID, sourceGUID, destGUID)
+		data = string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
 		barData[id] = data
 		barData[spellName .. sourceGUID] = true
 
@@ -128,18 +129,17 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 			return
 		end
 
-		local id = id .. ":CD"
-		local cd = ""
-		local text
-		
+		id = (id or string.format("%s:%s:%s", spellID, sourceGUID, destGUID)) .. ":CD"
 		data = data or string.format("%s,%s,%s,%s,%s", eventType, spellID, spellName, sourceGUID, sourceName)
 		barData[id] = data .. ",cd"
 		
 		-- If the timer is being redirected to another anchor, show the CD text
+		local cd = ""
 		if( spellData.cdInside ~= "cooldowns" or Afflicted.db.profile.anchors[spellData.cdInside].redirectTo ~= "" ) then
 			cd = "[CD] "
 		end
 		
+		local text
 		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
 			text = string.format("%s%s", cd, sourceName)
 		elseif( sourceName ~= "" ) then

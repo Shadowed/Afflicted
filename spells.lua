@@ -736,10 +736,11 @@ AfflictedSpells = {
 	[49230] = 25454,
 	[49231] = 25454,
 	[25454] = {
+		cdEnabled = true,
 		text = "Earth Shock",
-		seconds = 5,
+		cooldown = 5,
 		dontFade = true,
-		showIn = "spells",
+		cdInside = "spells",
 		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -782,7 +783,7 @@ AfflictedSpells = {
 		disabled = true,
 		seconds = 45,
 		resetOn = 11958,
-		showIn = "cooldowns",
+		showIn = "buffs",
 		SPELL_SUMMON = true,
 	},
 
