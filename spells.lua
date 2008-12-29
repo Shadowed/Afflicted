@@ -854,6 +854,8 @@ AfflictedSpells = {
 	},
 	
 	--[[ TRINKETS ]]--
+	-- Every Man for Himself (Human Racial)
+	[59752] = 42292,
 	-- PVP Trinket (2m)
 	[42292] = {
 		cooldown = 120,
