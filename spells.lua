@@ -25,16 +25,24 @@ AfflictedSpells = {
 	[48707] = {
 		disabled = true,
 		seconds = 5,
-		cooldown = 60,
+		cooldown = 45,
 		cdEnabled = true,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Shadow of Death
+	[54223] = {
+		disabled = true,
+		seconds = 25,
+		showIn = "buffs",
+		SPELL_AURA_APPLIEDBUFFENEMY = true,
 	},
 
 	-- Anti-Magic Zone
 	[51052] = {
 		disabled = true,
-		seconds = 30,
+		seconds = 10,
 		cooldown = 120,
 		cdEnabled = true,
 		showIn = "buffs",
@@ -44,7 +52,7 @@ AfflictedSpells = {
 	-- Lichborne
 	[49039] = {
 		disabled = true,
-		seconds = 30,
+		seconds = 15,
 		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -77,14 +85,6 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- Swiftmend
-	[18562] = {
-		disabled = true,
-		cooldown = 13,
-		cdInside = "spells",
-		SPELL_CAST_SUCCESS = true
-	},
-		
 	-- Survival Instincts
 	[61336] = {
 		seconds = 20,
@@ -205,7 +205,7 @@ AfflictedSpells = {
 	[11305] = {
 		disabled = true,
 		seconds = 15,
-		cooldown = 210,
+		cooldown = 120,
 		resetOn = 14185,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -221,7 +221,7 @@ AfflictedSpells = {
 	
 	-- Blind
 	[2094] = {
-		cooldown = 90,
+		cooldown = 120,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -241,7 +241,7 @@ AfflictedSpells = {
 	[26669] = {
 		disabled = true,
 		seconds = 15,
-		cooldown = 210,
+		cooldown = 120,
 		resetOn = 14185,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -252,7 +252,7 @@ AfflictedSpells = {
 	[26889] = {
 		disabled = true,
 		seconds = 10,
-		cooldown = 210,
+		cooldown = 120,
 		resetOn = 14185,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -280,20 +280,7 @@ AfflictedSpells = {
 	-- Repentance
 	[20066] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 60,
-		cdInside = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Hammer of Justice
-	[853] = 10308,
-	[5588] = 10308,
-	[5589] = 10308,
-	[10308] = {
-		disabled = true,
-		dontFade = true,
-		cooldown = 45,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -380,7 +367,8 @@ AfflictedSpells = {
 
 	-- Bestial Wrath
 	[19574] = {
-		cooldown = 18,
+		seconds = 18,
+		cooldown = 120,
 		cdEnabled = true,
 		cdInside = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -450,19 +438,7 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-	
-	-- Shadow Word: Death
-	[32379] = 32996,
-	[48157] = 32996,
-	[48158] = 32996,
-	[32996] = {
-		disabled = true,
-		dontFade = true,
-		cooldown = 12,
-		cdInside = "spells",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
+
 	-- Fear Ward
 	[6346] = {
 		disabled = true,
@@ -639,6 +615,7 @@ AfflictedSpells = {
 	[19734] = 27277,
 	[19736] = 27277,
 	[27276] = 27277,
+	[48011] = 27277,
 	[27277] = {
 		disabled = true,
 		dontFade = true,
@@ -749,6 +726,7 @@ AfflictedSpells = {
 	-- Deep Freeze
 	[44572] = {
 		cooldown = 30,
+		resetOn = 11958,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -806,7 +784,7 @@ AfflictedSpells = {
 	-- Invisibility
 	[66] = {
 		disabled = true,
-		seconds = 23,
+		seconds = 20,
 		cooldown = 180,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
@@ -836,20 +814,11 @@ AfflictedSpells = {
 	},
 	
 	--[[ RACIALS ]]--
-	-- Perception
-	[20600] = {
-		disabled = true,
-		seconds = 20,
-		cooldown = 180,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
 	-- Escape Artist
 	[20589] = {
 		disabled = true,
 		cooldown = 105,
-		cdInside = "buffs",
+		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
 	
@@ -865,6 +834,7 @@ AfflictedSpells = {
 	},
 
 	-- Tremendous Fortitude
+	[55915] = 44055,
 	[44055] = {
 		seconds = 15,
 		cooldown = 180,
@@ -872,49 +842,15 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- Berserker's Call
-	[43716] = {
-		disabled = true,
-		seconds = 20,
-		cooldown = 120,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
 
-	-- Bloodlust Brooch
-	[35166] = {
-		disabled = true,
-		seconds = 20,
-		cooldown = 120,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-	
-	-- The Skull of Gul'dan
-	[40396] = {
-		disabled = true,
-		seconds = 20,
-		cooldown = 120,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
-
-	-- Figurine - Shadowsong Panther
-	[46784] = {
-		disabled = true,
-		seconds = 15,
-		cooldown = 90,
-		showIn = "buffs",
-		SPELL_CAST_SUCCESS = true,
-	},
 	
 	--[[ ENGINEERING BULLSHIT ]]--
-	-- Nigh Invulnerability Belt
-	[30458] = {
+	-- Nitro Boost
+	[55004] = {
 		disabled = true,
-		seconds = 8,
+		seconds = 2,
 		cooldown = 300,
-		showIn = "spells",
+		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 }
