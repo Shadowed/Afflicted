@@ -277,6 +277,14 @@ AfflictedSpells = {
 	},
 		
 	--[[ PALADINS ]]--
+	-- Divine Plea
+	[54428] = {
+		cooldown = 60,
+		seconds = 15,
+		cdInside = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Repentance
 	[20066] = {
 		disabled = true,
