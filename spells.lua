@@ -837,6 +837,7 @@ AfflictedSpells = {
 	[42292] = {
 		cooldown = 120,
 		cdEnabled = true,
+		dontFade = true,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -849,8 +850,6 @@ AfflictedSpells = {
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
-	
-
 	
 	--[[ ENGINEERING BULLSHIT ]]--
 	-- Nitro Boost
