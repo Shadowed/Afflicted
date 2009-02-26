@@ -171,7 +171,8 @@ AfflictedLocals = {
 	["Repeating timer"] = "Repeating timer",
 	["Sets the timer as repeating, meaning once it hits 0 it'll start back up at the original time until the timer is specifically removed."] = "Sets the timer as repeating, meaning once it hits 0 it'll start back up at the original time until the timer is specifically removed.",
 	
-	["Ignore fade events"] = "Ignore fade events",
+	["Fade early if buff is removed"] = "Fade early if buff is removed",
+	["Sets if the spell duration should be removed early, if the buff fades before the time runs out. (Dispelled, clicked off, and so on)"] = "Sets if the spell duration should be removed early, if the buff fades before the time runs out. (Dispelled, clicked off, and so on)",
 	["Prevents the timer from ending early due to the spell fading early before the timer runs out."] = "Prevents the timer from ending early due to the spell fading early before the timer runs out.",
 	
 	["Duration"] = "Duration",

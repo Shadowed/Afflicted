@@ -118,47 +118,18 @@ function Config:SetupDB()
 			end
 		end
 	end
-	
 
 	-- Upgrade
 	if( self.db.profile.version ) then
-		if( self.db.profile.version <= 655 ) then
+		if( self.db.profile.version <= 838 ) then
 			self.db:ResetProfile()
 			self:Print(L["Your configuration has been reset to the defaults."])
-		elseif( self.db.profile.version <= 667 ) then
-			for k, spell in pairs(self.db.profile.spells) do
-				if( type(spell) == "table" ) then
-					spell.SPELL_MISC = nil
-					spell.SPELL_AURA_APPLIEDDEBUFFGROUP = nil
-					spell.SPELL_AURA_APPLIEDBUFFENEMY = nil
-					spell.SPELL_INTERRUPT = nil
-
-					if( not spell.SPELL_SUMMON and not spell.SPELL_CREATE and not spell.SPELL_AURA_APPLIEDDEBUFFENEMY ) then
-						spell.SPELL_CAST_SUCCESS = true
-					end
+		elseif( self.db.profile.version <= 979 ) then
+			for id, data in pairs(self.db.profile.spells) do
+				if( type(data) == "table" and data.dontFade ) then
+					data.doFade = not data.dontFade
+					data.dontFade = nil
 				end
-			end
-		elseif( self.db.profile.version <= 702 ) then
-			for k, anchor in pairs(self.db.profile.anchors) do
-				if( not anchor.redirectTo ) then
-					anchor.redirectTo = ""
-				end
-			end
-			
-		elseif( self.db.profile.version <= 758 ) then
-			for k, anchor in pairs(self.db.profile.anchors) do
-				anchor.maxRows = anchor.maxRows or self.defaults.profile.anchorDefault.maxRows
-				anchor.displayType = anchor.displayType or self.defaults.profile.anchorDefault.displayType
-
-				if( self.db.profile.showBars == false ) then
-					self.db.profile.showBars = nil
-					anchor.displayType = "icon"
-				end
-			end
-		
-		elseif( self.db.profile.version <= 838 ) then
-			if( self.db.profile.anchors.cooldowns.fadeMessage == L["FINISHED *spell (*target)"] ) then
-				self.db.profile.anchors.cooldowns.fadeMessage = L["READY *spell (*target)"]
 			end
 		end
 		
@@ -629,7 +600,7 @@ function Config:CreateSpellDisplay(info, value)
 		elseif( data.text ) then
 			text = data.text
 		else
-			text = string.format("#%d", tonumber(value))
+			text = (GetSpellInfo(value)) or string.format("#%d", value)
 		end
 	end
 	
@@ -706,9 +677,9 @@ function Config:CreateSpellDisplay(info, value)
 					noFade = {
 						order = 3,
 						type = "toggle",
-						name = L["Ignore fade events"],
-						desc = L["Prevents the timer from ending early due to the spell fading early before the timer runs out."],
-						arg = "spells." .. value .. ".dontFade",
+						name = L["Fade early if buff is removed"],
+						desc = L["Sets if the spell duration should be removed early, if the buff fades before the time runs out. (Dispelled, clicked off, and so on)"],
+						arg = "spells." .. value .. ".doFade",
 					},
 					checkEvents = {
 						order = 4,
@@ -1307,6 +1278,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 			if( type(data) == "table" ) then
 				i = i + 1
 
+				
 				if( not addedTypes[data.showIn] ) then
 					addedTypes[data.showIn] = 0
 				end
@@ -1315,7 +1287,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 					addedTypes[data.showIn] = addedTypes[data.showIn] + 1
 					
 					local anchor = Afflicted.db.profile.anchors[data.showIn]
-					if( anchor.enabled ) then
+					if( ( anchor.displayType == "bar" and anchor.redirectTo ~= "" and Afflicted.db.profile.anchors[Afflicted.modules.Bars.nameToType[anchor.redirectTo]].enabled ) or anchor.enabled ) then
 						if( ( not data.icon or data.icon == "" ) and type(spell) == "number" ) then
 							data.icon = select(3, GetSpellInfo(spell))
 						end

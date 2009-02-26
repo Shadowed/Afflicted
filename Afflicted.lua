@@ -1,5 +1,5 @@
 --[[ 
-	Afflicted, Mayen/Amarand/Dayliss from Icecrown (US) PvE
+	Afflicted, Mayen/Selari/Dayliss from Illidan (US) PvP
 ]]
 
 Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
@@ -277,7 +277,7 @@ end
 -- An ability was ended early via the combat log
 function Afflicted:ProcessEnd(eventType, spellID, spellName, sourceGUID, sourceName)
 	local spellData = getSpellData(spellID, spellName)
-	if( not spellData or spellData.disabled or spellData.dontFade ) then
+	if( not spellData or spellData.disabled or not spellData.doFade ) then
 		return
 	end
 	

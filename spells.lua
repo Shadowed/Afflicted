@@ -1,5 +1,15 @@
 AfflictedSpells = { 
 	--[[ DEATH KNIGHTS ]]--
+	-- Hysteria
+	[49016] = {
+		disabled = true,
+		doFade = true,
+		seconds = 30,
+		cooldown = 180,
+		showIn = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Strangulate
 	[47476] = 49916,
 	[49913] = 49916,
@@ -7,7 +17,6 @@ AfflictedSpells = {
 	[49915] = 49916,
 	[49916] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 120,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -21,6 +30,15 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
+	-- Dancing Rune Weapon
+	[49028] = {
+		disabled = true,
+		cooldown = 180,
+		seconds = 30,
+		showIn = "spells",
+		SPELL_CAST_SUCESS = true,
+	},
+	
 	-- Anti-Magic Shell
 	[48707] = {
 		disabled = true,
@@ -31,14 +49,6 @@ AfflictedSpells = {
 		SPELL_CAST_SUCCESS = true,
 	},
 	
-	-- Shadow of Death
-	[54223] = {
-		disabled = true,
-		seconds = 25,
-		showIn = "buffs",
-		SPELL_AURA_APPLIEDBUFFENEMY = true,
-	},
-
 	-- Anti-Magic Zone
 	[51052] = {
 		disabled = true,
@@ -60,7 +70,6 @@ AfflictedSpells = {
 	
 	-- Mind Freeze
 	[47528] = {
-		dontFade = true,
 		cooldown = 10,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -79,6 +88,7 @@ AfflictedSpells = {
 	-- Innervate
 	[29166] = {
 		disabled = true,
+		doFade = true,
 		seconds = 20,
 		cooldown = 360,
 		showIn = "buffs",
@@ -103,7 +113,6 @@ AfflictedSpells = {
 	
 	-- Feral Charge - Bear
 	[16979] = {
-		dontFade = true,
 		cooldown = 15,
 		cdEnabled = true,
 		cdInside = "spells",
@@ -113,7 +122,6 @@ AfflictedSpells = {
 	-- Feral Charge (Cat)
 	[49376] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 30,
 		cdEnabled = true,
 		cdInside = "spells",
@@ -126,7 +134,6 @@ AfflictedSpells = {
 	[6798] = 8983,
 	[8983] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 60,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -136,7 +143,6 @@ AfflictedSpells = {
 	[49802] = 22570,
 	[22570] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 10,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -214,7 +220,6 @@ AfflictedSpells = {
 	-- Preparation
 	[14185] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 600,
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -230,7 +235,6 @@ AfflictedSpells = {
 	[408] = 8643,
 	[8643] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 20,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -279,6 +283,7 @@ AfflictedSpells = {
 	--[[ PALADINS ]]--
 	-- Divine Plea
 	[54428] = {
+		doFade = true,
 		cooldown = 60,
 		seconds = 15,
 		cdInside = "buffs",
@@ -295,6 +300,7 @@ AfflictedSpells = {
 
 	-- Divine Shield
 	[642] = {
+		doFade = true,
 		seconds = 12,
 		cooldown = 300,
 		showIn = "buffs",
@@ -303,6 +309,7 @@ AfflictedSpells = {
 	
 	-- Hand of Sacrifice
 	[6940] = {
+		doFade = true,
 		seconds = 12,
 		cooldown = 120,
 		showIn = "buffs",
@@ -311,6 +318,7 @@ AfflictedSpells = {
 	
 	-- Hand of Freedom
 	[1044] = {
+		doFade = true,
 		seconds = 14,
 		cooldown = 25,
 		cdEnabled = true,
@@ -320,6 +328,7 @@ AfflictedSpells = {
 	
 	-- Hand of Protection
 	[1022] = {
+		doFade = true,
 		seconds = 6,
 		cooldown = 300,
 		showIn = "buffs",
@@ -327,6 +336,7 @@ AfflictedSpells = {
 	},
 	
 	[5599] = {
+		doFade = true,
 		seconds = 8,
 		cooldown = 300,
 		showIn = "buffs",
@@ -334,6 +344,7 @@ AfflictedSpells = {
 	},
 	
 	[10278] = {
+		doFade = true,
 		seconds = 10,
 		cooldown = 300,
 		showIn = "buffs",
@@ -342,12 +353,7 @@ AfflictedSpells = {
 
 	--[[ HUNTERS ]]--
 	-- Viper sting
-	[3034] = 27018,
-	[14279] = 27018,
-	[14280] = 27018,
-	[49008] = 27018,
-	[27018] = {
-		dontFade = true,
+	[3034] = {
 		cooldown = 15,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -357,7 +363,6 @@ AfflictedSpells = {
 	[1513] = 14327,
 	[14326] = 14327,
 	[14327] = {
-		dontFade = true,
 		disabled = true,
 		seconds = 30,
 		showIn = "spells",
@@ -366,7 +371,6 @@ AfflictedSpells = {
 
 	-- Scatter Shot
 	[19503] = {
-		dontFade = true,
 		cooldown = 30,
 		cdEnabled = true,
 		cdInside = "spells",
@@ -385,7 +389,6 @@ AfflictedSpells = {
 	
 	-- Silencing Shot
 	[34490] = {
-		dontFade = true,
 		cooldown = 20,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -425,7 +428,6 @@ AfflictedSpells = {
 		seconds = 60,
 		cooldown = 30,
 		showIn = "spells",
-		dontFade = true,
 		dontSave = true,
 		SPELL_CREATE = true,
 	},
@@ -433,6 +435,7 @@ AfflictedSpells = {
 	--[[ PRIESTS ]]--
 	-- Guardian Spirit
 	[47788] = {
+		doFade = true,
 		seconds = 10,
 		cooldown = 180,
 		showIn = "buffs",
@@ -450,7 +453,6 @@ AfflictedSpells = {
 	-- Fear Ward
 	[6346] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 180,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -469,6 +471,7 @@ AfflictedSpells = {
 	
 	-- Power Infusion
 	[10060] = {
+		doFade = true,
 		seconds = 15,
 		cooldown = 120,
 		showIn = "buffs",
@@ -477,6 +480,7 @@ AfflictedSpells = {
 
 	-- Pain Suppression
 	[33206] = {
+		doFade = true,
 		seconds = 8,
 		cdEnabled = true,
 		cooldown = 120,
@@ -486,7 +490,6 @@ AfflictedSpells = {
 			
 	-- Silence
 	[15487] = {
-		dontFade = true,
 		cooldown = 45,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -585,7 +588,6 @@ AfflictedSpells = {
 	-- Spell Lock
 	[19244] = 19647,
 	[19647] = {
-		dontFade = true,
 		cdEnabled = true,
 		cooldown = 24,
 		cdInside = "spells",
@@ -611,6 +613,7 @@ AfflictedSpells = {
 	-- Fel Domination
 	[18708] = {
 		disabled = true,
+		doFade = true,
 		seconds = 15,
 		cooldown = 900,
 		showIn = "buffs",
@@ -626,7 +629,6 @@ AfflictedSpells = {
 	[48011] = 27277,
 	[27277] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 8,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
@@ -644,7 +646,7 @@ AfflictedSpells = {
 	-- Heroism
 	[32182] = {
 		disabled = true,
-		dontFade = true,
+		doFade = true,
 		seconds = 40,
 		cooldown = 600,
 		showIn = "buffs",
@@ -654,7 +656,7 @@ AfflictedSpells = {
 	-- Bloodlust
 	[2825] = {
 		disabled = true,
-		dontFade = true,
+		doFade = true,
 		seconds = 40,
 		cooldown = 600,
 		showIn = "buffs",
@@ -724,7 +726,6 @@ AfflictedSpells = {
 		cdEnabled = true,
 		text = "Earth Shock",
 		cooldown = 5,
-		dontFade = true,
 		cdInside = "spells",
 		icon = "Interface\\Icons\\Spell_Nature_EarthShock",
 		SPELL_CAST_SUCCESS = true,
@@ -749,6 +750,7 @@ AfflictedSpells = {
 
 	-- Ice Block
 	[45438] = {
+		doFade = true,
 		seconds = 10,
 		cooldown = 240,
 		resetOn = 11958,
@@ -759,7 +761,6 @@ AfflictedSpells = {
 	-- Cold Snap
 	[11958] = {
 		disabled = true,
-		dontFade = true,
 		cooldown = 480,
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -791,6 +792,7 @@ AfflictedSpells = {
 	
 	-- Invisibility
 	[66] = {
+		doFade = true,
 		disabled = true,
 		seconds = 20,
 		cooldown = 180,
@@ -814,6 +816,7 @@ AfflictedSpells = {
 
 	-- Icy Veins
 	[12472] = {
+		doFade = true,
 		seconds = 20,
 		resetOn = 11958,
 		cooldown = 180,
@@ -837,7 +840,6 @@ AfflictedSpells = {
 	[42292] = {
 		cooldown = 120,
 		cdEnabled = true,
-		dontFade = true,
 		cdInside = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},

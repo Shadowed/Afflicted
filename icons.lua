@@ -260,7 +260,7 @@ function Icons:UnitDied(destGUID)
 			for i=#(group.active), 1, -1 do
 				local row = group.active[i]
 
-				if( ( row.sourceGUID == destGUID or row.destGUID == destGUID ) and not row.dontFade and not row.isCooldown ) then
+				if( ( row.sourceGUID == destGUID or row.destGUID == destGUID ) and not row.isCooldown ) then
 					releaseIcon(group, i)
 				end
 			end
