@@ -136,6 +136,12 @@ function Config:SetupDB()
 					data.dontFade = nil
 				end
 			end
+		elseif( self.db.profile.version <= 1131 ) then
+			for _, anchor in pairs(self.db.profile.anchors) do
+				if( not anchor.fadeTime ) then
+					anchor.fadeTime = 0.5
+				end
+			end
 		end
 		
 		-- Do a quick spell check to see if something was removed from the default list
