@@ -1,8 +1,8 @@
 --- AceGUI-3.0 provides access to numerous widgets which can be used to create GUIs.
 -- @class file
 -- @name AceGUI-3.0
--- @release $Id: AceGUI-3.0.lua 740 2009-02-15 13:56:40Z nevcairiel $
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 18
+-- @release $Id: AceGUI-3.0.lua 746 2009-03-01 15:17:19Z nevcairiel $
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 19
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -253,7 +253,7 @@ do
 		frame:SetParent(nil)
 		frame:SetParent(parent.content)
 		self.parent = parent
-		fixlevels(parent.frame,parent.frame:GetChildren())
+		--fixlevels(parent.frame,parent.frame:GetChildren())
 	end
 	
 	WidgetBase.SetCallback = function(self, name, func)

@@ -41,6 +41,9 @@ function Config:SetupDB()
 			barWidth = 180,
 			barNameOnly = false,
 			barName = "BantoBar",
+
+			fontSize = 12,
+			fontName = "Friz Quadrata TT",
 			
 			spells = AfflictedSpells,
 			inside = {["arena"] = true, ["pvp"] = true},
@@ -56,6 +59,8 @@ function Config:SetupDB()
 				announceDest = "1",
 				scale = 1.0,
 				maxRows = 20,
+				fadeTime = 0.5,
+				icon = "LEFT",
 				redirectTo = "",
 				displayType = "bar",
 
@@ -268,6 +273,18 @@ local function setGlobalOption(info, value)
 	globalOptions[info.arg] = value
 end
 
+-- Return all fonts
+local fonts = {}
+function Config:GetFonts()
+	for k in pairs(fonts) do fonts[k] = nil end
+
+	for _, name in pairs(SML:List(SML.MediaType.FONT)) do
+		fonts[name] = name
+	end
+	
+	return fonts
+end
+
 -- Return all registered SML textures
 local textures = {}
 function Config:GetTextures()
@@ -374,18 +391,33 @@ function Config:CreateAnchorDisplay(info, value)
 						values = displayTypes,
 						arg = "anchors." .. id .. ".displayType",
 					},
-					sep = {
-						order = 3,
-						name = "",
-						type = "description",
+					iconPosition = {
+						order = 2.25,
+						type = "select",
+						name = L["Icon position"],
+						values = {["LEFT"] = L["Left"], ["RIGHT"] = L["Right"]},
+						arg = "anchors." .. id .. ".icon",
 					},
 					scale = {
-						order = 4,
+						order = 2.5,
 						type = "range",
 						name = L["Display scale"],
 						desc = L["How big the actual timers should be."],
 						min = 0, max = 2, step = 0.1,
 						arg = "anchors." .. id .. ".scale",
+					},
+					sep = {
+						order = 3,
+						name = "",
+						type = "description",
+					},
+					fadeTime = {
+						order = 4,
+						type = "range",
+						name = L["Fade time"],
+						desc = L["How many seconds it should take after a bar is finished for it to fade out."],
+						min = 1, max = 2, step = 0.1,
+						arg = "anchors." .. id .. ".fadeTime",
 					},
 					maxRows = {
 						order = 5,
@@ -733,41 +765,6 @@ function Config:CreateSpellDisplay(info, value)
 					},
 				},
 			},
-			--[[
-			limit = {
-				order = 7,
-				type = "group",
-				inline = true,
-				name = L["Trigger limits"],
-				args = {
-					desc = {
-						order = 0,
-						name = L["Lets you prevent timers from trigger too quickly, causing duplicates."],
-						type = "description",
-					},
-					single = {
-						order = 1,
-						type = "input",
-						name = L["Per-player limit"],
-						desc = L["How many seconds between the time this timer triggers, and the next one can trigger. This is the per player one, meaning it won't trigger more then the set amount per the player it triggered on/from."],
-						validate = function(info, value) return tonumber(value) end,
-						get = getString,
-						set = setNumber,
-						arg = "spells." .. value .. ".singleLimit",
-					},
-					global = {
-						order = 1,
-						type = "input",
-						name = L["Per-spell limit"],
-						desc = L["How many seconds between the time this timer triggers, and the next one can trigger. This is the per spell one, meaning it won't trigger more then the set amount per the spellID that triggers it."],
-						validate = function(info, value) return tonumber(value) end,
-						get = getString,
-						set = setNumber,
-						arg = "spells." .. value .. ".globalLimit",
-					},
-				},
-			},
-			]]
 			announce = {
 				order = 8,
 				type = "group",
@@ -991,7 +988,7 @@ local function loadOptions()
 								type = "toggle",
 								name = L["Only show triggered name in text"],
 								desc = L["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."],
-								width = "double",
+								width = "full",
 								arg = "barNameOnly",
 							},
 							barWidth = {
@@ -1002,18 +999,34 @@ local function loadOptions()
 								set = setNumber,
 								arg = "barWidth",
 							},
-							sep = {
+							fontSize = {
 								order = 3,
+								type = "range",
+								name = L["Font size"],
+								min = 1, max = 20, step = 1,
+								set = setNumber,
+								arg = "fontSize",
+							},
+							sep = {
+								order = 4,
 								name = "",
 								type = "description",
 							},
 							barName = {
-								order = 4,
+								order = 5,
 								type = "select",
 								name = L["Bar texture"],
 								dialogControl = 'LSM30_Statusbar',
 								values = "GetTextures",
 								arg = "barName",
+							},
+							fontName = {
+								order = 6,
+								type = "select",
+								name = L["Font name"],
+								dialogControl = "LSM30_Font",
+								values = "GetFonts",
+								arg = "fontName",
 							},
 						},
 					},
@@ -1305,7 +1318,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 			end
 			
 			config:RegisterOptionsTable("Afflicted2", options)
-			dialog:SetDefaultSize("Afflicted2", 625, 590)
+			dialog:SetDefaultSize("Afflicted2", 640, 590)
 			registered = true
 		end
 

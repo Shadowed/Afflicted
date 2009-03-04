@@ -30,6 +30,9 @@ function Bars:CreateDisplay(type)
 	group:SetDisplayGroup(anchorData.redirectTo ~= "" and anchorData.redirectTo or nil)
 	group:SetBarGrowth(anchorData.growUp and "UP" or "DOWN")
 	group:SetMaxBars(anchorData.maxRows)
+	group:SetFont(SML:Fetch(SML.MediaType.FONT, Afflicted.db.profile.fontName), Afflicted.db.profile.fontSize)
+	group:SetFadeTime(anchorData.fadeTime)
+	group:SetIconPosition(anchorData.icon)
 
 	if( anchorData.position ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", anchorData.position.x, anchorData.position.y)
@@ -47,10 +50,14 @@ function Bars:OnBarMove(parent, x, y)
 	Afflicted.db.profile.anchors[nameToType[parent.name]].position.y = y
 end
 
-function Bars:TextureRegistered(event, mediaType, key)
+function Bars:MediaRegistered(event, mediaType, key)
 	if( mediaType == SML.MediaType.STATUSBAR and Afflicted.db.profile.barName == key ) then
 		for id, group in pairs(Bars.groups) do
 			group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
+		end
+	elseif( mediaType == SML.MediaType.FONT and Afflicted.db.profile.fontName == key ) then
+		for id, group in pairs(Bars.groups) do
+			group:SetFont(SML:Fetch(SML.MediaType.FONT, Afflicted.db.profile.fontName), Afflicted.db.profile.fontSize)
 		end
 	end
 end
@@ -59,7 +66,7 @@ end
 function Bars:LoadVisual()
 	if( not GTBLib ) then
 		SML = Afflicted.SML
-		SML.RegisterCallback(Bars, "LibSharedMedia_Registered", "TextureRegistered")
+		SML.RegisterCallback(Bars, "LibSharedMedia_Registered", "MediaRegistered")
 		
 		GTBLib = LibStub:GetLibrary("GTB-1.0")
 		self.GTB = GTBLib
@@ -225,5 +232,9 @@ function Bars:ReloadVisual()
 		group:SetWidth(Afflicted.db.profile.barWidth)
 		group:SetAnchorVisible(Afflicted.db.profile.showAnchors)
 		group:SetMaxBars(data.maxRows)
+		group:SetFont(SML:Fetch(SML.MediaType.FONT, Afflicted.db.profile.fontName), Afflicted.db.profile.fontSize)
+		group:SetFadeTime(data.fadeTime)
+		group:SetIconPosition(data.icon)
+		group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
 	end
 end

@@ -88,6 +88,13 @@ AfflictedLocals = {
 	["Only show triggered name in text"] = "Only show triggered name in text",
 	["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."] = "Instead of showing both the spell name and the triggered name, only the name will be shown in the bar.",
 	
+	["Fade time"] = "Fade time",
+	["How many seconds it should take after a bar is finished for it to fade out."] = "How many seconds it should take after a bar is finished for it to fade out.",
+	
+	["Icon position"] = "Icon position",
+	["Left"] = "Left",
+	["Right"] = "Right",
+	
 	["Bar width"] = "Bar width",
 	["Bar texture"] = "Bar texture",
 	
@@ -215,6 +222,9 @@ AfflictedLocals = {
 	["Allows you to start a new timer when this one is triggered that has the cooldown left on the ability, use this if you want to track both the timer duration and the timer cooldown."] = "Allows you to start a new timer when this one is triggered that has the cooldown left on the ability, use this if you want to track both the timer duration and the timer cooldown.",
 	
 	["How many seconds this cooldown timer should last."] = "How many seconds this cooldown timer should last.",
+	
+	["Font name"] = "Font name",
+	["Font size"] = "Font size",
 	
 	["Disabled"] = "Disabled",
 	["Enabled"] = "Enabled",
