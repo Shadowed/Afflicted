@@ -355,7 +355,7 @@ function Config:CreateAnchorDisplay(info, value)
 		Afflicted.db.profile.anchors[id].text = value
 	end
 		
-	options.args.anchors.args[value] = {
+	options.args.anchors.args[id] = {
 		order = 1,
 		type = "group",
 		name = value,

@@ -116,9 +116,9 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		local anchor = Afflicted.db.profile.anchors[spellData.showIn]
 		local text = spellName
 		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
-			text = sourceName
+			text = Afflicted:StripServer(sourceName)
 		elseif( sourceName ~= "" ) then
-			text = string.format("%s - %s", spellName, sourceName)
+			text = string.format("%s - %s", spellName, Afflicted:StripServer(sourceName))
 		else
 			text = spellName
 		end
@@ -152,9 +152,9 @@ function Bars:CreateTimer(spellData, eventType, spellID, spellName, sourceGUID, 
 		
 		local text
 		if( Afflicted.db.profile.barNameOnly and sourceName ~= "" ) then
-			text = string.format("%s%s", cd, sourceName)
+			text = string.format("%s%s", cd, Afflicted:StripServer(sourceName))
 		elseif( sourceName ~= "" ) then
-			text = string.format("%s%s - %s", cd, spellName, sourceName)
+			text = string.format("%s%s - %s", cd, spellName, Afflicted:StripServer(sourceName))
 		else
 			text = string.format("%s%s", cd, spellName)
 		end

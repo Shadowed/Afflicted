@@ -11,11 +11,7 @@ AfflictedSpells = {
 	},
 	
 	-- Strangulate
-	[47476] = 49916,
-	[49913] = 49916,
-	[49914] = 49916,
-	[49915] = 49916,
-	[49916] = {
+	[47476] = {
 		disabled = true,
 		cooldown = 120,
 		showIn = "spells",
@@ -25,7 +21,7 @@ AfflictedSpells = {
 	-- Death Pact
 	[48743] = {
 		disabled = true,
-		cooldown = 120,
+		cooldown = 90,
 		showIn = "spells",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -34,7 +30,7 @@ AfflictedSpells = {
 	[49028] = {
 		disabled = true,
 		cooldown = 180,
-		seconds = 30,
+		seconds = 22,
 		showIn = "spells",
 		SPELL_CAST_SUCESS = true,
 	},
@@ -275,12 +271,28 @@ AfflictedSpells = {
 	[13750] = {
 		disabled = true,
 		seconds = 15,
-		cooldown = 300,
+		cooldown = 180,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
 		
 	--[[ PALADINS ]]--
+	-- Aura Mastery
+	[31821] = {
+		cooldown = 120,
+		seconds = 10,
+		cdInside = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
+	-- Divine Sacrifice
+	[64205] = {
+		cooldown = 120,
+		seconds = 10,
+		cdInside = "buffs",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Divine Plea
 	[54428] = {
 		doFade = true,
@@ -497,6 +509,14 @@ AfflictedSpells = {
 	
 	
 	--[[ WARRIORS ]]--
+	-- Shattering Throw
+	[64380] = {
+		disabled = true,
+		cooldown = 300,
+		showIn = "spells",
+		SPELL_CAST_SUCCESS = true,
+	},
+	
 	-- Berserker Rage
 	[18499] = {
 		disabled = true,
@@ -648,7 +668,7 @@ AfflictedSpells = {
 		disabled = true,
 		doFade = true,
 		seconds = 40,
-		cooldown = 600,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},
@@ -658,7 +678,7 @@ AfflictedSpells = {
 		disabled = true,
 		doFade = true,
 		seconds = 40,
-		cooldown = 600,
+		cooldown = 300,
 		showIn = "buffs",
 		SPELL_CAST_SUCCESS = true,
 	},

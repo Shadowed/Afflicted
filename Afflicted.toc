@@ -21,6 +21,7 @@ libs\GTB-1.0\GTB-1.0.xml
 localization.enUS.lua
 localization.deDE.lua
 localization.frFR.lua
+localization.zhCN.lua
 
 spells.lua
 Afflicted.lua
