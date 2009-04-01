@@ -1,5 +1,6 @@
 AfflictedLocals = {
 	["ALT + Drag to move the frame anchor."] = "ALT + Drag to move the frame anchor.",
+	["Reset Afflicted configuration as you were using Afflicted2."] = "Reset Afflicted configuration as you were using Afflicted2.",
 	
 	-- Cmd
 	["Slash commands"] = "Slash commands",

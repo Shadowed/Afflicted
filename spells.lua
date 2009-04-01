@@ -1,5 +1,5 @@
 AfflictedSpells = {}
-AfflictedSpells.revision = tonumber(string.match("$Revision: 1175 $;", "(%d+)") or 1)
+AfflictedSpells.revision = tonumber(string.match("$Revision$;", "(%d+)") or 1)
 
 function AfflictedSpells:Verify()
 	AfflictedSpells:GetData()

@@ -62,18 +62,24 @@ function Afflicted:OnInitialize()
 	self.defaults.profile.anchors.defenses.text = "Defensive"
 	self.defaults.profile.anchors.damage = CopyTable(anchor)
 	self.defaults.profile.anchors.damage.text = "Damage"
-	
+		
 	-- Initialize DB
-	self.db = LibStub:GetLibrary("AceDB-3.0"):New("Afflicted3DB", self.defaults)
+	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "Reload")
 	self.db.RegisterCallback(self, "OnProfileCopied", "Reload")
 	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
 	self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
-	self.revision = tonumber(string.match("$Revision: 1175 $", "(%d+)") or 1)
+	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 	
 	-- Load SML
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
+	
+	-- Found an old Afflicted2 install
+	if( self.db.profile.spellRevision == 0 and self.db.profile.revision == 0 and self.db.profile.version ) then
+		self:Print(L["Reset Afflicted configuration as you were using Afflicted2."])
+		self.db:ResetDB()
+	end
 
 	-- Load spell defaults in if the DB has changed
 	if( self.db.profile.spellRevision <= AfflictedSpells.revision ) then
@@ -404,8 +410,13 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 end
 
 function Afflicted:Reload()
-	self.icons:ReloadVisual()
-	self.bars:ReloadVisual()
+	if( self.icons ) then
+		self.icons:ReloadVisual()
+	end
+	
+	if( self.bars ) then
+		self.bars:ReloadVisual()
+	end
 end
 
 -- Strips server name

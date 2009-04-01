@@ -1155,8 +1155,8 @@ local function loadOptions()
 	end
 	
 	-- DB Profiles
-	--options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(Afflicted.db)
-	--options.args.profile.order = 2
+	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(Afflicted.db)
+	options.args.profile.order = 5
 end
 
 -- Slash commands
