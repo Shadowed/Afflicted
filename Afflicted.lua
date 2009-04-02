@@ -188,7 +188,7 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		local spellID, spellName, spellSchool, auraType = ...
 		local spell = self:GetSpell(spellID, spellName)
 		if( spell and spell.resets ) then
-			self:ResetCooldowns(spell.resets)
+			self:ResetCooldowns(sourceGUID, spell.resets)
 		end
 		
 		self:AbilityTriggered(sourceGUID, sourceName, spell, spellID)
@@ -282,14 +282,11 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 end
 
 -- Reset spells
-function Afflicted:ResetCooldowns(spells)
-	for spellID in pairs(spells) do
+function Afflicted:ResetCooldowns(sourceGUID, resets)
+	for spellID in pairs(resets) do
 		local spellData = Afflicted.spells[spellID]
 		if( spellData and spellData.cdAnchor ) then
-			local anchor = self.db.profile.anchors[spellData.cdAnchor]
-			if( anchor.enabled ) then
-				self[anchor.display]:RemoveTimerByID(spellData.cdAnchor, sourceGUID .. spellID .. "CD")
-			end
+			self[self.db.profile.anchors[spellData.cdAnchor].display]:RemoveTimerByID(spellData.cdAnchor, sourceGUID .. spellID .. "CD")
 		end
 	end
 end

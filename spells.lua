@@ -167,9 +167,9 @@ function AfflictedSpells:GetData()
 		-- Nature's Grasp
 		[17329] = 53312,
 		[27009] = 27009,
-		[53312] = "duration:45;anchor:buffs;cooldown:60;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
+		[53312] = "type:buff;duration:45;anchor:buffs;cooldown:60;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
 		-- Innervate
-		[29166] = "duration:20;anchor:buffs;cooldown:360;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
+		[29166] = "type:buff;duration:20;anchor:buffs;cooldown:360;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
 		-- Frenzied Regeneration
 		[22842] = "duration:10;anchor:defenses;cooldown:180;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
 		-- Feral Charge - Bear
@@ -185,9 +185,9 @@ function AfflictedSpells:GetData()
 		-- Dispersion
 		[47585] = "duration:6;anchor:defenses;cooldown:135;cdAnchor:cooldowns;class:PRIEST;",
 		-- Guardian Spirit
-		[47788] = "duration:10;anchor:defenses;cooldown:180;cdAnchor:cooldowns;class:PRIEST;",
+		[47788] = "type:buff;duration:10;anchor:defenses;cooldown:180;cdAnchor:cooldowns;class:PRIEST;",
 		-- Pain Suppression
-		[33206] = "duration:8;anchor:defenses;cooldown:144;cdAnchor:cooldowns;class:PRIEST;",
+		[33206] = "type:buff;duration:8;anchor:defenses;cooldown:144;cdAnchor:cooldowns;class:PRIEST;",
 		-- Psychic Horror
 		[64044] = "cooldown:120;cdAnchor:spells;cdDisabled:true;class:PRIEST;",
 		-- Silence
@@ -233,7 +233,7 @@ function AfflictedSpells:GetData()
 		-- Heroism
 		[32182] = 2825,
 		-- Bloodlust
-		[2825] = "duration:40;anchor:damage;cooldown:300;cdAnchor:cooldowns;class:SHAMAN;",
+		[2825] = "type:buff;duration:40;anchor:damage;cooldown:300;cdAnchor:cooldowns;class:SHAMAN;",
 		-- Tremor Totem
 		[8143] = "type:totem;duration:5;anchor:buffs;disabled:true;repeating:true;class:SHAMAN;",
 		-- Feral Spirit
@@ -303,11 +303,11 @@ function AfflictedSpells:GetData()
 		-- Deep Freeze
 		[44572] = "cooldown:30;cdAnchor:spells;class:MAGE;",
 		-- Icy Veins
-		[12472] = "duration:20;anchor:damage;cooldown:144;cdAnchor:cooldowns;class:MAGE;",
+		[12472] = "type:buff;duration:20;anchor:damage;cooldown:144;cdAnchor:cooldowns;class:MAGE;",
 		-- Invisibility
 		[66] = "disabled:true;duration:23;anchor:defenses;cooldown:180;cdDisabled:true;cdAnchor:cooldowns;class:MAGE;",
 		-- Ice Block
-		[45438] = "duration:10;anchor:defenses;cooldown:240;cdAnchor:cooldowns;class:MAGE;",
+		[45438] = "type:buff;duration:10;anchor:defenses;cooldown:240;cdAnchor:cooldowns;class:MAGE;",
 		-- Counterspell
 		[2138] = "cooldown:24;cdAnchor:interrupts;class:MAGE;",
 		-- Blink
@@ -321,7 +321,7 @@ function AfflictedSpells:GetData()
 		-- Killing Spree
 		[51690] = "cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
 		-- Shadow Dance
-		[51713] = "duration:10;anchor:damage;cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
+		[51713] = "duration:10;anchor:damage;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
 		-- Shadow Step
 		[36554] = "duration:3;anchor:buffs;cooldown:30;cdAnchor:cooldowns;class:ROGUE;",
 		-- Adrenaline Rush
@@ -333,7 +333,7 @@ function AfflictedSpells:GetData()
 		-- Preparation
 		[14185] = "cooldown:300;cdDisabled:true;cdAnchor:cooldowns;resets:14177,36554,26889,11305,26669,;",
 		-- Tricks of the Trade
-		[57934] = "duration:6;anchor:damage;cooldown:30;cdAnchor:cooldowns;class:ROGUE;",
+		[57934] = "duration:6;anchor:damage;cooldown:30;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
 		-- Cloak of Shadows
 		[31224] = "duration:5;anchor:defenses;cooldown:60;cdAnchor:cooldowns;class:ROGUE;",
 		-- Vanish
@@ -341,11 +341,11 @@ function AfflictedSpells:GetData()
 		-- Sprint
 		[11305] = "duration:15;anchor:buffs;cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
 		-- Evasion
-		[26669] = "duration:15;anchor:defenses;cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
+		[26669] = "duration:15;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
 		-- Blind
 		[2094] = "cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
 		-- Dismantle
-		[51722] = "cooldown:60;cdAnchor:cooldowns;class:ROGUE;",
+		[51722] = "cooldown:60;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
 	}
 	
 	return self.spells
