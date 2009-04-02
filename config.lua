@@ -687,7 +687,7 @@ local function loadOptions()
 				values = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]},
 				set = function(info, value, state)
 					Afflicted.db.profile[info[#(info)]][value] = state
-					Afflicted:Reload()
+					Afflicted:ReloadEnabled()
 				end,
 				get = function(info, value)
 					return Afflicted.db.profile[info[#(info)]][value]
@@ -695,8 +695,42 @@ local function loadOptions()
 				width = "double",
 				arg = "inside"
 			},
-			display = {
+			announce = {
 				order = 3,
+				type = "group",
+				inline = true,
+				name = L["Announcements"],
+				args = {
+					announceColor = {
+						order = 1,
+						type = "color",
+						name = L["Color"],
+						set = function(info, r, g, b)
+							Afflicted.db.profile[info[#(info)]].r = r
+							Afflicted.db.profile[info[#(info)]].g = g
+							Afflicted.db.profile[info[#(info)]].b = b
+						end,
+						get = function(info)
+							return Afflicted.db.profile[info[#(info)]].r, Afflicted.db.profile[info[#(info)]].g, Afflicted.db.profile[info[#(info)]].b
+						end,
+						width = "full",
+					},
+					dispelLocation = {
+						order = 2,
+						type = "select",
+						name = L["Dispel announcements"],
+						values = announceDest,
+					},
+					interruptLocation = {
+						order = 3,
+						type = "select",
+						name = L["Interrupt announcements"],
+						values = announceDest,
+					},
+				},
+			},
+			display = {
+				order = 4,
 				type = "group",
 				inline = true,
 				name = L["Display"],

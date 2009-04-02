@@ -26,56 +26,9 @@ function AfflictedSpells:Verify()
 			print(string.format("Cannot find spell ID %d", spellID))
 			found = true
 		elseif( type(spellData) == "string" ) then
-			local tbl = {}
-			-- Load the data into the DB
-			for key, value in string.gmatch(spellData, "([^:]+):([^;]+);") do
-				-- Convert to number if needed
-				if( key == "duration" or key == "cooldown" ) then
-					value = tonumber(value)
-				elseif( value == "true" ) then
-					value = true
-				elseif( value == "false" ) then
-					value = false
-				end
-
-				tbl[key] = value
-			end
-
-			-- Load the reset spellID data
-			if( tbl.resets ) then
-				local text = tbl.resets
-
-				tbl.resets = {}
-				for spellID in string.gmatch(text, "([0-9]+),") do
-					tbl.resets[tonumber(spellID)] = true
-				end
-			end
-			
-			-- Now verify and make sure we don't have any bad fields
-			local results = {}
-			for k, v in pairs(tbl) do
-				if( not fields[k] ) then
-					table.insert(results, string.format("Bad field %s found containing %s (%s)", k, tostring(v), type(v)))
-				elseif( type(v) ~= fields[k] ) then
-					table.insert(results, string.format("Invalid field type %s found containing %s (%s) should be", k, tostring(v), type(v), fields[k]))
-				end
-			end
-			
-			if( ( tbl.cooldown and not tbl.cdAnchor ) or ( tbl.duration and not tbl.anchor ) ) then
-				table.insert(results, "Bad settings found, does not have a correction association of seconds -> anchor.")
-			end
-			
 			if( string.match(spellData, ";;") or not string.match(spellData, ";$") ) then
-				table.insert(results, "Bad settings found, either has a double ;; or no ending ;")
-			end
-			
-			-- Check for some oddities
-			if( #(results) > 0 ) then
+				print(string.format("Bad spell format for spell ID %d", spellID))
 				found = true
-				print(string.format("[#%d] %s (%s)", spellID, name, rank or "<nil>"))
-				for _, txt in pairs(results) do
-					print(txt)
-				end
 			end
 		end
 	end
@@ -178,6 +131,8 @@ function AfflictedSpells:GetData()
 		[64205] = "duration:10;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:PALADIN;",
 		
 		-- Warrior
+		-- Pummel
+		[6552] = "cooldown:10;cdAnchor:interrupts;class:WARRIOR;",
 		-- Shattering Throw
 		[64382] = "cooldown:300;cdAnchor:damage;class:WARRIOR;",
 		-- Intervene
@@ -297,8 +252,10 @@ function AfflictedSpells:GetData()
 		[27068] = 49012,
 		[49011] = 49012,
 		[49012] = "cooldown:60;cdAnchor:cooldowns;class:HUNTER;",
+		-- Silencing Shot
+		[34490] = "cooldown:20;cdAnchor:interrupts;class:HUNTER;",
 		-- Readiness
-		[23989] = "cooldown:180;cdAnchor:cooldowns;resets:49012,34600,63670,19263,3034,14327,;class:HUNTER;",
+		[23989] = "cooldown:180;cdAnchor:cooldowns;resets:49012,34600,63670,19263,3034,14327,34490,;class:HUNTER;",
 		-- Nether Shock (Nether Ray)
 		[53588] = 53589,
 		[53589] = "cooldown:40;cdDisabled:true;cdAnchor:interrupts;class:HUNTER;",
@@ -311,6 +268,8 @@ function AfflictedSpells:GetData()
 		-- Sonic Blast (Bat)
 		[53567] = 53568,
 		[53568] = "cooldown:60;cdDisabled:true;cdAnchor:interrupts;class:HUNTER;",
+		-- Pummel (Gorilla)
+		[26090] = "cooldown:30;cdDisabled:true;cdAnchor:interrupts;class:HUNTER;",
 		-- Black Arrow
 		[63670] = 63672,
 		[63671] = 63672,
@@ -355,6 +314,10 @@ function AfflictedSpells:GetData()
 		[1953] = "cooldown:15;cdDisabled:true;cdAnchor:cooldowns;class:MAGE;",
 		
 		-- Rogue
+		-- Kick
+		[1766] = "cooldown:10;cdAnchor:interrupts;class:ROGUE;",
+		-- Kidney Shot
+		[8643] = "cooldown:20;cdAnchor:spells;class:ROGUE;",
 		-- Killing Spree
 		[51690] = "cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
 		-- Shadow Dance

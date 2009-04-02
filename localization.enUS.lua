@@ -1,6 +1,11 @@
 AfflictedLocals = {
 	["ALT + Drag to move the frame anchor."] = "ALT + Drag to move the frame anchor.",
 	["Reset Afflicted configuration as you were using Afflicted2."] = "Reset Afflicted configuration as you were using Afflicted2.",
+	["Interrupted %s"] = "Interrupted %s",
+	["Interrupted %s's %s"] = "Interrupted %s's %s",
+	["FAILED %s's %s"] = "FAILED %s's %s",
+	["Removed %s"] = "Removed %s",
+	["Removed %s's %s"] = "Removed %s's %s",
 	
 	-- Cmd
 	["Slash commands"] = "Slash commands",
@@ -141,6 +146,11 @@ AfflictedLocals = {
 	["3 vs 3"] = "3 vs 3",
 	["5 vs 5"] = "5 vs 5",
 	["Spells that should be enabled inside a specific arena bracket."] = "Spells that should be enabled inside a specific arena bracket.",
+	
+	["Announcements"] = "Announcements",
+	["Color"] = "Color",
+	["Dispel announcements"] = "Dispel announcements",
+	["Interrupt announcements"] = "Interrupt announcements",
 
 	-- Class localization
 	["DRUID"] = "Druid",

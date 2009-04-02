@@ -13,6 +13,10 @@ function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
 			showAnchors = false,
+			announceColor = {r = 1, g = 1, b = 1},
+			dispelLocation = "none",
+			interruptLocation = "none",
+			
 			targetOnly = false,
 			
 			barWidth = 180,
@@ -164,7 +168,8 @@ function Afflicted:GetSpell(spellID, spellName)
 end
 
 local COMBATLOG_OBJECT_REACTION_HOSTILE	= COMBATLOG_OBJECT_REACTION_HOSTILE
-local eventRegistered = {["SPELL_CAST_SUCCESS"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true}
+local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
+local eventRegistered = {["SPELL_CAST_SUCCESS"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true, ["SPELL_INTERRUPT"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_DISPEL"] = true}
 
 function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, ...)
 	if( not eventRegistered[eventType] ) then
@@ -222,6 +227,34 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 
 			self:AbilityTriggered(sourceGUID, sourceName, spell, spellID)
 		end
+
+	-- We got interrupted, or we interrupted someone else
+	elseif( eventType == "SPELL_INTERRUPT" and self.db.profile.interruptLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE ) then
+		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool = ...
+		
+		-- Combat text output should be shorttened since we know who we did it on anyway
+		if( self.db.profile.interruptLocation == "ct" ) then
+			self:SendMessage(string.format(L["Interrupted %s"], extraSpellName), self.db.profile.interruptLocation, self.db.profile.announceColor)
+		else
+			self:SendMessage(string.format(L["Interrupted %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.interruptLocation, self.db.profile.announceColor)
+		end
+		
+		
+	-- We tried to dispel a buff, and failed
+	elseif( eventType == "SPELL_DISPEL_FAILED" and self.db.profile.dispelLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
+		self:SendMessage(string.format(L["FAILED %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor)
+			
+	-- Managed to dispel or steal a buff
+	elseif( eventType == "SPELL_DISPEL" and self.db.profile.dispelLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
+		
+		-- Combat text output should be shorttened since we know who we did it on anyway
+		if( self.db.profile.dispelLocation == "ct" ) then
+			self:SendMessage(string.format(L["Removed %s"], self:StripServer(destName)), self.db.profile.dispelLocation, self.db.profile.announceColor)
+		else
+			self:SendMessage(string.format(L["Removed %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor)
+		end
 		
 	-- Check if we should clear timers
 	elseif( ( eventType == "PARTY_KILL" or ( instancetype ~= "arena" and eventType == "UNIT_DIED" ) ) and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
@@ -251,7 +284,8 @@ end
 -- Reset spells
 function Afflicted:ResetCooldowns(spells)
 	for spellID in pairs(spells) do
-		if( spellData.cdAnchor ) then
+		local spellData = Afflicted.spells[spellID]
+		if( spellData and spellData.cdAnchor ) then
 			local anchor = self.db.profile.anchors[spellData.cdAnchor]
 			if( anchor.enabled ) then
 				self[anchor.display]:RemoveTimerByID(spellData.cdAnchor, sourceGUID .. spellID .. "CD")
@@ -407,6 +441,11 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 	end
 	
 	instanceType = type
+end
+
+function Afflicted:ReloadEnabled()
+	instanceType = nil
+	self:ZONE_CHANGED_NEW_AREA()
 end
 
 function Afflicted:Reload()
