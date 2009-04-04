@@ -128,7 +128,7 @@ function AfflictedSpells:GetData()
 		-- Aura Mastery
 		[31821] = "duration:10;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:PALADIN;",
 		-- Divine Sacrifice
-		[64205] = "duration:10;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:PALADIN;",
+		[64205] = "type:buff;duration:10;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:PALADIN;",
 		
 		-- Warrior
 		-- Pummel

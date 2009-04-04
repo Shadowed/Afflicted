@@ -597,7 +597,7 @@ local function createAnchorConfiguration(index, anchor)
 					desc = {
 						order = 1,
 						type = "description",
-						name = L["Anchors that were added manually will be deleted, default anchors will be reset to default settings if you delete them. Disable default anchors to stop timers from showing."],
+						name = L["Anchors that were added manually will be deleted, default anchors will be reset to default settings if you delete them. Disable default anchors to stop timers from showing.\nYou will have to choose a new anchor to move any spells in this one to when you delete this anchor."],
 					},
 					move = {
 						order = 1,
