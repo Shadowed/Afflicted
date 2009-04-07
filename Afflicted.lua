@@ -191,6 +191,11 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 			self:ResetCooldowns(sourceGUID, spell.resets)
 		end
 		
+		-- Totems and traps will be handled in SPELL_SUMMON and SPELL_CREATE, don't trigger them here
+		if( spell and ( spell.type == "totem" or spell.type == "trap" ) ) then
+			return
+		end
+		
 		self:AbilityTriggered(sourceGUID, sourceName, spell, spellID)
 		
 	-- Check for something being summoned (Pets, totems)

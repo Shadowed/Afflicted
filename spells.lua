@@ -110,7 +110,7 @@ function AfflictedSpells:GetData()
 		
 		-- Paladin
 		-- Divine Plea
-		[54428] = "type:buff;duration:15;anchor:buffs;cooldown:60;cdAnchor:cooldowns;class:PALADIN;",
+		[54428] = "disabled:true;cdDisabled:true;type:buff;duration:15;anchor:buffs;cooldown:60;cdAnchor:cooldowns;class:PALADIN;",
 		-- Avenging Wrath
 		[31884] = "duration:20;anchor:damage;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:PALADIN;",
 		-- Hammer of Justice
@@ -152,15 +152,15 @@ function AfflictedSpells:GetData()
 		-- Retaliation (dumbasses)
 		[20230] = "type:buff;duration:12;anchor:damage;cooldown:300;cdDisabled:true;cdAnchor:cooldowns;class:WARRIOR;",
 		-- Disarm
-		[676] = "cooldown:60;cdAnchor:spells;class:WARRIOR;",
+		[676] = "cdDisabled:true;cooldown:60;cdAnchor:spells;class:WARRIOR;",
 		
 		-- Druid
 		-- Survival Instincts
-		[61336] = "duration:20;anchor:defenses;cooldown:300;cdAnchor:cooldowns;class:DRUID;",
+		[61336] = "duration:20;anchor:defenses;cooldown:300;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
 		-- Force of Nature (Treants)
 		[33831] = "duration:30;anchor:damage;cooldown:180;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
 		-- Berserk
-		[50334] = "duration:15;anchor:damage;cooldown:180;cdAnchor:cooldowns;class:DRUID;",
+		[50334] = "duration:15;anchor:damage;cooldown:180;cdDisabled:true;cdAnchor:cooldowns;class:DRUID;",
 		-- Tiger's fury
 		[9846] = 50212,
 		[50212] = "cooldown:30;cdAnchor:damage;cdDisabled:true;class:DRUID;",
@@ -177,7 +177,7 @@ function AfflictedSpells:GetData()
 		-- Feral Charge - Cat
 		[49376] = "cooldown:30;cdAnchor:spells;class:DRUID;",
 		-- Bash
-		[8983] = "cooldown:30;cdAnchor:interrupts;class:DRUID;",
+		[8983] = "cooldown:30;cdAnchor:interrupts;cdDisabled:true;class:DRUID;",
 		
 		-- Priest
 		-- Hymn of Hope
@@ -197,11 +197,11 @@ function AfflictedSpells:GetData()
 		
 		-- Warlock
 		-- Metamorphosis
-		[47241] = "duration:30;anchor:damage;cooldown:126;cdAchor:cooldowns;class:WARLOCK;",
+		[47241] = "duration:30;anchor:damage;cooldown:126;cdDisabled:true;cdAchor:cooldowns;class:WARLOCK;",
 		-- Demonic Empowerment
 		[47193] = "cooldown:60;cdDisabled:true;cdAnchor:cooldowns;class:WARLOCK;",
 		-- Fel Domination
-		[18708] = "type:buff;duration:15;anchor:spells;cooldown:900;cdAnchor:cooldowns;class:WARLOCK;",
+		[18708] = "type:buff;duration:15;anchor:spells;cooldown:900;cdDisabled:true;cdAnchor:cooldowns;class:WARLOCK;",
 		-- Demonic Circle: Teleport
 		[48020] = "cooldown:30;cdAnchor:defenses;cdDisabled:true;class:WARLOCK;",
 		-- Devour Magic (Felhunter)
@@ -216,7 +216,7 @@ function AfflictedSpells:GetData()
 		
 		-- Shaman
 		-- Hex
-		[51544] = "cooldown:45;cdAnchor:spells;",
+		[51544] = "cooldown:45;cdDisabled:true;cdAnchor:spells;",
 		-- Wind Shock
 		[57994] = 49230,
 		-- Frost Shock
@@ -233,7 +233,7 @@ function AfflictedSpells:GetData()
 		-- Heroism
 		[32182] = 2825,
 		-- Bloodlust
-		[2825] = "type:buff;duration:40;anchor:damage;cooldown:300;cdAnchor:cooldowns;class:SHAMAN;",
+		[2825] = "type:buff;duration:40;anchor:damage;cooldown:300;cdDisabled:true;cdAnchor:cooldowns;class:SHAMAN;",
 		-- Tremor Totem
 		[8143] = "type:totem;duration:5;anchor:buffs;disabled:true;repeating:true;class:SHAMAN;",
 		-- Feral Spirit
@@ -241,9 +241,9 @@ function AfflictedSpells:GetData()
 		-- Shamanistic Rage
 		[30823] = "disabled:true;duration:15;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:SHAMAN;",
 		-- Mana Tide Totem
-		[16190] = "type:totem;duration:12;anchor:buffs;cooldown:300;cdAnchor:cooldowns;class:SHAMAN;",
+		[16190] = "type:totem;duration:12;anchor:buffs;cooldown:300;disabled:true;cdAnchor:cooldowns;class:SHAMAN;",
 		-- Grounding Totem
-		[8177] = "type:totem;duration:45;anchor:buffs;cooldown:15;cdAnchor:cooldowns;class:SHAMAN;",
+		[8177] = "type:totem;duration:45;anchor:buffs;cooldown:15;disabled:true;cdAnchor:cooldowns;class:SHAMAN;",
 		
 		-- Hunter
 		-- Bestial Wrath
@@ -337,11 +337,11 @@ function AfflictedSpells:GetData()
 		-- Cloak of Shadows
 		[31224] = "duration:5;anchor:defenses;cooldown:60;cdAnchor:cooldowns;class:ROGUE;",
 		-- Vanish
-		[26889] = "type:buff;duration:10;anchor:defenses;cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
+		[26889] = "type:buff;disabled:true;duration:10;anchor:defenses;cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
 		-- Sprint
-		[11305] = "duration:15;anchor:buffs;cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
+		[11305] = "duration:15;disabled:true;anchor:buffs;cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
 		-- Evasion
-		[26669] = "duration:15;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
+		[26669] = "duration:15;disabled:true;anchor:defenses;cooldown:120;cdDisabled:true;cdAnchor:cooldowns;class:ROGUE;",
 		-- Blind
 		[2094] = "cooldown:120;cdAnchor:cooldowns;class:ROGUE;",
 		-- Dismantle
