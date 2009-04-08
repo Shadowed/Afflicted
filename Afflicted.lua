@@ -83,6 +83,12 @@ function Afflicted:OnInitialize()
 	if( self.db.profile.spellRevision == 0 and self.db.profile.revision == 0 and self.db.profile.version ) then
 		self:Print(L["Reset Afflicted configuration as you were using Afflicted2."])
 		self.db:ResetDB()
+	-- Removing this when I release Afflicted as out of beta
+	elseif( self.db.profile.spellRevision <= 1217 ) then
+		self:Print("Reset spell configuration to use a new format.")
+		for id in pairs(self.db.profile.spells) do
+			self.db.profile.spells[id] = nil
+		end
 	end
 
 	-- Load spell defaults in if the DB has changed
@@ -104,40 +110,13 @@ function Afflicted:OnInitialize()
 	-- Setup our spell cache
 	self.spells = setmetatable({}, {
 		__index = function(tbl, index)
-			-- No data found, don't try and cache this value again
+			-- No data found, don't try and load this index again
 			if( not Afflicted.db.profile.spells[index] ) then
 				tbl[index] = false
 				return false
-			elseif( type(Afflicted.db.profile.spells[index]) == "number" ) then
-				tbl[index] = Afflicted.db.profile.spells[index]
-				return tbl[index]
 			end
 			
-			tbl[index] = {}
-
-			-- Load the data into the DB
-			for key, value in string.gmatch(Afflicted.db.profile.spells[index], "([^:]+):([^;]+);") do
-				-- Convert to number if needed
-				if( key == "duration" or key == "cooldown" ) then
-					value = tonumber(value)
-				elseif( value == "true" ) then
-					value = true
-				elseif( value == "false" ) then
-					value = false
-				end
-
-				tbl[index][key] = value
-			end
-
-			-- Load the reset spellID data
-			if( tbl[index].resets ) then
-				local text = tbl[index].resets
-
-				tbl[index].resets = {}
-				for spellID in string.gmatch(text, "([0-9]+),") do
-					tbl[index].resets[tonumber(spellID)] = true
-				end
-			end
+			tbl[index] = loadstring("return " .. Afflicted.db.profile.spells[index])()
 			
 			return tbl[index]
 		end
@@ -150,7 +129,6 @@ function Afflicted:OnInitialize()
 	-- Annnd update revision
 	self.db.profile.revision = self.revision
 
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 end
 
@@ -383,18 +361,25 @@ function Afflicted:OnDatabaseShutdown()
 		if( type(self.spells[id]) == "table" ) then
 			local data = ""
 			for key, value in pairs(self.spells[id]) do
-				local text = value
+				local text = ""
+				-- Right now, the tables in the spells are resets which is a number indexed table
 				if( type(value) == "table" ) then
-					text = ""
-					for key in pairs(value) do
-						text = text .. key .. ","
+					for _, subValue in pairs(value) do
+						text = string.format("%s%s;", text, subValue)
 					end
+					
+					text = string.format("{%s}", text)
+				elseif( type(value) == "string" ) then
+					text = string.format("'%s'", value)
+				else
+					text = tostring(value)
 				end
 				
-				data = data .. key .. ":" .. tostring(text) .. ";"
+				data = string.format("%s%s=%s;", data, key, text)	
 			end
 
-			self.db.profile.spells[id] = data
+			self.db.profile.spells[id] = string.format("{%s}", data)
+			
 		-- We have a linked spell setup (spellID -> spellID)
 		elseif( type(self.spells[id]) == "number" ) then
 			self.db.profile.spells[id] = self.spells[id]
