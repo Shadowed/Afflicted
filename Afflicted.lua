@@ -78,7 +78,7 @@ function Afflicted:OnInitialize()
 	
 	-- Load SML
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
-	
+		
 	-- Found an old Afflicted2 install
 	if( self.db.profile.spellRevision == 0 and self.db.profile.revision == 0 and self.db.profile.version ) then
 		self:Print(L["Reset Afflicted configuration as you were using Afflicted2."])

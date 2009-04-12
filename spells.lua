@@ -113,6 +113,8 @@ function AfflictedSpells:GetData()
 		[64205] = "{type='buff';duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		
 		-- Warrior
+		-- Shield Bash
+		[72] = "{cooldown=12;cdAnchor='interrupts';class='WARRIOR';}",
 		-- Pummel
 		[6552] = "{cooldown=10;cdAnchor='interrupts';class='WARRIOR';}",
 		-- Shattering Throw
@@ -128,30 +130,30 @@ function AfflictedSpells:GetData()
 		-- Intercept
 		[20252] = "{cooldown=15;cdAnchor='spells';class='WARRIOR';}",
 		-- Shield Wall
-		[871] = "{duration=12;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
+		[871] = "{disabled=true;duration=12;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
 		-- Intimidating Shout
 		[5246] = "{cooldown=120;cdDisabled=true;cdAnchor='spells';class='WARRIOR';}",
 		-- Retaliation (dumbasses)
-		[20230] = "{type='buff';duration=12;anchor='damage';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
+		[20230] = "{type='buff';disabled=true;duration=12;anchor='damage';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
 		-- Disarm
 		[676] = "{cdDisabled=true;cooldown=60;cdAnchor='spells';class='WARRIOR';}",
 		
 		-- Druid
 		-- Survival Instincts
-		[61336] = "{duration=20;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
+		[61336] = "{disabled=true;duration=20;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Force of Nature (Treants)
-		[33831] = "{duration=30;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
+		[33831] = "{disabled=true;duration=30;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Berserk
-		[50334] = "{duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
+		[50334] = "{disabled=true;duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Tiger's fury
 		[9846] = 50212,
 		[50212] = "{cooldown=30;cdAnchor='damage';cdDisabled=true;class='DRUID';}",
 		-- Nature's Grasp
 		[17329] = 53312,
 		[27009] = 27009,
-		[53312] = "{type='buff';duration=45;anchor='buffs';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
+		[53312] = "{type='buff';disabled=true;duration=45;anchor='buffs';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Innervate
-		[29166] = "{type='buff';duration=20;anchor='buffs';cooldown=360;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
+		[29166] = "{type='buff';disabled=true;duration=20;anchor='buffs';cooldown=360;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Frenzied Regeneration
 		[22842] = "{duration=10;anchor='defenses';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Feral Charge - Bear
