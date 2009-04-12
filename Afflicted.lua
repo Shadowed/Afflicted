@@ -83,12 +83,6 @@ function Afflicted:OnInitialize()
 	if( self.db.profile.spellRevision == 0 and self.db.profile.revision == 0 and self.db.profile.version ) then
 		self:Print(L["Reset Afflicted configuration as you were using Afflicted2."])
 		self.db:ResetDB()
-	-- Removing this when I release Afflicted as out of beta
-	elseif( self.db.profile.spellRevision <= 1217 ) then
-		self:Print("Reset spell configuration to use a new format.")
-		for id in pairs(self.db.profile.spells) do
-			self.db.profile.spells[id] = nil
-		end
 	end
 
 	-- Load spell defaults in if the DB has changed
@@ -103,9 +97,6 @@ function Afflicted:OnInitialize()
 			end
 		end
 	end
-
-	-- So we know what spellIDs need to be updated when logging out
-	self.writeQueue = {}
 	
 	-- Setup our spell cache
 	self.spells = setmetatable({}, {
@@ -121,6 +112,9 @@ function Afflicted:OnInitialize()
 			return tbl[index]
 		end
 	})
+
+	-- So we know what spellIDs need to be updated when logging out
+	self.writeQueue = {}
 
 	-- Load display libraries
 	self.bars = self.modules.Bars:LoadVisual()
