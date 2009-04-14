@@ -1,5 +1,5 @@
 local major = "GTB-1.0"
-local minor = tonumber(string.match("$Revision: 1172 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 1242 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 
@@ -146,7 +146,7 @@ local function barOnUpdate(self)
 	if( self.secondsLeft <= 0 ) then
 		-- Check if it's a repeating timer
 		local bar = groups[self.groupName].bars[self.barID]
-		if( bar.repeating ) then
+		if( bar and bar.repeating ) then
 			self.secondsLeft = self.startSeconds
 			self.lastUpdate = time
 			return
