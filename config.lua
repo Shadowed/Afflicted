@@ -152,7 +152,7 @@ end
 -- Load all the spells into the per class list
 local function buildString(spell, divider)
 	local txt = ""
-I	if( spell.disabled or spell.duration == 0 or not spell.anchor ) then
+	if( spell.disabled or spell.duration == 0 or not spell.anchor ) then
 		txt = L["Duration disabled"]
 	else
 		txt = string.format(L["Duration: %d (%s)"], spell.duration, (Afflicted.db.profile.anchors[spell.anchor] and Afflicted.db.profile.anchors[spell.anchor].text or spell.anchor))

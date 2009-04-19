@@ -69,7 +69,7 @@ function Bars:LoadVisual()
 	-- Create anchors
 	Bars.groups = {}
 	for name, data in pairs(Afflicted.db.profile.anchors) do
-		if( data.display == "bars" ) then
+		if( data.enabled and data.display == "bars" ) then
 			Bars.groups[name] = self:CreateDisplay(name)
 		end
 	end
