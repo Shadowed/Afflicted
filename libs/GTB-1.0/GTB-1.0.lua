@@ -1,5 +1,5 @@
 local major = "GTB-1.0"
-local minor = tonumber(string.match("$Revision: 1242 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 1257 $", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 
@@ -38,6 +38,7 @@ end
 -- GTB Library
 GTB.framePool = GTB.framePool or {}
 GTB.groups = GTB.groups or {}
+GTB.defaultFontPath = GameFontHighlight:GetFont()
 
 local framePool = GTB.framePool
 local groups = GTB.groups
@@ -280,7 +281,7 @@ function GTB:RegisterGroup(name, texture)
 	argcheck(texture, 2, "string")
 	assert(3, not groups[name], L["GROUP_EXISTS"], name)
 
-	local obj = {name = name, frame = CreateFrame("Frame", nil, UIParent), fontSize = 11, height = 16, obj = obj, bars = {}, usedBars = {}}
+	local obj = {name = name, frame = CreateFrame("Frame", nil, UIParent), fontSize = 12, height = 16, obj = obj, bars = {}, usedBars = {}}
 	
 	-- Inject our methods
 	for _, func in pairs(methods) do
@@ -458,24 +459,15 @@ function GTB.SetFont(group, path, size, style)
 	argcheck(style, 4, "string", "nil")
 	assert(3, group.name and groups[group.name], L["MUST_CALL"], "SetFont")
 	
-	-- Update running bars
-	local path, size, style = GameFontHighlight:GetFont()
-	path = group.fontPath or path
-	style = group.fontStyle or style
-	size = group.fontSize or size
-
+	group.fontSize = size or 11
+	group.fontPath = path or GTB.defaultFontPath
+	group.fontStyle = style
+	
 	-- Update any existing ones
 	for _, bar in pairs(group.bars) do
-		bar.timer:SetFont(path, size, style)
-		bar.text:SetFont(path, size, style)
+		bar.timer:SetFont(group.fontPath, group.fontSize, group.fontStyle)
+		bar.text:SetFont(group.fontPath, group.fontSize, group.fontStyle)
 	end
-	
-	
-	-- Save
-	group.fontSize = size
-	group.fontPath = path
-	group.fontStyle = style
-
 end
 
 -- Width of all the bars
@@ -630,7 +622,10 @@ function GTB.RegisterBar(group, id, text, seconds, startSeconds, icon, r, g, b)
 
 	-- Retrieve a frame thats either recycled, or a newly created one
 	local frame = getFrame()
-		
+	
+	-- Font path was not set, so use the default.
+	group.fontPath = group.fontPath or GTB.defaultFontPath
+	
 	-- So we can do sorting and positioning
 	table.insert(group.usedBars, frame)
 	
@@ -644,7 +639,6 @@ function GTB.RegisterBar(group, id, text, seconds, startSeconds, icon, r, g, b)
 	frame.text:SetWidth(group.width - frame.timer:GetWidth() - 5)
 	frame.text:SetFont(group.fontPath, group.fontSize, group.fontStyle)
 	frame.text:SetText(text)
-	
 	
 	-- Update icon
 	if( icon ) then
