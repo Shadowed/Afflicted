@@ -152,7 +152,7 @@ end
 -- Load all the spells into the per class list
 local function buildString(spell, divider)
 	local txt = ""
-	if( spell.disabled or not spell.duration or not spell.anchor ) then
+I	if( spell.disabled or spell.duration == 0 or not spell.anchor ) then
 		txt = L["Duration disabled"]
 	else
 		txt = string.format(L["Duration: %d (%s)"], spell.duration, (Afflicted.db.profile.anchors[spell.anchor] and Afflicted.db.profile.anchors[spell.anchor].text or spell.anchor))
@@ -162,7 +162,7 @@ local function buildString(spell, divider)
 		txt = txt .. divider
 	end
 
-	if( spell.cdDisabled or not spell.cooldown or not spell.cdAnchor ) then
+	if( spell.cdDisabled or spell.cooldown == 0 or not spell.cdAnchor ) then
 		txt = txt .. L["Cooldown disabled"]
 	else
 		txt = txt .. string.format(L["Cooldown: %d (%s)"], spell.cooldown, (Afflicted.db.profile.anchors[spell.cdAnchor] and Afflicted.db.profile.anchors[spell.cdAnchor].text or spell.anchor))
@@ -265,9 +265,37 @@ local function createSpellConfiguration(index, spell, spellName)
 					},
 				},
 			},
+			announce = {
+				order = 3,
+				type = "group",
+				inline = true,
+				name = L["Announcements"],
+				args = {
+					custom = {
+						order = 1,
+						type = "toggle",
+						name = L["Enable announcements"],
+						width = "full",
+					},
+					startMessage = {
+						order = 2,
+						type = "input",
+						name = L["Start message"],
+						desc = L["Message to show when the spell is used."],
+						width = "full",
+					},
+					endMessage = {
+						order = 3,
+						type = "input",
+						name = L["Ended message"],
+						desc = L["Message to show the spell ends, this only applies to duration based typers, cooldowns will use a static message."],
+						width = "full",
+					},
+				},
+			},
 			type = {
 				type = "group",
-				order = 3,
+				order = 4,
 				inline = true,
 				name = L["Spell data"],
 				args = {
@@ -355,7 +383,7 @@ local function createSpellConfiguration(index, spell, spellName)
 				},
 			},
 			delete = {
-				order = 4,
+				order = 5,
 				type = "group",
 				inline = true,
 				name = L["Delete"],
@@ -735,59 +763,68 @@ local function loadOptions()
 				inline = true,
 				name = L["Display"],
 				args = {
-					desc = {
-						order = 0,
-						name = L["Global display setting, changing these will change all the anchors settings.\nNOTE: These values do not reflect each anchors configuration, this is just a quick way to set all of them to the same thing."],
-						type = "description",
-					},
-					growUp = {
-						order = 1,
-						type = "toggle",
-						name = L["Grow up"],
-						desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
-						get = getGlobalOption,
-						set = setGlobalOption,
-						width = "full",
-					},
 					targetOnly = {
-						order = 2,
+						order = 1,
 						type = "toggle",
 						name = L["Only show target/focus timers"],
 						desc = L["Only timers of people you have targeted, or focused will be triggered. They will not be removed if you change targets however."],   
 						width = "full",
 					},
+					anchors = {
+						order = 2,
+						type = "group",
+						inline = true,
+						name = L["Anchors"],
+						args = {
+							desc = {
+								order = 0,
+								name = L["Global display setting, changing these will change all the anchors settings.\nNOTE: These values do not reflect each anchors configuration, this is just a quick way to set all of them to the same thing."],
+								type = "description",
+							},
+							growUp = {
+								order = 1,
+								type = "toggle",
+								name = L["Grow up"],
+								desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
+								get = getGlobalOption,
+								set = setGlobalOption,
+								width = "full",
+							},
+							display = {
+								order = 3,
+								type = "select",
+								name = L["Display style"],
+								values = {[""] = "----", ["bars"] = L["Bars"], ["icons"] = L["Icons"]},
+								get = getGlobalOption,
+								set = setGlobalOption,
+							},
+							sep = {
+								order = 4,
+								name = "",
+								type = "description",
+							},
+							scale = {
+								order = 5,
+								type = "range",
+								name = L["Scale"],
+								min = 0, max = 2, step = 0.01,
+								get = getGlobalOption,
+								set = setGlobalOption,
+							},
+							maxRows = {
+								order = 6,
+								type = "range",
+								name = L["Max timers"],
+								desc = L["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."],
+								min = 1, max = 50, step = 1,
+								get = getGlobalOption,
+								set = setGlobalOption,
+							},
+							
+						},
+					},
 					display = {
 						order = 3,
-						type = "select",
-						name = L["Display style"],
-						values = {[""] = "----", ["bars"] = L["Bars"], ["icons"] = L["Icons"]},
-						get = getGlobalOption,
-						set = setGlobalOption,
-					},
-					sep = {
-						order = 4,
-						name = "",
-						type = "description",
-					},
-					scale = {
-						order = 5,
-						type = "range",
-						name = L["Scale"],
-						min = 0, max = 2, step = 0.01,
-						get = getGlobalOption,
-						set = setGlobalOption,
-					},
-					maxRows = {
-						order = 6,
-						type = "range",
-						name = L["Max timers"],
-						desc = L["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."],
-						min = 1, max = 50, step = 1,
-						get = getGlobalOption,
-						set = setGlobalOption,
-					},
-					display = {
-						order = 8,
 						type = "group",
 						inline = true,
 						name = L["Bar only"],
@@ -1220,13 +1257,13 @@ SlashCmdList["AFFLICTED"] = function(msg)
 			if( type(id) == "number" and type(spell) == "table" ) then
 				local spellName, _, spellIcon = GetSpellInfo(id)
 				
-				if( spell.anchor and spell.duration and not added[spell.anchor] ) then
+				if( spell.anchor and spell.duration > 0 and not added[spell.anchor] ) then
 					added[spell.anchor] = true
 					addedCount = addedCount + 1
 					self:CreateTimer(UnitGUID("player"), UnitName("player"), spell.anchor, spell.repeating, false, spell.duration, id, spellName, spellIcon)
 				end
 				
-				if( spell.cdAnchor and spell.cooldown and not added[spell.cdAnchor] ) then
+				if( spell.cdAnchor and spell.cooldown > 0 and not added[spell.cdAnchor] ) then
 					added[spell.cdAnchor] = true
 					addedCount = addedCount + 1
 					self:CreateTimer(UnitGUID("player"), UnitName("player"), spell.cdAnchor, false, true, spell.cooldown, id, spellName, spellIcon)

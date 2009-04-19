@@ -4,9 +4,12 @@ AfflictedLocals = {
 	["Interrupted %s"] = "Interrupted %s",
 	["Interrupted %s's %s"] = "Interrupted %s's %s",
 	["FAILED %s's %s"] = "FAILED %s's %s",
+	["Stole %s"] = "Stole %s",
+	["Stole %s's %s"] = "Stole %s's %s",
 	["Removed %s"] = "Removed %s",
 	["Removed %s's %s"] = "Removed %s's %s",
-	
+	["READY *spell (*target)"] = "READY *spell (*target)",
+
 	-- Cmd
 	["Slash commands"] = "Slash commands",
 	["- clear - Clears all running timers."] = "- clear - Clears all running timers.",
@@ -71,6 +74,9 @@ AfflictedLocals = {
 	
 	["Disable duration"] = "Disable duration",
 	["Duration"] = "Duration",
+	
+	["Message to show when the spell is used."] = "Message to show when the spell is used.",
+	["Message to show the spell ends, this only applies to duration, cooldowns will use a static message."] = "Message to show the spell ends, this only applies to duration, cooldowns will use a static message.",
 	
 	["Disable cooldown"] = "Disable cooldown",
 	["Cooldown"] = "Cooldown",

@@ -10,6 +10,7 @@ local savedGroups = {}
 function Bars:CreateDisplay(type)
 	local anchorData = Afflicted.db.profile.anchors[type]
 	local group = GTBLib:RegisterGroup(string.format("Afflicted (%s)", anchorData.text), SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
+	group:SetGroupID(type)
 	group:RegisterOnFade(Bars, "OnFade")
 	group:RegisterOnMove(Bars, "OnMove")
 	group:SetScale(anchorData.scale)
@@ -21,7 +22,6 @@ function Bars:CreateDisplay(type)
 	group:SetFont(SML:Fetch(SML.MediaType.FONT, Afflicted.db.profile.fontName), Afflicted.db.profile.fontSize)
 	group:SetFadeTime(anchorData.fadeTime)
 	group:SetIconPosition(anchorData.icon or "LEFT")
-	group:SetGroupID(type)
 
 	if( anchorData.position ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", anchorData.position.x, anchorData.position.y)
@@ -58,7 +58,7 @@ function Bars:LoadVisual()
 		SML.RegisterCallback(Bars, "LibSharedMedia_Registered", "MediaRegistered")
 		
 		GTBLib = LibStub:GetLibrary("GTB-1.0")
-		self.GTB = GTBLib
+		Bars.GTB = GTBLib
 	end
 
 	local obj = {}
@@ -70,7 +70,7 @@ function Bars:LoadVisual()
 	Bars.groups = {}
 	for name, data in pairs(Afflicted.db.profile.anchors) do
 		if( data.display == "bars" ) then
-			Bars.groups[name] = Bars:CreateDisplay(name)
+			Bars.groups[name] = self:CreateDisplay(name)
 		end
 	end
 	
@@ -136,12 +136,16 @@ function Bars:OnFade(barID)
 end
 
 -- Remove a timer by the ID, totems basically
-function Bars:RemoveTimerByID(anchor, id)
-	if( Bars.groups[anchor] ) then
-		return Bars.groups[anchor]:UnregisterBar(id)
+function Bars:RemoveTimerByID(id)
+	local removedTimer
+	for _, group in pairs(Bars.groups) do
+		local removed = group:UnregisterBar(id)
+		if( removed ) then
+			removedTimer = true
+		end
 	end
 	
-	return nil
+	return removedTimer
 end
 
 -- Reload visual data

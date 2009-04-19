@@ -16,24 +16,19 @@ function Afflicted:OnInitialize()
 			announceColor = {r = 1, g = 1, b = 1},
 			dispelLocation = "none",
 			interruptLocation = "none",
-			
 			targetOnly = false,
-			
+			cooldownMessage = L["READY *spell (*target)"],
 			barWidth = 180,
 			barNameOnly = false,
 			barName = "BantoBar",
-
 			fontSize = 12,
 			fontName = "Friz Quadrata TT",
-			
 			inside = {["none"] = true},
 			anchors = {},
 			spells = {},
 			arenas = {[2] = {}, [3] = {}, [5] = {}},
-
 			revision = 0,
 			spellRevision = 0,
-			
 			anchorDefault = {
 				enabled = true,
 				announce = false,
@@ -108,7 +103,11 @@ function Afflicted:OnInitialize()
 			end
 			
 			tbl[index] = loadstring("return " .. Afflicted.db.profile.spells[index])()
-			
+			if( type(tbl[index]) == "table" ) then
+				tbl[index].cooldown = tbl[index].cooldown or 0
+				tbl[index].duration = tbl[index].duration or 0
+			end
+		
 			return tbl[index]
 		end
 	})
@@ -123,6 +122,7 @@ function Afflicted:OnInitialize()
 	-- Annnd update revision
 	self.db.profile.revision = self.revision
 
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 end
 
@@ -141,8 +141,7 @@ end
 
 local COMBATLOG_OBJECT_REACTION_HOSTILE	= COMBATLOG_OBJECT_REACTION_HOSTILE
 local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
-local eventRegistered = {["SPELL_CAST_SUCCESS"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true, ["SPELL_INTERRUPT"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_DISPEL"] = true}
-
+local eventRegistered = {["SPELL_CAST_SUCCESS"] = true, ["SPELL_AURA_REMOVED"] = true, ["SPELL_SUMMON"] = true, ["SPELL_CREATE"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true, ["SPELL_INTERRUPT"] = true, ["SPELL_STOLEN"] = true, ["SPELL_DISPEL_FAILED"] = true, ["SPELL_DISPEL"] = true}
 function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, ...)
 	if( not eventRegistered[eventType] ) then
 		return
@@ -151,8 +150,9 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Enemy buff faded
 	if( eventType == "SPELL_AURA_REMOVED" and bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
 		local spellID, spellName, spellSchool, auraType = ...
-		if( auraType == "BUFF" ) then
-			self:AbilityEarlyFade(sourceGUID, sourceName, self:GetSpell(spellID, spellName), spellID)
+		local spell = self:GetSpell(spellID, spellName)
+		if( auraType == "BUFF" and spell and spell.type == "buff" ) then
+			self:AbilityEarlyFade(sourceGUID, sourceName, spell, spellID)
 		end
 
 	-- Spell casted succesfully
@@ -173,14 +173,14 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	-- Check for something being summoned (Pets, totems)
 	elseif( eventType == "SPELL_SUMMON" and bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
 		local spellID, spellName, spellSchool = ...
-	
+		
 		-- Fixes an issue with totems not being removed when they get redropped
 		local id = sourceGUID .. (AfflictedSpells:GetTotemClass(spellName) or spellName)
 		local spell = self:GetSpell(spellID, spellName)
 		if( spell and spell.type == "totem" ) then
 			-- We already had a totem of this timer up, remove the previous one first
 			if( summonedTotems[id] ) then
-				self[self.db.profile.anchors[spell.anchor].display]:RemoveTimerByID(self.anchor, summonedTotems[id])
+				self[self.db.profile.anchors[spell.anchor].display]:RemoveTimerByID(summonedTotems[id])
 			end
 			
 			-- Set it as summoned so the totem specifically dying removes its timers
@@ -223,18 +223,27 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		self:SendMessage(string.format(L["FAILED %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor)
 			
 	-- Managed to dispel or steal a buff
-	elseif( eventType == "SPELL_DISPEL" and self.db.profile.dispelLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+	elseif( ( eventType == "SPELL_DISPEL" or eventType == "SPELL_STOLEN") and self.db.profile.dispelLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
-		
 		-- Combat text output should be shorttened since we know who we did it on anyway
 		if( self.db.profile.dispelLocation == "ct" ) then
-			self:SendMessage(string.format(L["Removed %s"], self:StripServer(destName)), self.db.profile.dispelLocation, self.db.profile.announceColor)
+			local msg = L["Removed %s"]
+			if( eventType == "SPELL_STOLEN" ) then
+				msg = L["Stole %s"]
+			end
+			
+			self:SendMessage(string.format(msg, self:StripServer(destName)), self.db.profile.dispelLocation, self.db.profile.announceColor)
 		else
-			self:SendMessage(string.format(L["Removed %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor)
+			local msg = L["Removed %s's %s"]
+			if( eventType == "SPELL_STOLEN" ) then
+				msg = L["Stole %s's %s"]
+			end
+
+			self:SendMessage(string.format(msg, self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor)
 		end
 		
-	-- Check if we should clear timers
-	elseif( ( eventType == "PARTY_KILL" or ( instancetype ~= "arena" and eventType == "UNIT_DIED" ) ) and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
+		-- Check if we should clear timers
+	elseif( ( eventType == "PARTY_KILL" or ( instanceType ~= "arena" and eventType == "UNIT_DIED" ) ) and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
 		-- If this is a summoned object (trap/totem) that was specifically killed, remove its timer
 		if( summonedObjects[destGUID] ) then
 			self.bars:RemoveTimerByID(summonedObjects[destGUID])
@@ -263,7 +272,7 @@ function Afflicted:ResetCooldowns(sourceGUID, resets)
 	for spellID in pairs(resets) do
 		local spellData = Afflicted.spells[spellID]
 		if( spellData and spellData.cdAnchor ) then
-			self[self.db.profile.anchors[spellData.cdAnchor].display]:RemoveTimerByID(spellData.cdAnchor, sourceGUID .. spellID .. "CD")
+			self[self.db.profile.anchors[spellData.cdAnchor].display]:RemoveTimerByID(sourceGUID .. spellID .. "CD")
 		end
 	end
 end
@@ -282,27 +291,30 @@ function Afflicted:AbilityTriggered(sourceGUID, sourceName, spellData, spellID)
 	if( arenaBracket and self.db.profile.arenas[arenaBracket][spellID or spellName] ) then
 		return
 	end
-	
-		
 	-- Start duration timer (if any)
-	if( not spellData.disabled and spellData.anchor and spellData.duration ) then
+	if( not spellData.disabled and spellData.anchor and spellData.duration > 0 ) then
 		self:CreateTimer(sourceGUID, sourceName, spellData.anchor, spellData.repeating, false, spellData.duration, spellID, spellName, spellIcon)
-
+		
 		-- Announce timer used
-		self:Announce(spellData, spellData.anchor, "startMessage", spellName, sourceName)
+		self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "startMessage", spellName, sourceName)
 	end
 	
 	-- Start CD timer
-	if( not spellData.cdDisabled and spellData.cdAnchor and spellData.cooldown ) then
+	if( not spellData.cdDisabled and spellData.cdAnchor and spellData.cooldown > 0 ) then
 		self:CreateTimer(sourceGUID, sourceName, spellData.cdAnchor, false, true, spellData.cooldown, spellID, spellName, spellIcon)
+		
+		-- Only announce that a cooldown was used if we didn't announce a duration, it's implied that the cooldown started.
+		if( spellData.disabled or not spellData.anchor or spellData.duration == 0 ) then
+			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "startMessage", spellName, sourceName)
+		end
 	end
 end
 
 -- Spell faded early, so announce that
-function Afflicted:AbilityEarlyFade(sourceGUID, sourceName, spellData, spellID, spellName)
+function Afflicted:AbilityEarlyFade(sourceGUID, sourceName, spellData, spellID, spellName, announce)
 	if( spellData and not spellData.disabled and spellData.type == "buff" ) then
-		local removed = self[self.db.profile.anchors[spellData.anchor].display]:RemoveTimerByID(spellData.anchor, sourceGUID .. spellID)
-		if( removed ) then
+		local removed = self[self.db.profile.anchors[spellData.anchor].display]:RemoveTimerByID(sourceGUID .. spellID)
+		if( removed and announce ) then
 			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellName, sourceName)
 		end
 	end
@@ -314,7 +326,7 @@ function Afflicted:AbilityEnded(sourceGUID, sourceName, spellData, spellID, spel
 		if( not isCooldown and not spellData.disabled ) then
 			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellName, sourceName)
 		elseif( isCooldown and not spellData.cdDisabled ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "endMessage", spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "cooldownMessage", spellName, sourceName)
 		end
 	end
 end
@@ -322,22 +334,22 @@ end
 -- Create a timer and shunt it to the correct display
 function Afflicted:CreateTimer(sourceGUID, sourceName, anchorName, repeating, isCooldown, duration, spellID, spellName, spellIcon)
 	anchor = self.db.profile.anchors[anchorName]
-	if( not anchor ) then
-		return
+	if( anchor ) then
+		self[anchor.display]:CreateTimer(sourceGUID, sourceName, anchorName, repeating, isCooldown, duration, spellID, spellName, spellIcon)
 	end
-	
-	self[anchor.display]:CreateTimer(sourceGUID, sourceName, anchorName, repeating, isCooldown, duration, spellID, spellName, spellIcon)
 end
 
 -- Announce something
-function Afflicted:Announce(spellData, anchor, key, spellName, sourceName)
+function Afflicted:Announce(spellData, anchor, key, spellName, sourceName, isCooldown)
 	local msg
-	if( spellData.custom ) then
+	if( key == "cooldownMessage" and ( spellData.custom or ( anchor.enabled and anchor.announce ) ) ) then
+		msg = self.db.profile.cooldownMessage
+	elseif( spellData.custom ) then
 		msg = spellData[key]
 	elseif( anchor.enabled and anchor.announce ) then
 		msg = anchor[key]
 	end
-	
+		
 	if( not msg or msg == "" ) then
 		return
 	end

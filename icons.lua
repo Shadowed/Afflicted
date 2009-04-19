@@ -311,28 +311,25 @@ end
 
 -- Remove a specific anchors timer by ID
 function Icons:RemoveTimerByID(anchor, id)
-	local group = Icons.groups[anchor]
-	if( not group ) then
-		return nil
-	end
-	
-	-- Remove the icon timer
-	local removed
-	for i=#(group.active), 1, -1 do
-		if( group.active[i].id == id ) then
-			removed = true
-			releaseIcon(group, i)
+	local removedTimer
+	for _, group in pairs(Icons.groups) do
+		-- Remove the icon timer
+		local removed
+		for i=#(group.active), 1, -1 do
+			if( group.active[i].id == id ) then
+				removed = true
+				releaseIcon(group, i)
+			end
+		end
+		
+		if( removed ) then
+			-- Reposition everything
+			repositionTimers(group)
+			removedTimer = true
 		end
 	end
 	
-	-- Didn't remove anything, nothing to change
-	if( not removed ) then
-		return nil
-	end
-	
-	-- Reposition everything
-	repositionTimers(group)
-	return true
+	return removedTimer
 end
 
 function Icons:ReloadVisual()
