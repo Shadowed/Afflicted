@@ -242,7 +242,7 @@ function AfflictedSpells:GetData()
 		-- Ice Block
 		[45438] = "{type='buff';duration=10;anchor='defenses';cooldown=240;cdDisabled=true;cdAnchor='cooldowns';class='MAGE';}",
 		-- Counterspell
-		[2138] = "{cooldown=24;cdAnchor='interrupts';class='MAGE';}",
+		[2139] = "{cooldown=24;cdAnchor='interrupts';class='MAGE';}",
 		-- Blink
 		[1953] = "{cooldown=15;cdDisabled=true;cdAnchor='cooldowns';class='MAGE';}",
 		
