@@ -227,6 +227,7 @@ local function createSpellConfiguration(index, spell, spellName)
 					duration = {
 						order = 2,
 						name = L["Duration"],
+						desc = L["Click the number between the 0 and 900 to set the time to a specific number of seconds."],
 						type = "range",
 						min = 0, max = 900, step = 1,
 					},
@@ -254,6 +255,7 @@ local function createSpellConfiguration(index, spell, spellName)
 					cooldown = {
 						order = 2,
 						name = L["Cooldown"],
+						desc = L["Click the number between the 0 and 900 to set the time to a specific number of seconds."],
 						type = "range",
 						min = 0, max = 900, step = 1,
 					},

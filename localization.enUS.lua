@@ -74,6 +74,7 @@ AfflictedLocals = {
 	
 	["Disable duration"] = "Disable duration",
 	["Duration"] = "Duration",
+	["Click the number between the 0 and 900 to set the time to a specific number of seconds."] = "Click the number between the 0 and 900 to set the time to a specific number of seconds.",
 	
 	["Message to show when the spell is used."] = "Message to show when the spell is used.",
 	["Message to show the spell ends, this only applies to duration, cooldowns will use a static message."] = "Message to show the spell ends, this only applies to duration, cooldowns will use a static message.",

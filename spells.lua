@@ -62,6 +62,8 @@ function AfflictedSpells:GetData()
 		[64205] = "{type='buff';duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		
 		-- Warrior
+		-- Shield Reflect
+		[23920] = "{type='buff';disabled=true;duration=5;cdDisabled=true;cooldown=10;cdAnchor='buffs';class='WARRIOR';}",
 		-- Shield Bash
 		[72] = "{cooldown=12;cdAnchor='interrupts';class='WARRIOR';}",
 		-- Pummel
