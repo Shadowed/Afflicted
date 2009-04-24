@@ -101,7 +101,7 @@ function AfflictedSpells:GetData()
 		[50212] = "{cooldown=30;cdAnchor='damage';cdDisabled=true;class='DRUID';}",
 		-- Nature's Grasp
 		[17329] = 53312,
-		[27009] = 27009,
+		[27009] = 53312,
 		[53312] = "{type='buff';disabled=true;duration=45;anchor='buffs';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Innervate
 		[29166] = "{type='buff';disabled=true;duration=20;anchor='buffs';cooldown=360;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
@@ -293,7 +293,6 @@ function AfflictedSpells:GetData()
 	return self.spells
 end
 
---[[
 function AfflictedSpells:Verify()
 	AfflictedSpells:GetData()
 	
@@ -304,6 +303,11 @@ function AfflictedSpells:Verify()
 		if( not GetSpellInfo(id) ) then
 			print(string.format("Spell does not exist %s.", id))
 			found = true
+		elseif( type(data) == "number" ) then
+			if( type(self.spells[data]) ~= "string" ) then
+				print(string.format("[%s] is linking to a spell that links to another spell.", id))
+				found = true
+			end
 		elseif( type(data) == "string" ) then
 			local tbl, error = loadstring("return " .. data)
 			if( type(tbl) ~= "function" ) then
@@ -324,7 +328,6 @@ function AfflictedSpells:Verify()
 		print("All good, no spellIDs missing.")
 	end
 end
-]]
 
 function AfflictedSpells:GetTotemClass(spellName)
 	if( not self.totems ) then
