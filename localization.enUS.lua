@@ -40,6 +40,9 @@ AfflictedLocals = {
 	
 	["Display"] = "Display",
 	
+	["Show icons in alerts"] = "Show icons in alerts",
+	["Any announcement into a local channel, will show the icon of the spell that was announced."] = "Any announcement into a local channel, will show the icon of the spell that was announced.",
+	
 	["Font name"] = "Font name",
 	["Font size"] = "Font size",
 	["Texture"] = "Texture",

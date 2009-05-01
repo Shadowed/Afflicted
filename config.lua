@@ -705,10 +705,16 @@ local function loadOptions()
 		handler = Config,
 		args = {
 			showAnchors = {
-				order = 1,
+				order = 0,
 				type = "toggle",
 				name = L["Show timer anchors"],
 				desc = L["Show the anchors that lets you drag timer groups around."],
+			},
+			showIcons = {
+				order = 1,
+				type = "toggle",
+				name = L["Show icons in alerts"],
+				desc = L["Any announcement into a local channel, will show the icon of the spell that was announced."],
 			},
 			inside = {
 				order = 2,

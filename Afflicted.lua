@@ -13,6 +13,7 @@ function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
 			showAnchors = false,
+			showIcons = false,
 			announceColor = {r = 1, g = 1, b = 1},
 			dispelLocation = "none",
 			interruptLocation = "none",
@@ -211,16 +212,16 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		
 		-- Combat text output should be shorttened since we know who we did it on anyway
 		if( self.db.profile.interruptLocation == "ct" ) then
-			self:SendMessage(string.format(L["Interrupted %s"], extraSpellName), self.db.profile.interruptLocation, self.db.profile.announceColor)
+			self:SendMessage(string.format(L["Interrupted %s"], extraSpellName), self.db.profile.interruptLocation, self.db.profile.announceColor, extraSpellID)
 		else
-			self:SendMessage(string.format(L["Interrupted %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.interruptLocation, self.db.profile.announceColor)
+			self:SendMessage(string.format(L["Interrupted %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.interruptLocation, self.db.profile.announceColor, extraSpellID)
 		end
 		
 		
 	-- We tried to dispel a buff, and failed
 	elseif( eventType == "SPELL_DISPEL_FAILED" and self.db.profile.dispelLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
-		self:SendMessage(string.format(L["FAILED %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor)
+		self:SendMessage(string.format(L["FAILED %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor, extraSpellID)
 			
 	-- Managed to dispel or steal a buff
 	elseif( ( eventType == "SPELL_DISPEL" or eventType == "SPELL_STOLEN") and self.db.profile.dispelLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
@@ -232,14 +233,14 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 				msg = L["Stole %s"]
 			end
 			
-			self:SendMessage(string.format(msg, self:StripServer(destName)), self.db.profile.dispelLocation, self.db.profile.announceColor)
+			self:SendMessage(string.format(msg, self:StripServer(destName)), self.db.profile.dispelLocation, self.db.profile.announceColor, spellID)
 		else
 			local msg = L["Removed %s's %s"]
 			if( eventType == "SPELL_STOLEN" ) then
 				msg = L["Stole %s's %s"]
 			end
 
-			self:SendMessage(string.format(msg, self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor)
+			self:SendMessage(string.format(msg, self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor, spellID)
 		end
 		
 		-- Check if we should clear timers
@@ -288,7 +289,7 @@ function Afflicted:AbilityTriggered(sourceGUID, sourceName, spellData, spellID)
 	local spellName, _, spellIcon = GetSpellInfo(spellID)
 	
 	-- We're in an arena, and we don't want this spell enabled in the bracket
-	if( arenaBracket and self.db.profile.arenas[arenaBracket][spellID or spellName] ) then
+	if( arenaBracket and ( self.db.profile.arenas[arenaBracket][spellID] or self.db.profile.arenas[arenaBracket][spellName] ) ) then
 		return
 	end
 	-- Start duration timer (if any)
@@ -296,7 +297,7 @@ function Afflicted:AbilityTriggered(sourceGUID, sourceName, spellData, spellID)
 		self:CreateTimer(sourceGUID, sourceName, spellData.anchor, spellData.repeating, false, spellData.duration, spellID, spellName, spellIcon)
 		
 		-- Announce timer used
-		self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "startMessage", spellName, sourceName)
+		self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "startMessage", spellID, spellName, sourceName)
 	end
 	
 	-- Start CD timer
@@ -305,7 +306,7 @@ function Afflicted:AbilityTriggered(sourceGUID, sourceName, spellData, spellID)
 		
 		-- Only announce that a cooldown was used if we didn't announce a duration, it's implied that the cooldown started.
 		if( spellData.disabled or not spellData.anchor or spellData.duration == 0 ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "startMessage", spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "startMessage", spellID, spellName, sourceName)
 		end
 	end
 end
@@ -315,7 +316,7 @@ function Afflicted:AbilityEarlyFade(sourceGUID, sourceName, spellData, spellID, 
 	if( spellData and not spellData.disabled and spellData.type == "buff" ) then
 		local removed = self[self.db.profile.anchors[spellData.anchor].display]:RemoveTimerByID(sourceGUID .. spellID)
 		if( removed and announce ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellID, spellName, sourceName)
 		end
 	end
 end
@@ -324,9 +325,9 @@ end
 function Afflicted:AbilityEnded(sourceGUID, sourceName, spellData, spellID, spellName, isCooldown)
 	if( spellData ) then
 		if( not isCooldown and not spellData.disabled ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellID, spellName, sourceName)
 		elseif( isCooldown and not spellData.cdDisabled ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "cooldownMessage", spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "cooldownMessage", spellID, spellName, sourceName)
 		end
 	end
 end
@@ -340,7 +341,7 @@ function Afflicted:CreateTimer(sourceGUID, sourceName, anchorName, repeating, is
 end
 
 -- Announce something
-function Afflicted:Announce(spellData, anchor, key, spellName, sourceName, isCooldown)
+function Afflicted:Announce(spellData, anchor, key, spellID, spellName, sourceName, isCooldown)
 	local msg
 	if( key == "cooldownMessage" and ( spellData.custom or ( anchor.enabled and anchor.announce ) ) ) then
 		msg = self.db.profile.cooldownMessage
@@ -357,7 +358,7 @@ function Afflicted:Announce(spellData, anchor, key, spellName, sourceName, isCoo
 	msg = string.gsub(msg, "*spell", spellName)
 	msg = string.gsub(msg, "*target", self:StripServer(sourceName))
 
-	self:SendMessage(msg, anchor.announceDest, anchor.announceColor)
+	self:SendMessage(msg, anchor.announceDest, anchor.announceColor, spellID)
 end
 
 -- Database is getting ready to be written, we need to convert any changed data back into text
@@ -461,8 +462,22 @@ function Afflicted:StripServer(text)
 	return name
 end
 
+function Afflicted:WrapIcon(msg, spellID)
+	if( not self.db.profile.showIcons or not spellID ) then
+		return msg
+	end
+	
+	-- Make sure we have a valid icon
+	local icon = select(3, GetSpellInfo(spellID))
+	if( not icon ) then
+		return msg
+	end
+
+	return string.format("|T%s:0:0|t %s", icon, msg)
+end
+
 local chatFrames = {}
-function Afflicted:SendMessage(msg, dest, color)
+function Afflicted:SendMessage(msg, dest, color, spellID)
 	-- We're not showing anything
 	if( dest == "none" ) then
 		return
@@ -484,7 +499,7 @@ function Afflicted:SendMessage(msg, dest, color)
 		end
 		
 		local frame = chatFrames[dest] or DEFAULT_CHAT_FRAME
-		frame:AddMessage("|cff33ff99Afflicted|r|cffffffff:|r " .. msg, color.r, color.g, color.b)
+		frame:AddMessage(string.format("|cff33ff99Afflicted|r|cffffffff:|r %s", self:WrapIcon(msg, spellID)), color.r, color.g, color.b)
 	-- Raid warning announcement to raid/party
 	elseif( dest == "rw" ) then
 		SendChatMessage(msg, "RAID_WARNING")
@@ -502,13 +517,13 @@ function Afflicted:SendMessage(msg, dest, color)
 			self.alertFrame:SetPoint("CENTER", 0, 60)
 		end
 		
-		self.alertFrame:AddMessage(msg, color.r, color.g, color.b)
+		self.alertFrame:AddMessage(self:WrapIcon(msg, spellID), color.r, color.g, color.b)
 	-- Party chat
 	elseif( dest == "party" ) then
 		SendChatMessage(msg, "PARTY")
 	-- Combat text
 	elseif( dest == "ct" ) then
-		self:CombatText(msg, color)
+		self:CombatText(self:WrapIcon(msg, spellID), color)
 	end
 end
 
