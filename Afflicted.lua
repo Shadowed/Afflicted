@@ -88,7 +88,7 @@ function Afflicted:OnInitialize()
 		local spells = AfflictedSpells:GetData()
 		for spellID, data in pairs(spells) do
 			-- Do not add a spell if it doesn't exist
-			if( GetSpellInfo(spellID) and not self.db.profile.spells[spellID] ) then
+			if( not self.db.profile.spells[spellID] ) then
 				self.db.profile.spells[spellID] = data
 			end
 		end
@@ -131,8 +131,6 @@ end
 function Afflicted:GetSpell(spellID, spellName)
 	if( self.spells[spellName] ) then
 		return self.spells[spellName]
-	elseif( not self.spells[spellID] ) then
-		return nil
 	elseif( tonumber(self.spells[spellID]) ) then
 		return self.spells[self.spells[spellID]]
 	end
@@ -217,7 +215,6 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 			self:SendMessage(string.format(L["Interrupted %s's %s"], self:StripServer(destName), extraSpellName), self.db.profile.interruptLocation, self.db.profile.announceColor, extraSpellID)
 		end
 		
-		
 	-- We tried to dispel a buff, and failed
 	elseif( eventType == "SPELL_DISPEL_FAILED" and self.db.profile.dispelLocation ~= "none" and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE and bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE ) then
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
@@ -228,18 +225,10 @@ function Afflicted:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 		local spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSpellSchool, auraType = ...
 		-- Combat text output should be shorttened since we know who we did it on anyway
 		if( self.db.profile.dispelLocation == "ct" ) then
-			local msg = L["Removed %s"]
-			if( eventType == "SPELL_STOLEN" ) then
-				msg = L["Stole %s"]
-			end
-			
+			local msg = eventType == "SPELL_STOLEN" and L["Stole %s"] or L["Removed %s"]
 			self:SendMessage(string.format(msg, self:StripServer(destName)), self.db.profile.dispelLocation, self.db.profile.announceColor, spellID)
 		else
-			local msg = L["Removed %s's %s"]
-			if( eventType == "SPELL_STOLEN" ) then
-				msg = L["Stole %s's %s"]
-			end
-
+			local msg = eventType == "SPELL_STOLEN" and L["Stole %s's %s"] or L["Removed %s's %s"]
 			self:SendMessage(string.format(msg, self:StripServer(destName), extraSpellName), self.db.profile.dispelLocation, self.db.profile.announceColor, spellID)
 		end
 		
@@ -292,6 +281,7 @@ function Afflicted:AbilityTriggered(sourceGUID, sourceName, spellData, spellID)
 	if( arenaBracket and ( self.db.profile.arenas[arenaBracket][spellID] or self.db.profile.arenas[arenaBracket][spellName] ) ) then
 		return
 	end
+	
 	-- Start duration timer (if any)
 	if( not spellData.disabled and spellData.anchor and spellData.duration > 0 ) then
 		self:CreateTimer(sourceGUID, sourceName, spellData.anchor, spellData.repeating, false, spellData.duration, spellID, spellName, spellIcon)

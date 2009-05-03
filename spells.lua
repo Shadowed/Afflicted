@@ -17,15 +17,15 @@ function AfflictedSpells:GetData()
 		-- Mind Freeze
 		[47528] = "{cooldown=10;cdAnchor='interrupts';class='DEATHKNIGHT';}",
 		-- Anti-Magic Shell
-		[48707] = "{cdDisabled=true;type='buff';duration=5;cooldown=45;anchor='defenses';cdAnchor='cooldowns';class='DEATHKNIGHT';}",
+		[48707] = "{cdDisabled=true;type='buff';disabled=true;duration=5;cooldown=45;anchor='defenses';cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Death Grip
-		[49576] = "{cooldown=35;cdAnchor='spells';class='DEATHKNIGHT';}",
+		[49576] = "{cdDisabled=true;cooldown=35;cdAnchor='spells';class='DEATHKNIGHT';}",
 		-- Anti-Magic Zone
 		[51052] = "{disabled=true;duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Dancing Rune Weapon
 		[49028] = "{disabled=true;duration=14;anchor='damage';cooldown=90;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Deathchill
-		[49796] = "{type='buff';duration=30;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
+		[49796] = "{disabled=true;type='buff';duration=30;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Hysteria
 		[49016] = "{type='buff';duration=30;anchor='damage';cooldown=180;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Lichborne
@@ -47,17 +47,17 @@ function AfflictedSpells:GetData()
 		-- Hammer of Justice
 		[10308] = "{cooldown=40;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Hand of Protection
-		[10278] = "{type='buff';duration=10;anchor='defenses';cooldown=180;cdAnchor='cooldowns';class='PALADIN';}",
+		[10278] = "{type='buff';duration=10;anchor='defenses';cdDisabled=true;cooldown=180;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Divine Shield
 		[642] = "{type='buff';duration=12;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Hand of Freedom
-		[1044] = "{type='buff';duration=14;anchor='spells';cooldown=25;cdAnchor='cooldowns';class='PALADIN';}",
+		[1044] = "{type='buff';duration=14;anchor='spells';cdDisabled=true;cooldown=25;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Divine Protection
-		[498] = "{type='buff';duration=12;anchor='defenses';cooldown=180;cdAnchor='cooldowns';class='PALADIN';}",
+		[498] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=180;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Hand of Sacrifice
-		[6940] = "{type='buff';duration=12;anchor='defenses';cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
+		[6940] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Aura Mastery
-		[31821] = "{duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
+		[31821] = "{duration=10;anchor='defenses';cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Divine Sacrifice
 		[64205] = "{type='buff';duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		
@@ -75,13 +75,13 @@ function AfflictedSpells:GetData()
 		-- Recklessness
 		[1719] = "{duration=12;anchor='damage';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
 		-- Charge
-		[11578] = "{cooldown=15;cdDisabled=true;cdAnchor='spells';class='WARRIOR';}",
+		[11578] = "{cooldown=13;cdAnchor='spells';class='WARRIOR';}",
 		-- Berserker Rage
-		[18499] = "{duration=10;anchor='spells';cooldown=30;cdAnchor='cooldowns';class='WARRIOR';}",
+		[18499] = "{disabled=true;duration=10;anchor='spells';cooldown=30;cdAnchor='cooldowns';class='WARRIOR';}",
 		-- Intercept
 		[20252] = "{cooldown=15;cdAnchor='spells';class='WARRIOR';}",
 		-- Shield Wall
-		[871] = "{duration=12;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
+		[871] = "{disabled=true;duration=12;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
 		-- Intimidating Shout
 		[5246] = "{cooldown=120;cdDisabled=true;cdAnchor='spells';class='WARRIOR';}",
 		-- Retaliation (dumbasses)
@@ -91,14 +91,14 @@ function AfflictedSpells:GetData()
 		
 		-- Druid
 		-- Survival Instincts
-		[61336] = "{disabled=true;duration=20;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
+		[61336] = "{duration=20;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Force of Nature (Treants)
 		[33831] = "{disabled=true;duration=30;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Berserk
 		[50334] = "{duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Tiger's fury
 		[9846] = 50212,
-		[50212] = "{cooldown=30;cdAnchor='damage';cdDisabled=true;class='DRUID';}",
+		[50212] = "{cooldown=30;cdDisabled=true;cdAnchor='damage';cdDisabled=true;class='DRUID';}",
 		-- Nature's Grasp
 		[17329] = 53312,
 		[27009] = 53312,
@@ -132,7 +132,7 @@ function AfflictedSpells:GetData()
 		
 		-- Warlock
 		-- Metamorphosis
-		[47241] = "{duration=30;anchor='damage';cooldown=126;cdDisabled=true;cdAchor='cooldowns';class='WARLOCK';}",
+		[47241] = "{disabled=true;duration=30;anchor='damage';cooldown=126;cdDisabled=true;cdAchor='cooldowns';class='WARLOCK';}",
 		-- Demonic Empowerment
 		[47193] = "{cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='WARLOCK';}",
 		-- Fel Domination
@@ -182,7 +182,7 @@ function AfflictedSpells:GetData()
 		
 		-- Hunter
 		-- Bestial Wrath
-		[19574] = "{duration=18;anchor='damage';cooldown=120;cdAnchor='cooldowns';class='HUNTER';}",
+		[19574] = "{duration=18;anchor='damage';cdDisabled=true;cooldown=120;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Wyvern Sting
 		[27068] = 49012,
 		[49011] = 49012,
@@ -190,7 +190,7 @@ function AfflictedSpells:GetData()
 		-- Silencing Shot
 		[34490] = "{cooldown=20;cdAnchor='interrupts';class='HUNTER';}",
 		-- Readiness
-		[23989] = "{cooldown=180;cdAnchor='cooldowns';resets={49012,34600,63670,19263,3034,14327,34490};class='HUNTER';}",
+		[23989] = "{cooldown=180;cdDisabled=true;cdAnchor='cooldowns';resets={49012,34600,63670,19263,3034,14327,34490};class='HUNTER';}",
 		-- Nether Shock (Nether Ray)
 		[53588] = 53589,
 		[53589] = "{cooldown=40;cdAnchor='interrupts';class='HUNTER';}",
@@ -210,7 +210,7 @@ function AfflictedSpells:GetData()
 		[63671] = 63672,
 		[63672] = "{cooldown=30;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
 		-- Master's Call
-		[53271] = "{duration=4;anchor='defenses';cooldown=60;cdAnchor='cooldowns';class='HUNTER';}",
+		[53271] = "{duration=4;anchor='defenses';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Explosive Trap
 		[27025] = 34600,
 		[49066] = 34600,
@@ -276,7 +276,7 @@ function AfflictedSpells:GetData()
 		-- Sprint
 		[11305] = "{duration=15;disabled=true;anchor='buffs';cooldown=120;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Evasion
-		[26669] = "{duration=15;disabled=true;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
+		[26669] = "{duration=15;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Blind
 		[2094] = "{cooldown=120;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Dismantle
