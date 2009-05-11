@@ -172,7 +172,7 @@ local function buildString(spell, divider)
 end
 
 -- Build a list of spells based on a filter (if any)
-local function createSpellConfiguration(index, spell, spellName)
+local function createSpellConfiguration(index, spell, spellID, spellName)
 	local classList = {}
 	for classToken in pairs(RAID_CLASS_COLORS) do
 		classList[classToken] = L[classToken]
@@ -206,7 +206,7 @@ local function createSpellConfiguration(index, spell, spellName)
 	return {
 		type = "group",
 		order = 1,
-		name = spellName,
+		name = spellName or string.format("#%d", spellID),
 		desc = buildString(spell, "\n"),
 		set = setSpell,
 		get = getSpell,
@@ -1006,7 +1006,7 @@ local function loadOptions()
 								spellName = GetSpellInfo(spellName)
 							end
 
-							options.args.spells.args[tostring(addedSpellIndex)] = createSpellConfiguration(addedSpellIndex, Afflicted.spells[value], spellName)
+							options.args.spells.args[tostring(addedSpellIndex)] = createSpellConfiguration(addedSpellIndex, Afflicted.spells[value], value, spellName)
 						end,
 						width = "full",
 					},
@@ -1174,13 +1174,13 @@ local function loadOptions()
 	
 	-- Category spell toggling
 	local totalAdded = {}
-	local function createCatSpell(index, spell, spellName, category)
+	local function createCatSpell(index, spell, spellID, spellName, category)
 		totalAdded[category] = (totalAdded[category] or 0) + 1
 		
 		options.args.spellcats.args[category].args[tostring(index)] = {
 			order = index,
 			type = "execute",
-			name = spellName,
+			name = spellName or spellID,
 			desc = buildString(spell, "\n"),
 			arg = spellName,
 			hidden = isSpellHidden,
@@ -1189,11 +1189,11 @@ local function loadOptions()
 	end
 	
 	-- Spell enabled in arenas
-	local function createSpellArenaConfiguration(index, spell, spellName)
+	local function createSpellArenaConfiguration(index, spell, spellID, spellName)
 		return {
 			type = "toggle",
 			order = 1,
-			name = spellName,
+			name = spellName or string.format("#%d", spellID),
 			desc = buildString(spell, "\n"),
 			hidden = isSpellHidden,
 			arg = spellName,
@@ -1214,19 +1214,19 @@ local function loadOptions()
 			
 			-- Add the group tab entry
 			if( spell.class ) then
-				createCatSpell(addedSpellIndex, spell, spellName, spell.class)
+				createCatSpell(addedSpellIndex, spell, id, spellName, spell.class)
 			end
 			
 			-- Add the all tab entry
-			createCatSpell(addedSpellIndex, spell, spellName, "ALL")
+			createCatSpell(addedSpellIndex, spell, id, spellName, "ALL")
 			
 			-- Add the arena listing
-			options.args.arenas.args["2"].args[tostring(addedSpellIndex)] = createSpellArenaConfiguration(addedSpellIndex, spell, spellName)
-			options.args.arenas.args["3"].args[tostring(addedSpellIndex)] = createSpellArenaConfiguration(addedSpellIndex, spell, spellName)
-			options.args.arenas.args["5"].args[tostring(addedSpellIndex)] = createSpellArenaConfiguration(addedSpellIndex, spell, spellName)
+			options.args.arenas.args["2"].args[tostring(addedSpellIndex)] = createSpellArenaConfiguration(addedSpellIndex, spell, id, spellName)
+			options.args.arenas.args["3"].args[tostring(addedSpellIndex)] = createSpellArenaConfiguration(addedSpellIndex, spell, id, spellName)
+			options.args.arenas.args["5"].args[tostring(addedSpellIndex)] = createSpellArenaConfiguration(addedSpellIndex, spell, id, spellName)
 						
 			-- Now add the spell modifier thingy one
-			options.args.spells.args[tostring(addedSpellIndex)] = createSpellConfiguration(addedSpellIndex, spell, spellName)	
+			options.args.spells.args[tostring(addedSpellIndex)] = createSpellConfiguration(addedSpellIndex, spell, id, spellName)	
 		elseif( type(spell) == "number" ) then
 			linkedSpells[spell] = linkedSpells[spell] or {}
 			table.insert(linkedSpells[spell], id)
