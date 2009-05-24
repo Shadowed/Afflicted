@@ -1115,52 +1115,14 @@ local function loadOptions()
 	-- Open a specific spell
 	local timerFrame
 	local timeElapsed = 0.15
+	local AceDialog, AceRegistry
 	local function openSpell(info)
-		local treeGroup = AceGUI30TreeButton1.obj
-		local scrollBar = treeGroup.scrollbar
+		AceDialog = AceDialog or LibStub("AceConfigDialog-3.0")
+		AceRegistry = AceRegistry or LibStub("AceConfigRegistry-3.0")
 		
-		local originalValue = scrollBar:GetValue()
-		
-		-- Do we need to expand the spells category?
-		if( not treeGroup.status.groups.spells ) then
-			treeGroup.status.groups.spells = true
-			treeGroup:RefreshTree()
-		end
-		
-
-		local maxValue = select(2, scrollBar:GetMinMaxValues())
-		local value = 0
-		
-		-- Scan and find it to select it
-		while( true ) do
-			scrollBar:SetValue(value)
-			
-			for _, button in pairs(treeGroup.buttons) do
-				if( button.value == info[#(info)] ) then
-					if( not timerFrame ) then
-						timerFrame = CreateFrame("Frame")
-						timerFrame:Hide()
-						timerFrame:SetScript("OnUpdate", function(self, elapsed)
-							timeElapsed = timeElapsed - elapsed
-							if( timeElapsed <= 0 ) then
-								self:Hide()
-								
-								button:Click()
-							end
-						end)
-					end
-					
-					timeElapsed = 0.15
-					timerFrame:Show()
-					return
-				end
-			end
-			
-			if( value >= maxValue ) then break end
-			value = value + 10
-		end
-		
-		scrollBar:SetValue(0)
+		AceDialog.Status.Afflicted.status.groups.groups.spells = true
+		AceDialog.Status.Afflicted.status.groups.selected = "spells\001" .. info[#(info)]
+		AceRegistry:NotifyChange("Afflicted")
 	end
 	
 	-- Spell search thing
@@ -1290,12 +1252,12 @@ SlashCmdList["AFFLICTED"] = function(msg)
 				loadOptions()
 			end
 			
-			config:RegisterOptionsTable("Afflicted3", options)
-			dialog:SetDefaultSize("Afflicted3", 640, 590)
+			config:RegisterOptionsTable("Afflicted", options)
+			dialog:SetDefaultSize("Afflicted", 640, 590)
 			registered = true
 		end
 
-		dialog:Open("Afflicted3")
+		dialog:Open("Afflicted")
 	else
 		Afflicted:Print(L["Slash commands"])
 		DEFAULT_CHAT_FRAME:AddMessage(L["- clear - Clears all running timers."])
