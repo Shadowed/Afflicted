@@ -389,6 +389,26 @@ function Afflicted:OnDatabaseShutdown()
 	end
 end
 
+-- Find the current arena bracket we are in
+function Afflicted:SaveArenaBracket()
+	arenaBracket = nil
+	for i=1, MAX_BATTLEFIELD_QUEUES do
+		local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
+		if( status == "active" and teamSize > 0 ) then
+			arenaBracket = teamSize
+			break
+		end
+	end
+end
+
+-- Couldn't find data on the arena bracket we were in, so keep checking up UBS until we find it (or, we leave the arena)
+function Afflicted:UPDATE_BATTLEFIELD_STATUS()
+	self:SaveArenaBracket()
+	if( arenaBracket ) then
+		self:UnregisterEvent("UPDATE_BATTLEFIELD_STATUS")
+	end
+end
+
 -- Enabling Afflicted based on zone type
 function Afflicted:ZONE_CHANGED_NEW_AREA()
 	local type = select(2, IsInInstance())
@@ -406,11 +426,9 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 		if( self.db.profile.inside[type] ) then
 			-- Find arena bracket
 			if( type == "arena" ) then
-				for i=1, MAX_BATTLEFIELD_QUEUES do
-					local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
-					if( status == "active" and teamSize > 0 ) then
-						arenaBracket = teamSize
-					end
+				self:SaveArenaBracket()
+				if( not arenaBracket ) then
+					self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
 				end
 			end
 			
@@ -421,6 +439,7 @@ function Afflicted:ZONE_CHANGED_NEW_AREA()
 			self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		else
 			self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+			self:UnregisterEvent("UPDATE_BATTLEFIELD_STATUS")
 		end
 	end
 	
