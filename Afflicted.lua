@@ -62,7 +62,7 @@ function Afflicted:OnInitialize()
 	self.defaults.profile.anchors.damage.text = "Damage"
 		
 	-- Initialize DB
-	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults)
+	self.db = LibStub:GetLibrary("AceDB-3.0"):New("AfflictedDB", self.defaults, true)
 	self.db.RegisterCallback(self, "OnProfileChanged", "Reload")
 	self.db.RegisterCallback(self, "OnProfileCopied", "Reload")
 	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
