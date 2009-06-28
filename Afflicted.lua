@@ -1,5 +1,5 @@
 --[[ 
-	Afflicted 3, Mayen/Selari/Dayliss from Illidan (US) PvP
+	Afflicted 3, Mayen of US-Mal'Ganis PvP
 ]]
 
 Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
@@ -24,12 +24,10 @@ function Afflicted:OnInitialize()
 			barName = "BantoBar",
 			fontSize = 12,
 			fontName = "Friz Quadrata TT",
-			inside = {["none"] = true},
+			inside = {["arena"] = true, ["pvp"] = true},
 			anchors = {},
 			spells = {},
 			arenas = {[2] = {}, [3] = {}, [5] = {}},
-			revision = 0,
-			spellRevision = 0,
 			anchorDefault = {
 				enabled = true,
 				announce = false,
@@ -70,27 +68,34 @@ function Afflicted:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
 	self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
-	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
-	
 	-- Load SML
 	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
-		
+
+	-- Load spell database
+	local spells = AfflictedSpells:GetData()
+	
 	-- Found an old Afflicted2 install
-	if( self.db.profile.spellRevision == 0 and self.db.profile.revision == 0 and self.db.profile.version ) then
+	if( self.db.profile.version ) then
 		self:Print(L["Reset Afflicted configuration as you were using Afflicted2."])
 		self.db:ResetDB()
+	elseif( self.db.profile.spellRevision ) then
+		self.db.profile.revision = nil
+		self.db.profile.spellRevision = nil
+		self.db.profile.arenas = {[2] = {}, [3] = {}, [5] = {}}
+
+		-- Remove any spells that no longer exist
+		for spellID in pairs(self.db.profile.spells) do
+			if( type(spellID) == "number" and not spells[spellID] ) then
+				self.db.profile.spells[spellID] = nil
+			end
+		end
 	end
 
-	-- Load spell defaults in if the DB has changed
-	if( self.db.profile.spellRevision <= AfflictedSpells.revision ) then
-		self.db.profile.spellRevision = AfflictedSpells.revision
-		
-		local spells = AfflictedSpells:GetData()
-		for spellID, data in pairs(spells) do
-			-- Do not add a spell if it doesn't exist
-			if( not self.db.profile.spells[spellID] ) then
-				self.db.profile.spells[spellID] = data
-			end
+	-- Load new spells in
+	for spellID, data in pairs(spells) do
+		-- Do not add a spell if it doesn't exist
+		if( not self.db.profile.spells[spellID] ) then
+			self.db.profile.spells[spellID] = data
 		end
 	end
 	
@@ -120,11 +125,180 @@ function Afflicted:OnInitialize()
 	self.bars = self.modules.Bars:LoadVisual()
 	self.icons = self.modules.Icons:LoadVisual()
 	
-	-- Annnd update revision
-	self.db.profile.revision = self.revision
-
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+end
+
+-- Debug
+local function loadEditbox()
+	-- Load addon list
+	local addons = {}
+	for i=1, GetNumAddOns() do
+		if( IsAddOnLoaded(i) ) then
+			table.insert(addons, (GetAddOnInfo(i)))
+		end
+	end
+	
+	-- Load enabled inside options
+	local inside = {}
+	for type, enabled in pairs(Afflicted.db.profile.inside) do
+		if( enabled ) then
+			table.insert(inside, string.format("Enabled in %s", type))
+		end
+	end
+	
+	-- Load positions
+	local anchors = {}
+	for name, data in pairs(Afflicted.db.profile.anchors) do
+		local x, y
+		if( data.position ) then
+			x = string.format("%.2f", data.position.x)
+			y = string.format("%.2f", data.position.y)
+		end
+		
+		table.insert(anchors, string.format("Anchor %s (%s) type %s, x %s/y %s", tostring(data.text), tostring(data.enabled), tostring(data.display), tostring(x), tostring(y)))
+	end
+	
+	-- Load spell list
+	local spellStats = {["total"] = 0, ["links"] = 0, ["cdDisabled"] = 0, ["disabled"] = 0, [2] = 0, [3] = 0, [5] = 0}
+	local spells = {}
+	for id in pairs(Afflicted.db.profile.spells) do
+		local data = Afflicted.spells[id]
+		if( type(data) == "table" ) then
+			spellStats.total = spellStats.total + 1
+			if( data.cdDisabled ) then
+				spellStats.cdDisabled = spellStats.cdDisabled + 1
+			end
+
+			if( data.disabled ) then
+				spellStats.disabled = spellStats.disabled + 1
+			end
+		else
+			spellStats.links = spellStats.links + 1
+		end
+	end
+	
+	table.insert(spells, string.format("Total spells %d, total cooldowns disabled %d, total spells disabled %d, total links %d", spellStats.total, spellStats.cdDisabled, spellStats.disabled, spellStats.links))
+	
+	-- Figure out whats disabled in arenas
+	for bracket, data in pairs(Afflicted.db.profile.arenas) do
+		for id, disabled in pairs(data) do
+			if( disabled ) then
+				spellStats[bracket] = spellStats[bracket] + 1
+			end
+		end
+	end
+	
+	table.insert(spells, string.format("%d spells disabled in 2vs2, %d in 3vs3, %d in 5vs5.", spellStats[2], spellStats[3], spellStats[5]))
+	
+	-- Compile it all
+	local text = ""
+	text = string.format("Addon list:\n{\"%s\"}", table.concat(addons, "\", \""))
+	text = string.format("%s\n\nEnabled in:\n%s", text, table.concat(inside, ", "))
+	text = string.format("%s\n\nAnchors:\n%s", text, table.concat(anchors, "\n"))
+	text = string.format("%s\n\nSpell data:\n%s", text, table.concat(spells, "\n"))
+	
+	Afflicted.guiFrame.editBox:SetText(text)
+end
+
+function Afflicted:Debug()
+	local backdrop = {
+		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
+		tile = true,
+		edgeSize = 1,
+		tileSize = 5,
+		insets = {left = 1, right = 1, top = 1, bottom = 1}
+	}
+
+	self.guiFrame = CreateFrame("Frame", nil, UIParent)
+	self.guiFrame:SetWidth(550)
+	self.guiFrame:SetHeight(275)
+	self.guiFrame:SetBackdrop(backdrop)
+	self.guiFrame:SetBackdropColor(0.0, 0.0, 0.0, 1.0)
+	self.guiFrame:SetBackdropBorderColor(0.65, 0.65, 0.65, 1.0)
+	self.guiFrame:SetMovable(true)
+	self.guiFrame:EnableMouse(true)
+	self.guiFrame:SetFrameStrata("HIGH")
+	self.guiFrame:Hide()
+
+	-- Fix edit box size
+	self.guiFrame:SetScript("OnShow", function(self)
+		self.child:SetHeight(self.scroll:GetHeight())
+		self.child:SetWidth(self.scroll:GetWidth())
+		self.editBox:SetWidth(self.scroll:GetWidth())
+		
+		loadEditbox()
+	end)
+	
+	-- Select all text
+	self.guiFrame.copy = CreateFrame("Button", nil, self.guiFrame, "UIPanelButtonGrayTemplate")
+	self.guiFrame.copy:SetWidth(70)
+	self.guiFrame.copy:SetHeight(18)
+	self.guiFrame.copy:SetText("Select all")
+	self.guiFrame.copy:SetPoint("TOPLEFT", self.guiFrame, "TOPLEFT", 1, -1)
+	self.guiFrame.copy:SetScript("OnClick", function(self)
+		self.editBox:SetFocus()
+		self.editBox:SetCursorPosition(0)
+		self.editBox:HighlightText(0)
+	end)
+	
+	-- Title info
+	self.guiFrame.title = self.guiFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	self.guiFrame.title:SetPoint("TOPLEFT", self.guiFrame, "TOPLEFT", 75, -4)
+	
+	-- Close button (Shocking!)
+	local button = CreateFrame("Button", nil, self.guiFrame, "UIPanelCloseButton")
+	button:SetPoint("TOPRIGHT", self.guiFrame, "TOPRIGHT", 6, 6)
+	button:SetScript("OnClick", function()
+		HideUIPanel(self.guiFrame)
+	end)
+	
+	self.guiFrame.closeButton = button
+	
+	-- Create the container frame for the scroll box
+	local container = CreateFrame("Frame", nil, self.guiFrame)
+	container:SetHeight(265)
+	container:SetWidth(1)
+	container:ClearAllPoints()
+	container:SetPoint("BOTTOMLEFT", self.guiFrame, 0, -9)
+	container:SetPoint("BOTTOMRIGHT", self.guiFrame, 4, 0)
+	
+	self.guiFrame.container = container
+	
+	-- Scroll frame
+	local scroll = CreateFrame("ScrollFrame", "QDRFrameScroll", container, "UIPanelScrollFrameTemplate")
+	scroll:SetPoint("TOPLEFT", 5, 0)
+	scroll:SetPoint("BOTTOMRIGHT", -28, 10)
+	
+	self.guiFrame.scroll = scroll
+	
+	local child = CreateFrame("Frame", nil, scroll)
+	scroll:SetScrollChild(child)
+	child:SetHeight(2)
+	child:SetWidth(2)
+	
+	self.guiFrame.child = child
+
+	-- Create the actual edit box
+	local editBox = CreateFrame("EditBox", nil, child)
+	editBox:SetPoint("TOPLEFT")
+	editBox:SetHeight(50)
+	editBox:SetWidth(50)
+
+	editBox:SetMultiLine(true)
+	editBox:SetAutoFocus(false)
+	editBox:EnableMouse(true)
+	editBox:SetFontObject(GameFontHighlightSmall)
+	editBox:SetTextInsets(0, 0, 0, 0)
+	editBox:SetScript("OnEscapePressed", editBox.ClearFocus)
+	scroll:SetScript("OnMouseUp", function() editBox:SetFocus() end)	
+
+	self.guiFrame.editBox = editBox
+	self.guiFrame.copy.editBox = editBox
+
+	self.guiFrame:SetPoint("CENTER", UIParent, "CENTER")
+	self.guiFrame:Show()
 end
 
 -- Quick function to get the linked spells easily and such
@@ -324,7 +498,7 @@ end
 
 -- Create a timer and shunt it to the correct display
 function Afflicted:CreateTimer(sourceGUID, sourceName, anchorName, repeating, isCooldown, duration, spellID, spellName, spellIcon)
-	anchor = self.db.profile.anchors[anchorName]
+	local anchor = self.db.profile.anchors[anchorName]
 	if( anchor ) then
 		self[anchor.display]:CreateTimer(sourceGUID, sourceName, anchorName, repeating, isCooldown, duration, spellID, spellName, spellIcon)
 	end
