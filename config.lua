@@ -175,7 +175,7 @@ end
 local function createSpellConfiguration(index, spell, spellID, spellName)
 	local classList = {}
 	for classToken in pairs(RAID_CLASS_COLORS) do
-		classList[classToken] = L[classToken]
+		classList[classToken] = L.classes[classToken]
 	end
 	
 	if( not setSpell ) then
@@ -318,6 +318,7 @@ local function createSpellConfiguration(index, spell, spellID, spellName)
 					advanced = {
 						type = "group",
 						order = 3,
+						hidden = true,
 						inline = true,
 						name = L["Advanced"],
 						args = {
@@ -1022,10 +1023,10 @@ local function loadOptions()
 		name = L["Arena spells"],
 		handler = Config,
 		set = function(info, value)
-			Afflicted.db.profile.arenas[tonumber(info[2])][info[#(info)]] = not value
+			Afflicted.db.profile.arenas[tonumber(info[2])][spellIDToNames[info[#(info)]]] = not value
 		end,
 		get = function(info)
-			return not Afflicted.db.profile.arenas[tonumber(info[2])][info[#(info)]]
+			return not Afflicted.db.profile.arenas[tonumber(info[2])][spellIDToNames[info[#(info)]]]
 		end,
 		childGroups = "tab",
 		args = {
@@ -1093,7 +1094,7 @@ local function loadOptions()
 		options.args.spellcats.args[classToken] = {
 			type = "group",
 			order = order,
-			name = L[classToken],
+			name = L.classes[classToken],
 			args = {}
 		}
 		
@@ -1105,7 +1106,7 @@ local function loadOptions()
 		options.args.spellcats.args[classToken] = {
 			type = "group",
 			order = order,
-			name = L[classToken],
+			name = L.classes[classToken],
 			args = {},
 		}
 		
