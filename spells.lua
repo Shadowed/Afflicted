@@ -25,7 +25,7 @@ function AfflictedSpells:GetData()
 		-- Deathchill
 		--[49796] = "{disabled=true;type='buff';duration=30;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Hysteria
-		[49016] = "{type='buff';duration=30;anchor='damage';cooldown=180;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
+		--[49016] = "{type='buff';duration=30;anchor='damage';cooldown=180;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Lichborne
 		[49039] = "{duration=15;anchor='defenses';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Rune Tap
@@ -51,7 +51,7 @@ function AfflictedSpells:GetData()
 		-- Hand of Freedom
 		[1044] = "{type='buff';duration=14;anchor='spells';cdDisabled=true;cooldown=25;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Divine Protection
-		[498] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=180;cdAnchor='cooldowns';class='PALADIN';}",
+		--[498] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=180;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Hand of Sacrifice
 		[6940] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Aura Mastery
@@ -136,7 +136,7 @@ function AfflictedSpells:GetData()
 		-- Fel Domination
 		[18708] = "{type='buff';duration=15;anchor='spells';cooldown=900;cdDisabled=true;cdAnchor='cooldowns';class='WARLOCK';}",
 		-- Demonic Circle= Teleport
-		[48020] = "{cooldown=30;cdDisabled=true;cdAnchor='defenses';cdDisabled=true;class='WARLOCK';}",
+		--[48020] = "{cooldown=30;cdDisabled=true;cdAnchor='defenses';cdDisabled=true;class='WARLOCK';}",
 		-- Devour Magic (Felhunter)
 		[27276] = 48011,
 		[27277] = 48011,
@@ -196,11 +196,11 @@ function AfflictedSpells:GetData()
 		[53547] = 53548,
 		[53548] = "{cooldown=40;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
 		-- Snatch (Bid of Pray)
-		[53542] = 53543,
-		[53543] = "{cooldown=60;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
+		--[53542] = 53543,
+		--[53543] = "{cooldown=60;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
 		-- Sonic Blast (Bat)
-		[53567] = 53568,
-		[53568] = "{cooldown=60;cdDisabled=true;cdAnchor='interrupts';class='HUNTER';}",
+		--[53567] = 53568,
+		--[53568] = "{cooldown=60;cdDisabled=true;cdAnchor='interrupts';class='HUNTER';}",
 		-- Pummel (Gorilla)
 		[26090] = "{cooldown=30;cdAnchor='interrupts';class='HUNTER';}",
 		-- Black Arrow
@@ -252,17 +252,17 @@ function AfflictedSpells:GetData()
 		-- Kidney Shot
 		[8643] = "{cooldown=20;cdAnchor='spells';class='ROGUE';}",
 		-- Killing Spree
-		[51690] = "{cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
+		--[51690] = "{cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Shadow Dance
-		[51713] = "{duration=10;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
+		--[51713] = "{duration=10;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Shadow Step
 		[36554] = "{disabled=true;duration=3;anchor='buffs';cooldown=30;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Adrenaline Rush
 		[13750] = "{duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
-		-- Blade Furry
-		[13877] = "{duration=15;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
+		-- Blade Flurry
+		--[13877] = "{duration=15;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Cold Blood
-		[14177] = "{cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
+		--[14177] = "{cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Preparation
 		[14185] = "{cooldown=300;cdDisabled=true;cdAnchor='cooldowns';resets={14177,36554,26889,11305,26669};class='ROGUE'}",
 		-- Tricks of the Trade
