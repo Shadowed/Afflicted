@@ -78,6 +78,7 @@ function Afflicted:OnInitialize()
 	if( self.db.profile.version ) then
 		self:Print(L["Reset Afflicted configuration as you were using Afflicted2."])
 		self.db:ResetDB()
+	-- Do a DB clean and reset the arena spells data
 	elseif( self.db.profile.spellRevision ) then
 		self.db.profile.revision = nil
 		self.db.profile.spellRevision = nil

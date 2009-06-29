@@ -15,6 +15,7 @@ local moveToAnchor = ""
 function Config:OnInitialize()
 	config = LibStub("AceConfig-3.0")
 	dialog = LibStub("AceConfigDialog-3.0")
+	registry = LibStub("AceConfigRegistry-3.0")
 
 	SML = Afflicted.SML
 	SML:Register(SML.MediaType.STATUSBAR, "BantoBar", "Interface\\Addons\\Afflicted\\images\\banto")
@@ -212,6 +213,20 @@ local function createSpellConfiguration(index, spell, spellID, spellName)
 		get = getSpell,
 		arg = index,
 		args = {
+			-- I hate users
+			help = {
+				type = "group",
+				order = 0,
+				inline = true,
+				name = L["Help"],
+				args = {
+					description = {
+						order = 0,
+						type = "description",
+						name = L["You can manually set slider values by clicking the number in the middle below the slider bar."],
+					},
+				},
+			},
 			duration = {
 				type = "group",
 				order = 1,
@@ -222,7 +237,6 @@ local function createSpellConfiguration(index, spell, spellID, spellName)
 						order = 1,
 						type = "toggle",
 						name = L["Disable duration"],
-						width = "full",
 					},
 					duration = {
 						order = 2,
@@ -249,7 +263,6 @@ local function createSpellConfiguration(index, spell, spellID, spellName)
 						order = 1,
 						type = "toggle",
 						name = L["Disable cooldown"],
-						width = "full",
 
 					},
 					cooldown = {
@@ -277,21 +290,18 @@ local function createSpellConfiguration(index, spell, spellID, spellName)
 						order = 1,
 						type = "toggle",
 						name = L["Enable announcements"],
-						width = "full",
 					},
 					startMessage = {
 						order = 2,
 						type = "input",
 						name = L["Start message"],
 						desc = L["Message to show when the spell is used."],
-						width = "full",
 					},
 					endMessage = {
 						order = 3,
 						type = "input",
 						name = L["Ended message"],
 						desc = L["Message to show the spell ends, this only applies to duration based typers, cooldowns will use a static message."],
-						width = "full",
 					},
 				},
 			},
@@ -394,7 +404,20 @@ local function createSpellConfiguration(index, spell, spellID, spellName)
 					desc = {
 						order = 1,
 						type = "description",
-						name = L["Spells that were added manually will be deleted, however spells that are added by default are simply reset next update."],
+						name = function(info)
+							local id = spellIDToNames[info[2]]
+							if( AfflictedSpells.spells[id] ) then
+								return L["You cannot delete a spell that is included with Afflicted by default, you will need to disable it if you don't want to use it."]
+							end
+							
+							return L["Deleting a spell from Afflicted will completely remove it, if you change your mind you will need to add it back."]
+						end,
+					},
+					header = {
+						order = 1.5,
+						name = "",
+						type = "header",
+						width = "full",
 					},
 					delete = {
 						order = 2,
@@ -413,6 +436,7 @@ local function createSpellConfiguration(index, spell, spellID, spellName)
 							Afflicted.spells[id] = false
 							Afflicted.writeQueue[id] = true
 						end,
+						disabled = function(info) return AfflictedSpells.spells[spellIDToNames[info[2]]] end,
 					},
 				},
 			},
@@ -463,31 +487,38 @@ local function createAnchorConfiguration(index, anchor)
 		get = getAnchor,
 		arg = index,
 		args = {
-			enabled = {
+			general = {
 				order = 1,
-				type = "toggle",
-				name = L["Enable anchor"],
-				desc = L["Allows timers to be shown under this anchor, if the anchor is disabled you won't see any timers."],
-				width = "full",
-			},
-			text = {
-				order = 2,
-				type = "input",
-				name = L["Anchor name"],
-				validate = function(info, value)
-					value = string.trim(value)
-					if( value == "" ) then
-						return L["No anchor name entered."]
-					end
+				type = "group",
+				inline = true,
+				name = L["General"],
+				args = {
+					enabled = {
+						order = 1,
+						type = "toggle",
+						name = L["Enable anchor"],
+						desc = L["Allows timers to be shown under this anchor, if the anchor is disabled you won't see any timers."],
+					},
+					text = {
+						order = 2,
+						type = "input",
+						name = L["Anchor name"],
+						validate = function(info, value)
+							value = string.trim(value)
+							if( value == "" ) then
+								return L["No anchor name entered."]
+							end
 
-					for _, data in pairs(Afflicted.db.profile.anchors) do
-						if( string.lower(data.text or "") == string.lower(value) ) then
-							return L["An anchor with that name already exists."]
-						end
-					end
+							for _, data in pairs(Afflicted.db.profile.anchors) do
+								if( string.lower(data.text or "") == string.lower(value) ) then
+									return L["An anchor with that name already exists."]
+								end
+							end
 
-					return true
-				end,
+							return true
+						end,
+					},
+				},
 			},
 			display = {
 				order = 3,
@@ -500,7 +531,6 @@ local function createAnchorConfiguration(index, anchor)
 						type = "toggle",
 						name = L["Grow up"],
 						desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
-						width = "double",
 					},
 					display = {
 						order = 2,
@@ -515,6 +545,11 @@ local function createAnchorConfiguration(index, anchor)
 						values = {["LEFT"] = L["Left"], ["RIGHT"] = L["Right"]},
 						hidden = isBarOptionsHidden,
 					},
+					sep = {
+						order = 3.5,
+						name = "",
+						type = "description",
+					},
 					fadeTime = {
 						order = 4,
 						type = "range",
@@ -522,11 +557,6 @@ local function createAnchorConfiguration(index, anchor)
 						desc = L["How many seconds it should take after a bar is finished for it to fade out."],
 						min = 0, max = 2, step = 0.1,
 						hidden = isBarOptionsHidden,
-					},
-					sep = {
-						order = 5,
-						name = "",
-						type = "description",
 					},
 					scale = {
 						order = 6,
@@ -541,25 +571,31 @@ local function createAnchorConfiguration(index, anchor)
 						desc = L["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."],
 						min = 1, max = 50, step = 1,
 					},
-					redirection = {
-						order = 8,
-						type = "group",
-						inline = true,
-						name = L["Redirection"],
-						hidden = isBarOptionsHidden,
-						args = {
-							desc = {
-								order = 0,
-								name = L["Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB, and the bar display to be enabled for this anchor."],
-								type = "description",
-							},
-							redirect = {
-								order = 1,
-								type = "select",
-								name = L["Redirect bars to group"],
-								values = "GetGroups",
-							},
-						},
+				},
+			},
+			redirection = {
+				order = 4,
+				type = "group",
+				inline = true,
+				name = L["Redirection"],
+				hidden = isBarOptionsHidden,
+				args = {
+					desc = {
+						order = 0,
+						name = L["Group name to redirect bars to, this lets you show Afflicted timers under another addons bar group. Requires the bars to be created using GTB, and the bar display to be enabled for this anchor."],
+						type = "description",
+					},
+					header = {
+						order = 0.5,
+						name = "",
+						type = "header",
+						width = "full",
+					},
+					redirect = {
+						order = 1,
+						type = "select",
+						name = L["Redirect bars to group"],
+						values = "GetGroups",
 					},
 				},
 			},
@@ -569,11 +605,22 @@ local function createAnchorConfiguration(index, anchor)
 				inline = true,
 				name = L["Announcements"],
 				args = {
+					desc = {
+						order = 0,
+						name = L["Announcement text for when timers are triggered in this anchor. You can use *spell for the spell name, and *target for the person who triggered it (if any)."],
+						type = "description",
+					},
+					header = {
+						order = 0.5,
+						name = "",
+						type = "header",
+						width = "full",
+					},
 					announce = {
 						order = 1,
 						type = "toggle",
 						name = L["Enable announcements"],
-						width = "full",
+						width = "double",
 					},
 					announceColor = {
 						order = 2,
@@ -582,7 +629,14 @@ local function createAnchorConfiguration(index, anchor)
 						desc = L["Alert text color, only applies to local outputs."],
 						set = setAnchorColor,
 						get = getAnchorColor,
-						width = "full",
+						hidden = function(info)
+							local id = anchorIDToNames[info[2]]
+							if( Afflicted.db.profile.anchors[id].announceDest == "party" or Afflicted.db.profile.anchors[id].announceDest == "raid" or Afflicted.db.profile.anchors[id].announceDest == "none" or Afflicted.db.profile.anchors[id].announceDest == "rw" ) then
+								return true
+							end
+							
+							return false
+						end,
 					},
 					announceDest = {
 						order = 3,
@@ -590,32 +644,17 @@ local function createAnchorConfiguration(index, anchor)
 						name = L["Destination"],
 						values = announceDest,
 					},
-					announceText = {
-						order = 6,
-						type = "group",
-						inline = true,
-						name = L["Announce text"],
-						args = {
-							desc = {
-								order = 0,
-								name = L["Announcement text for when timers are triggered in this anchor. You can use *spell for the spell name, and *target for the person who triggered it (if any)."],
-								type = "description",
-							},
-							startMessage = {
-								order = 1,
-								type = "input",
-								name = L["Start message"],
-								desc = L["Message to show when a timer is started in this anchor."],
-								width = "full",
-							},
-							endMessage = {
-								order = 2,
-								type = "input",
-								name = L["Ended message"],
-								desc = L["Message to show when a timer ends inside this anchor."],
-								width = "full",
-							},
-						},
+					startMessage = {
+						order = 4,
+						type = "input",
+						name = L["Start message"],
+						desc = L["Message to show when a timer is started in this anchor."],
+					},
+					endMessage = {
+						order = 5,
+						type = "input",
+						name = L["Ended message"],
+						desc = L["Message to show when a timer ends inside this anchor."],
 					},
 				},
 			},
@@ -628,10 +667,23 @@ local function createAnchorConfiguration(index, anchor)
 					desc = {
 						order = 1,
 						type = "description",
-						name = L["Anchors that were added manually will be deleted, default anchors will be reset to default settings if you delete them. Disable default anchors to stop timers from showing.\nYou will have to choose a new anchor to move any spells in this one to when you delete this anchor."],
+						name = function(info)
+							local anchorID = anchorIDToNames[info[2]]
+							if( Afflicted.defaults.profile.anchors[anchorID] ) then
+								return L["You cannot delete anchors that are included with Afflicted by default, you will need to disable it if you don't want to use the anchor."]
+							end
+							
+							return L["Anchors that were added manually will be deleted, default anchors will be reset to default settings if you delete them. Disable default anchors to stop timers from showing.\n\nYou will have to choose a new anchor to move any spells in this one to when you delete this anchor."]
+						end,
+					},
+					header = {
+						order = 1.5,
+						name = "",
+						type = "header",
+						width = "full",
 					},
 					move = {
-						order = 1,
+						order = 2,
 						type = "select",
 						name = L["Move spells in this anchor to"],
 						desc = L["You have to choose which anchor spells should be moved to when this one is deleted."],
@@ -643,9 +695,10 @@ local function createAnchorConfiguration(index, anchor)
 						end,
 						set = function(info, value) moveToAnchor = value end,
 						get = function() return moveToAnchor end,
+						disabled = function(info) return Afflicted.defaults.profile.anchors[anchorIDToNames[info[2]]] end,
 					},
 					delete = {
-						order = 2,
+						order = 3,
 						type = "execute",
 						name = L["Delete"],
 						confirm = true,
@@ -678,6 +731,7 @@ local function createAnchorConfiguration(index, anchor)
 							Afflicted.modules.Bars:ReloadVisual()
 							Afflicted.modules.Icons:ReloadVisual()
 						end,
+						disabled = function(info) return Afflicted.defaults.profile.anchors[anchorIDToNames[info[2]]] end,
 					},
 				},
 			},
@@ -705,32 +759,40 @@ local function loadOptions()
 		end,
 		handler = Config,
 		args = {
-			showAnchors = {
+			general = {
 				order = 0,
-				type = "toggle",
-				name = L["Show timer anchors"],
-				desc = L["Show the anchors that lets you drag timer groups around."],
-			},
-			showIcons = {
-				order = 1,
-				type = "toggle",
-				name = L["Show icons in alerts"],
-				desc = L["Any announcement into a local channel, will show the icon of the spell that was announced."],
-			},
-			inside = {
-				order = 2,
-				type = "multiselect",
-				name = L["Enable inside"],
-				values = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]},
-				set = function(info, value, state)
-					Afflicted.db.profile[info[#(info)]][value] = state
-					Afflicted:ReloadEnabled()
-				end,
-				get = function(info, value)
-					return Afflicted.db.profile[info[#(info)]][value]
-				end,
-				width = "double",
-				arg = "inside"
+				type = "group",
+				inline = true,
+				name = L["General"],
+				args = {
+					showAnchors = {
+						order = 0,
+						type = "toggle",
+						name = L["Show timer anchors"],
+						desc = L["Show the anchors that lets you drag timer groups around."],
+					},
+					showIcons = {
+						order = 1,
+						type = "toggle",
+						name = L["Show icons in alerts"],
+						desc = L["Any announcement into a local channel, will show the icon of the spell that was announced."],
+					},
+					inside = {
+						order = 2,
+						type = "multiselect",
+						name = L["Enable inside"],
+						values = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]},
+						set = function(info, value, state)
+							Afflicted.db.profile[info[#(info)]][value] = state
+							Afflicted:ReloadEnabled()
+						end,
+						get = function(info, value)
+							return Afflicted.db.profile[info[#(info)]][value]
+						end,
+						width = "double",
+						arg = "inside"
+					},
+				},
 			},
 			announce = {
 				order = 3,
@@ -750,7 +812,6 @@ local function loadOptions()
 						get = function(info)
 							return Afflicted.db.profile[info[#(info)]].r, Afflicted.db.profile[info[#(info)]].g, Afflicted.db.profile[info[#(info)]].b
 						end,
-						width = "full",
 					},
 					dispelLocation = {
 						order = 2,
@@ -763,6 +824,19 @@ local function loadOptions()
 						type = "select",
 						name = L["Interrupt announcements"],
 						values = announceDest,
+					},
+				},
+			},
+			help = {
+				order = 3.5,
+				type = "group",
+				inline = true,
+				name = L["Help"],
+				args = {
+					help = {
+						order = 0,
+						type = "description",
+						name = L["Settings for all anchors can be changed below, if you want to set specific settings for each anchor you will need to do it in the anchor menu on the top left."],
 					},
 				},
 			},
@@ -785,11 +859,6 @@ local function loadOptions()
 						inline = true,
 						name = L["Anchors"],
 						args = {
-							desc = {
-								order = 0,
-								name = L["Global display setting, changing these will change all the anchors settings.\nNOTE: These values do not reflect each anchors configuration, this is just a quick way to set all of them to the same thing."],
-								type = "description",
-							},
 							growUp = {
 								order = 1,
 								type = "toggle",
@@ -797,7 +866,11 @@ local function loadOptions()
 								desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
 								get = getGlobalOption,
 								set = setGlobalOption,
-								width = "full",
+							},
+							sep = {
+								order = 3,
+								name = "",
+								type = "description",
 							},
 							display = {
 								order = 3,
@@ -806,11 +879,6 @@ local function loadOptions()
 								values = {[""] = "----", ["bars"] = L["Bars"], ["icons"] = L["Icons"]},
 								get = getGlobalOption,
 								set = setGlobalOption,
-							},
-							sep = {
-								order = 4,
-								name = "",
-								type = "description",
 							},
 							scale = {
 								order = 5,
@@ -838,18 +906,13 @@ local function loadOptions()
 						inline = true,
 						name = L["Bar only"],
 						args = {
-							desc = {
-								order = 0,
-								name = L["Configuration that only applies to bar displays."],
-								type = "description",
-							},
 							barNameOnly = {
 								order = 1,
 								type = "toggle",
 								name = L["Only show triggered name in text"],
 								desc = L["Instead of showing both the spell name and the triggered name, only the name will be shown in the bar."],
-								width = "full",
 								arg = "barNameOnly",
+								width = "full",
 							},
 							barWidth = {
 								order = 2,
@@ -939,8 +1002,11 @@ local function loadOptions()
 
 							Afflicted.modules.Bars:ReloadVisual()
 							Afflicted.modules.Icons:ReloadVisual()
+
+							dialog.Status.Afflicted.status.groups.groups.spells = true
+							dialog.Status.Afflicted.status.groups.selected = "anchors\001" .. addedAnchorIndex
+							registry:NotifyChange("Afflicted")
 						end,
-						width = "full",
 					},
 				},
 			},
@@ -1008,8 +1074,11 @@ local function loadOptions()
 							end
 
 							options.args.spells.args[tostring(addedSpellIndex)] = createSpellConfiguration(addedSpellIndex, Afflicted.spells[value], value, spellName)
+
+							dialog.Status.Afflicted.status.groups.groups.spells = true
+							dialog.Status.Afflicted.status.groups.selected = "spells\001" .. addedSpellIndex
+							registry:NotifyChange("Afflicted")
 						end,
-						width = "full",
 					},
 				},
 			},
@@ -1089,41 +1158,22 @@ local function loadOptions()
 		args = {},
 	}
 
-	local order = 2
 	for classToken in pairs(RAID_CLASS_COLORS) do
 		options.args.spellcats.args[classToken] = {
 			type = "group",
-			order = order,
-			name = L.classes[classToken],
-			args = {}
-		}
-		
-		order = order + 1
-	end
-
-	local order = 2
-	for classToken in pairs(RAID_CLASS_COLORS) do
-		options.args.spellcats.args[classToken] = {
-			type = "group",
-			order = order,
+			order = 2,
 			name = L.classes[classToken],
 			args = {},
 		}
-		
-		order = order + 1
 	end
 	
 	-- Open a specific spell
 	local timerFrame
 	local timeElapsed = 0.15
-	local AceDialog, AceRegistry
 	local function openSpell(info)
-		AceDialog = AceDialog or LibStub("AceConfigDialog-3.0")
-		AceRegistry = AceRegistry or LibStub("AceConfigRegistry-3.0")
-		
-		AceDialog.Status.Afflicted.status.groups.groups.spells = true
-		AceDialog.Status.Afflicted.status.groups.selected = "spells\001" .. info[#(info)]
-		AceRegistry:NotifyChange("Afflicted")
+		dialog.Status.Afflicted.status.groups.groups.spells = true
+		dialog.Status.Afflicted.status.groups.selected = "spells\001" .. info[#(info)]
+		registry:NotifyChange("Afflicted")
 	end
 	
 	-- Spell search thing
@@ -1141,7 +1191,7 @@ local function loadOptions()
 		totalAdded[category] = (totalAdded[category] or 0) + 1
 		
 		options.args.spellcats.args[category].args[tostring(index)] = {
-			order = index,
+			order = 1,
 			type = "execute",
 			name = spellName or spellID,
 			desc = buildString(spell, "\n"),
@@ -1254,7 +1304,7 @@ SlashCmdList["AFFLICTED"] = function(msg)
 			end
 			
 			config:RegisterOptionsTable("Afflicted", options)
-			dialog:SetDefaultSize("Afflicted", 640, 590)
+			dialog:SetDefaultSize("Afflicted", 825, 500)
 			registered = true
 		end
 
