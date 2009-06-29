@@ -18,6 +18,7 @@ libs\AceConfig-3.0\AceConfig-3.0.xml
 libs\GTB-1.0\GTB-1.0.xml
 
 localization.enUS.lua
+localization.zhTW.lua
 localization.zhCN.lua
 localization.koKR.lua
 
