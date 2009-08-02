@@ -24,6 +24,7 @@ function Afflicted:OnInitialize()
 			barName = "BantoBar",
 			fontSize = 12,
 			fontName = "Friz Quadrata TT",
+			spellVersion = 0,
 			inside = {["arena"] = true, ["pvp"] = true},
 			anchors = {},
 			spells = {},
@@ -83,20 +84,25 @@ function Afflicted:OnInitialize()
 		self.db.profile.revision = nil
 		self.db.profile.spellRevision = nil
 		self.db.profile.arenas = {[2] = {}, [3] = {}, [5] = {}}
-
-		-- Remove any spells that no longer exist
+	end
+	
+	-- Spell database changed
+	if( self.db.profile.spellVersion < AfflictedSpells.version ) then
+		self.db.profile.spellVersion = AfflictedSpells.version
+		
+		-- Remove old spells
 		for spellID in pairs(self.db.profile.spells) do
 			if( type(spellID) == "number" and not spells[spellID] ) then
 				self.db.profile.spells[spellID] = nil
 			end
 		end
-	end
 
-	-- Load new spells in
-	for spellID, data in pairs(spells) do
-		-- Do not add a spell if it doesn't exist
-		if( not self.db.profile.spells[spellID] ) then
-			self.db.profile.spells[spellID] = data
+		-- Load new or changed spells in
+		for spellID, data in pairs(spells) do
+			-- Do not add a spell if it doesn't exist
+			if( not self.db.profile.spells[spellID] or self.db.profile.spells[spellID] ~= data ) then
+				self.db.profile.spells[spellID] = data
+			end
 		end
 	end
 	

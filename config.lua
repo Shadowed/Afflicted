@@ -3,7 +3,7 @@ if( not Afflicted ) then return end
 local Config = Afflicted:NewModule("Config")
 local L = AfflictedLocals
 
-local SML, registered, options, config, dialog
+local SML, registered, options, config, dialog, registry
 local addedSpellIndex = 0
 local addedAnchorIndex = 0
 local spellIDToNames = {}
@@ -449,6 +449,7 @@ local setAnchor, getAnchor, setAnchorColor, getAnchorColor
 
 -- Create an anchor configuration
 local function createAnchorConfiguration(index, anchor)
+	local isBarOptionsHidden
 	if( not setAnchor ) then
 		setAnchor = function(info, value)
 			local id = anchorIDToNames[info[2]]
@@ -1042,6 +1043,8 @@ local function loadOptions()
 						order = 2,
 						type = "input",
 						name = L["Add new spell by name or spell id"],
+						width = "double", 
+						dialogControl = "Spell_EditBox",
 						validate = function(info, value)
 							value = string.trim(value)
 							if( Afflicted.spells[value] ) then
@@ -1193,9 +1196,9 @@ local function loadOptions()
 		options.args.spellcats.args[category].args[tostring(index)] = {
 			order = 1,
 			type = "execute",
-			name = spellName or spellID,
+			name = spellName or string.format("#%d", spellID),
 			desc = buildString(spell, "\n"),
-			arg = spellName,
+			arg = spellName or spellID,
 			hidden = isSpellHidden,
 			func = openSpell,
 		}
@@ -1209,7 +1212,7 @@ local function loadOptions()
 			name = spellName or string.format("#%d", spellID),
 			desc = buildString(spell, "\n"),
 			hidden = isSpellHidden,
-			arg = spellName,
+			arg = spellName or spellID,
 		}
 	end
 	

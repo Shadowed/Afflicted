@@ -103,7 +103,7 @@ function Bars:CreateTimer(sourceGUID, sourceName, anchor, repeating, isCooldown,
 		return
 	end	
 	
-	id = sourceGUID .. spellID .. (isCooldown and "CD" or "")
+	local id = sourceGUID .. spellID .. (isCooldown and "CD" or "")
 	barData[id] = string.format("%s,%s,%s,%s", sourceGUID, sourceName, spellID, spellName) .. (isCooldown and ",CD" or "")
 
 	-- It's a cooldown, but it's not shown in the cooldown anchor so prefix [CD] to it
