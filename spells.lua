@@ -1,4 +1,6 @@
 AfflictedSpells = {}
+AfflictedSpells.version = 2
+
 function AfflictedSpells:GetData()
 	if( self.spells ) then
 		return self.spells
@@ -8,10 +10,8 @@ function AfflictedSpells:GetData()
 		-- Death Knight
 		-- Strangulate
 		[47476] = "{cooldown=120;cdAnchor='interrupts';class='DEATHKNIGHT';}",
-		-- Empower Rune Weapon
-		--[47568] = "{cdDisabled=true;cooldown=300;cdAnchor='spells';class='DEATHKNIGHT';}",
 		-- Icebound Fortitude
-		[48792] = "{disabled=true;duration=12;cooldown=60;cdDisabled=true;anchor='defenses';cdAnchor='cooldowns';class='DEATHKNIGHT';}",
+		[48792] = "{disabled=true;duration=12;cooldown=120;cdDisabled=true;anchor='defenses';cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Mind Freeze
 		[47528] = "{cooldown=10;cdAnchor='interrupts';class='DEATHKNIGHT';}",
 		-- Anti-Magic Shell
@@ -21,15 +21,9 @@ function AfflictedSpells:GetData()
 		-- Anti-Magic Zone
 		[51052] = "{disabled=true;duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Dancing Rune Weapon
-		[49028] = "{disabled=true;duration=14;anchor='damage';cooldown=90;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
-		-- Deathchill
-		--[49796] = "{disabled=true;type='buff';duration=30;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
-		-- Hysteria
-		--[49016] = "{type='buff';duration=30;anchor='damage';cooldown=180;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
+		[49028] = "{disabled=true;duration=17;anchor='damage';cooldown=90;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Lichborne
-		[49039] = "{duration=15;anchor='defenses';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
-		-- Rune Tap
-		--[48982] = "{cooldown=30;cdDisabled=true;cdAnchor='spells';class='DEATHKNIGHT';}",
+		[49039] = "{duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Vampiric Blood
 		[55233] = "{duration=20;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Leap (Ghoul)
@@ -38,6 +32,8 @@ function AfflictedSpells:GetData()
 		[47481] = "{cooldown=30;cdDisabled=true;cdAnchor='spells';class='DEATHKNIGHT';}",
 		
 		-- Paladin
+		-- Ardent Defender
+		[66233] = "{type='buff';disabled=true;cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Divine Plea
 		[54428] = "{type='buff';disabled=true;duration=15;anchor='buffs';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Avenging Wrath
@@ -50,8 +46,6 @@ function AfflictedSpells:GetData()
 		[642] = "{type='buff';duration=12;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Hand of Freedom
 		[1044] = "{type='buff';duration=14;anchor='spells';cdDisabled=true;cooldown=25;cdAnchor='cooldowns';class='PALADIN';}",
-		-- Divine Protection
-		--[498] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=180;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Hand of Sacrifice
 		[6940] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Aura Mastery
@@ -66,8 +60,6 @@ function AfflictedSpells:GetData()
 		[72] = "{cooldown=12;cdAnchor='interrupts';class='WARRIOR';}",
 		-- Pummel
 		[6552] = "{cooldown=10;cdAnchor='interrupts';class='WARRIOR';}",
-		-- Shattering Throw
-		--[64382] = "{cooldown=300;cdDisabled=true;cdAnchor='damage';class='WARRIOR';}",
 		-- Intervene
 		[3411] = "{cooldown=30;cdDisabled=true;cdAnchor='defenses';class='WARRIOR';}",
 		-- Recklessness
@@ -80,10 +72,6 @@ function AfflictedSpells:GetData()
 		[20252] = "{cooldown=15;cdAnchor='spells';class='WARRIOR';}",
 		-- Shield Wall
 		[871] = "{disabled=true;duration=12;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
-		-- Intimidating Shout
-		--[5246] = "{cooldown=120;cdDisabled=true;cdAnchor='spells';class='WARRIOR';}",
-		-- Retaliation (dumbasses)
-		--[20230] = "{type='buff';disabled=true;duration=12;anchor='damage';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
 		-- Disarm
 		[676] = "{cdDisabled=true;cooldown=60;cdAnchor='spells';class='WARRIOR';}",
 		
@@ -94,15 +82,12 @@ function AfflictedSpells:GetData()
 		--[33831] = "{disabled=true;duration=30;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Berserk
 		[50334] = "{duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
-		-- Tiger's fury
-		--[9846] = 50212,
-		--[50212] = "{cooldown=30;cdDisabled=true;cdAnchor='damage';cdDisabled=true;class='DRUID';}",
 		-- Nature's Grasp
 		[17329] = 53312,
 		[27009] = 53312,
 		[53312] = "{type='buff';disabled=true;duration=45;anchor='buffs';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Innervate
-		[29166] = "{type='buff';disabled=true;duration=20;anchor='buffs';cooldown=360;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
+		[29166] = "{type='buff';disabled=true;duration=10;anchor='buffs';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Frenzied Regeneration
 		[22842] = "{duration=10;anchor='defenses';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Feral Charge - Bear
@@ -116,27 +101,19 @@ function AfflictedSpells:GetData()
 		-- Hymn of Hope
 		[64901] = "{duration=8;anchor='buffs';cooldown=360;cdDisabled=true;cdAnchor='cooldowns';class='PRIEST';}",
 		-- Dispersion
-		[47585] = "{duration=6;anchor='defenses';cooldown=135;cdAnchor='cooldowns';class='PRIEST';}",
+		[47585] = "{duration=6;anchor='defenses';cooldown=75;cdAnchor='cooldowns';class='PRIEST';}",
 		-- Guardian Spirit
 		[47788] = "{type='buff';duration=10;anchor='defenses';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='PRIEST';}",
 		-- Pain Suppression
 		[33206] = "{type='buff';duration=8;anchor='defenses';cooldown=144;cdDisabled=true;cdAnchor='cooldowns';class='PRIEST';}",
-		-- Psychic Horror
-		--[64044] = "{cooldown=120;cdAnchor='spells';cdDisabled=true;class='PRIEST';}",
 		-- Silence
 		[15487] = "{cooldown=45;cdAnchor='interrupts';class='PRIEST';}",
 		-- Psychic Scream
 		[10890] = "{cooldown=26;cdAnchor='spells';cdDisabled=true;class='PRIEST';}",
 		
 		-- Warlock
-		-- Metamorphosis
-		--[47241] = "{disabled=true;duration=30;anchor='damage';cooldown=126;cdDisabled=true;cdAchor='cooldowns';class='WARLOCK';}",
-		-- Demonic Empowerment
-		--[47193] = "{cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='WARLOCK';}",
 		-- Fel Domination
-		[18708] = "{type='buff';duration=15;anchor='spells';cooldown=900;cdDisabled=true;cdAnchor='cooldowns';class='WARLOCK';}",
-		-- Demonic Circle= Teleport
-		--[48020] = "{cooldown=30;cdDisabled=true;cdAnchor='defenses';cdDisabled=true;class='WARLOCK';}",
+		[18708] = "{type='buff';duration=15;anchor='spells';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='WARLOCK';}",
 		-- Devour Magic (Felhunter)
 		[27276] = 48011,
 		[27277] = 48011,
@@ -151,28 +128,15 @@ function AfflictedSpells:GetData()
 		-- Hex
 		[51514] = "{cooldown=45;cdDisabled=true;cdAnchor='spells';class='SHAMAN'}",
 		-- Wind Shock
-		[57994] = 49230,
-		-- Frost Shock
-		[25464] = 49230,
-		[49235] = 49230,
-		-- Flame Shock
-		[25457] = 49230,
-		[49232] = 49230,
-		[49233] = 49230,
-		-- Earth Shock
-		[10414] = 49230,
-		[24454] = 49230,
-		[49230] = "{cooldown=6;cdAnchor='interrupts';class='SHAMAN';}",
+		[57994] = "{cooldown=6;cdAnchor='interrupts';class='SHAMAN';}",
 		-- Heroism
 		[32182] = 2825,
 		-- Bloodlust
 		[2825] = "{type='buff';duration=40;anchor='damage';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='SHAMAN';}",
 		-- Tremor Totem
 		[8143] = "{type='totem';disabled=true;duration=5;anchor='buffs';repeating=true;class='SHAMAN';}",
-		-- Feral Spirit
-		--[51533] = "{disabled=true;duration=45;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='SHAMAN';}",
 		-- Shamanistic Rage
-		[30823] = "{disabled=true;duration=15;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='SHAMAN';}",
+		[30823] = "{disabled=true;duration=15;anchor='defenses';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='SHAMAN';}",
 		-- Mana Tide Totem
 		[16190] = "{type='totem';disabled=true;duration=12;anchor='buffs';cooldown=300;cdAnchor='cooldowns';class='SHAMAN';}",
 		-- Grounding Totem
@@ -195,42 +159,32 @@ function AfflictedSpells:GetData()
 		-- Pin (Crab)
 		[53547] = 53548,
 		[53548] = "{cooldown=40;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
-		-- Snatch (Bid of Pray)
-		--[53542] = 53543,
-		--[53543] = "{cooldown=60;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
-		-- Sonic Blast (Bat)
-		--[53567] = 53568,
-		--[53568] = "{cooldown=60;cdDisabled=true;cdAnchor='interrupts';class='HUNTER';}",
 		-- Pummel (Gorilla)
 		[26090] = "{cooldown=30;cdAnchor='interrupts';class='HUNTER';}",
-		-- Black Arrow
-		[63670] = 63672,
-		[63671] = 63672,
-		[63672] = "{cooldown=30;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
-		-- Master's Call
-		--[53271] = "{duration=4;anchor='defenses';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
-		-- Explosive Trap
-		[27025] = 34600,
-		[49066] = 34600,
-		[49067] = 34600,
 		-- Freezing Trap
-		[14311] = 34600,
+		[14311] = "{type='trap';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Frost Trap
 		[13809] = 34600,
+		-- Explosive Trap
+		[27025] = 49056,
+		[49066] = 49056,
+		[49067] = 49056,
+		-- Black Arrow
+		[63670] = 49056,
+		[63671] = 49056,
+		[63672] = 49056,
 		-- Immolation Trap
-		[27023] = 34600,
-		[49055] = 34600,
-		[49056] = 34600,
+		[27023] = 49056,
+		[49055] = 49056,
+		[49056] = "{type='trap';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Snake Trap
-		[34600] = "{type='trap';disabled=true;duration=60;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
+		[34600] = "{type='trap';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Deterrence
 		[19263] = "{duration=5;anchor='defenses';cooldown=90;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Viper Sting
 		[3034] = "{cooldown=15;cdAnchor='spells';class='HUNTER';}",
 		
 		-- Mage
-		-- Presence of Mind
-		--[12043] = "{cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='MAGE';}",
 		-- Cold Snap
 		[11958] = "{cooldown=384;cdDisabled=true;cdAnchor='cooldowns';resets={12472,44572,45438};class='MAGE'}",
 		-- Deep Freeze
@@ -251,18 +205,11 @@ function AfflictedSpells:GetData()
 		[1766] = "{cooldown=10;cdAnchor='interrupts';class='ROGUE';}",
 		-- Kidney Shot
 		[8643] = "{cooldown=20;cdAnchor='spells';class='ROGUE';}",
-		-- Killing Spree
-		--[51690] = "{cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
-		-- Shadow Dance
 		--[51713] = "{duration=10;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Shadow Step
 		[36554] = "{disabled=true;duration=3;anchor='buffs';cooldown=30;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Adrenaline Rush
 		[13750] = "{duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
-		-- Blade Flurry
-		--[13877] = "{duration=15;anchor='damage';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
-		-- Cold Blood
-		--[14177] = "{cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Preparation
 		[14185] = "{cooldown=300;cdDisabled=true;cdAnchor='cooldowns';resets={14177,36554,26889,11305,26669};class='ROGUE'}",
 		-- Tricks of the Trade
