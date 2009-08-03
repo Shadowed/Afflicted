@@ -778,20 +778,41 @@ local function loadOptions()
 						name = L["Show icons in alerts"],
 						desc = L["Any announcement into a local channel, will show the icon of the spell that was announced."],
 					},
-					inside = {
-						order = 2,
-						type = "multiselect",
-						name = L["Enable inside"],
-						values = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]},
-						set = function(info, value, state)
-							Afflicted.db.profile[info[#(info)]][value] = state
-							Afflicted:ReloadEnabled()
-						end,
-						get = function(info, value)
-							return Afflicted.db.profile[info[#(info)]][value]
-						end,
-						width = "double",
-						arg = "inside"
+				},
+			},
+			inside = {
+				order = 2,
+				type = "multiselect",
+				name = L["Enable inside"],
+				values = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]},
+				set = function(info, value, state)
+					Afflicted.db.profile[info[#(info)]][value] = state
+					Afflicted:ReloadEnabled()
+				end,
+				get = function(info, value)
+					return Afflicted.db.profile[info[#(info)]][value]
+				end,
+				width = "double",
+				arg = "inside"
+			},
+			announcements = {
+				order = 3,
+				type = "group",
+				inline = true,
+				name = L["Announcements"],
+				args = {
+					help = {
+						order = 0,
+						type = "description",
+						name = L["Dispel and interrupt announcements are no longer part of Afflicted, you will need to get Purgeatory if you want them still."],
+					},
+					url = {
+						order = 1,
+						type = "input",
+						name = L["URL"],
+						set = false,
+						get = function() return "http://www.wowinterface.com/downloads/info14277-Purgeatory.html" end,
+						width = "full",
 					},
 				},
 			},
@@ -987,6 +1008,8 @@ local function loadOptions()
 		options.args.anchors.args[tostring(addedAnchorIndex)] = createAnchorConfiguration(addedAnchorIndex, data)
 	end
 	
+	local moveSpells = {}
+	
 	-- Create the actual spell list modifier
 	options.args.spells = {
 		type = "group",
@@ -1048,6 +1071,90 @@ local function loadOptions()
 							dialog.Status.Afflicted.status.groups.groups.spells = true
 							dialog.Status.Afflicted.status.groups.selected = "spells\001" .. addedSpellIndex
 							registry:NotifyChange("Afflicted")
+						end,
+					},
+				},
+			},
+			moveSpells = {
+				order = 1,
+				type = "group",
+				name = L["Move spells"],
+				handler = Config,
+				inline = true,
+				args = {
+					desc = {
+						order = 1,
+						type = "description",
+						name = function(info)
+							return moveSpells.msg or L["Allows you to mass move spells to another anchor without having to go through each one."]
+						end,
+					},
+					header = {
+						order = 1.5,
+						type = "header",
+						name = "",
+					},
+					anchorFrom = {
+						order = 2,
+						type = "select",
+						name = L["Spells inside"],
+						desc = L["The anchor you want all spells inside to be moved to another anchor."],
+						values = "GetAnchors",
+						set = function(info, value)
+							moveSpells.from = value
+						end,
+						get = function() return moveSpells.from end,
+					},
+					anchorTO = {
+						order = 3,
+						type = "select",
+						name = L["Anchor to"],
+						desc = L["The anchor to move everything to that is in the anchor set."],
+						values = "GetAnchors",
+						set = function(info, value)
+							moveSpells.to = value
+						end,
+						get = function() return moveSpells.to end,
+					},
+					sep = {
+						order = 4,
+						type = "description",
+						name = "",
+					},
+					move = {
+						order = 5,
+						type = "execute",
+						name = L["Move"],
+						disabled = function() return not moveSpells.to or not moveSpells.from end,
+						func = function(info)
+							local total = 0
+							for id, data in pairs(Afflicted.db.profile.spells) do
+								if( type(data) ~= "number" and type(Afflicted.spells[id]) == "table" ) then
+									local spell = Afflicted.spells[id]
+									local added
+									if( spell.cdAnchor == moveSpells.from ) then
+										spell.cdAnchor = moveSpells.to
+										added = true
+									end
+									
+									if( spell.anchor == moveSpells.from ) then
+										spell.anchor = moveSpells.to
+										added = true
+									end
+									
+									if( added ) then
+										total = total + 1
+										Afflicted.writeQueue[id] = true
+									end
+								end
+							end
+							
+							local from = Afflicted.db.profile.anchors[moveSpells.from].text or moveSpells.from
+							local to = Afflicted.db.profile.anchors[moveSpells.to].text or moveSpells.to
+							
+							moveSpells.msg = string.format(L["Moved %d spell and cooldown anchors from %s to %s."], total, from, to)
+							moveSpells.from = nil
+							moveSpells.to = nil
 						end,
 					},
 				},
