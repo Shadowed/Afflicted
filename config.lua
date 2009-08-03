@@ -795,39 +795,6 @@ local function loadOptions()
 					},
 				},
 			},
-			announce = {
-				order = 3,
-				type = "group",
-				inline = true,
-				name = L["Announcements"],
-				args = {
-					announceColor = {
-						order = 1,
-						type = "color",
-						name = L["Color"],
-						set = function(info, r, g, b)
-							Afflicted.db.profile[info[#(info)]].r = r
-							Afflicted.db.profile[info[#(info)]].g = g
-							Afflicted.db.profile[info[#(info)]].b = b
-						end,
-						get = function(info)
-							return Afflicted.db.profile[info[#(info)]].r, Afflicted.db.profile[info[#(info)]].g, Afflicted.db.profile[info[#(info)]].b
-						end,
-					},
-					dispelLocation = {
-						order = 2,
-						type = "select",
-						name = L["Dispel announcements"],
-						values = announceDest,
-					},
-					interruptLocation = {
-						order = 3,
-						type = "select",
-						name = L["Interrupt announcements"],
-						values = announceDest,
-					},
-				},
-			},
 			help = {
 				order = 3.5,
 				type = "group",
