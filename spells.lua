@@ -1,5 +1,5 @@
 AfflictedSpells = {}
-AfflictedSpells.version = 2
+AfflictedSpells.version = 3
 
 function AfflictedSpells:GetData()
 	if( self.spells ) then
@@ -63,7 +63,7 @@ function AfflictedSpells:GetData()
 		-- Intervene
 		[3411] = "{cooldown=30;cdDisabled=true;cdAnchor='defenses';class='WARRIOR';}",
 		-- Recklessness
-		--[1719] = "{duration=12;anchor='damage';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
+		[1719] = "{duration=12;anchor='damage';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='WARRIOR';}",
 		-- Charge
 		[11578] = "{cooldown=13;cdAnchor='spells';class='WARRIOR';}",
 		-- Berserker Rage
@@ -78,8 +78,6 @@ function AfflictedSpells:GetData()
 		-- Druid
 		-- Survival Instincts
 		[61336] = "{duration=20;anchor='defenses';cooldown=300;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
-		-- Force of Nature (Treants)
-		--[33831] = "{disabled=true;duration=30;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Berserk
 		[50334] = "{duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Nature's Grasp
@@ -91,9 +89,9 @@ function AfflictedSpells:GetData()
 		-- Frenzied Regeneration
 		[22842] = "{duration=10;anchor='defenses';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='DRUID';}",
 		-- Feral Charge - Bear
-		[16979] = "{cooldown=15;cdAnchor='interrupts';class='DRUID';}",
+		[16979] = "{cooldown=15;cooldownName='feral';cdAnchor='interrupts';class='DRUID';}",
 		-- Feral Charge - Cat
-		[49376] = "{cooldown=30;cdAnchor='spells';class='DRUID';}",
+		[49376] = "{cooldown=30;cooldownName='feral';cdAnchor='spells';class='DRUID';}",
 		-- Bash
 		[8983] = "{cooldown=30;cdDisabled=true;cdAnchor='interrupts';class='DRUID';}",
 		
@@ -161,10 +159,12 @@ function AfflictedSpells:GetData()
 		[53548] = "{cooldown=40;cdDisabled=true;cdAnchor='spells';class='HUNTER';}",
 		-- Pummel (Gorilla)
 		[26090] = "{cooldown=30;cdAnchor='interrupts';class='HUNTER';}",
-		-- Freezing Trap
-		[14311] = "{type='trap';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Frost Trap
-		[13809] = 34600,
+		[13809] = 14311,
+		-- Freezing Arrow
+		[60210] = 14311,
+		-- Freezing Trap
+		[14311] = "{type='trap';configName='frost';cooldownName='frost';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Explosive Trap
 		[27025] = 49056,
 		[49066] = 49056,
@@ -176,9 +176,9 @@ function AfflictedSpells:GetData()
 		-- Immolation Trap
 		[27023] = 49056,
 		[49055] = 49056,
-		[49056] = "{type='trap';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
+		[49056] = "{type='trap';configName='fire';cooldownName='fire';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Snake Trap
-		[34600] = "{type='trap';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
+		[34600] = "{type='trap';configName='nature';cooldownName='nature';disabled=true;duration=30;anchor='spells';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Deterrence
 		[19263] = "{duration=5;anchor='defenses';cooldown=90;cdDisabled=true;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Viper Sting
@@ -212,8 +212,6 @@ function AfflictedSpells:GetData()
 		[13750] = "{duration=15;anchor='damage';cooldown=180;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Preparation
 		[14185] = "{cooldown=300;cdDisabled=true;cdAnchor='cooldowns';resets={14177,36554,26889,11305,26669};class='ROGUE'}",
-		-- Tricks of the Trade
-		--[57934] = "{disabled=true;duration=6;anchor='damage';cooldown=30;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Cloak of Shadows
 		[31224] = "{duration=5;anchor='defenses';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='ROGUE';}",
 		-- Vanish
