@@ -2,9 +2,21 @@ if( not Afflicted ) then return end
 
 local Bars = Afflicted:NewModule("Bars", "AceEvent-3.0")
 local methods = {"CreateDisplay", "ClearTimers", "CreateTimer", "RemoveTimerByID", "ReloadVisual", "UnitDied"}
-local SML, GTBLib
-local barData = {}
-local savedGroups = {}
+local SML = LibStub:GetLibrary("LibSharedMedia-3.0")
+local GTBLib = LibStub:GetLibrary("GTB-1.0")
+local barData, savedGroups = {}, {}
+
+function Bars:OnInitialize()
+	SML.RegisterCallback(Bars, "LibSharedMedia_Registered", "MediaRegistered")
+	SML:Register(SML.MediaType.STATUSBAR, "BantoBar", "Interface\\Addons\\Afflicted\\images\\banto")
+	SML:Register(SML.MediaType.STATUSBAR, "Smooth",   "Interface\\Addons\\Afflicted\\images\\smooth")
+	SML:Register(SML.MediaType.STATUSBAR, "Perl",     "Interface\\Addons\\Afflicted\\images\\perl")
+	SML:Register(SML.MediaType.STATUSBAR, "Glaze",    "Interface\\Addons\\Afflicted\\images\\glaze")
+	SML:Register(SML.MediaType.STATUSBAR, "Charcoal", "Interface\\Addons\\Afflicted\\images\\Charcoal")
+	SML:Register(SML.MediaType.STATUSBAR, "Otravi",   "Interface\\Addons\\Afflicted\\images\\otravi")
+	SML:Register(SML.MediaType.STATUSBAR, "Striped",  "Interface\\Addons\\Afflicted\\images\\striped")
+	SML:Register(SML.MediaType.STATUSBAR, "LiteStep", "Interface\\Addons\\Afflicted\\images\\LiteStep")
+end
 
 -- PUBLIC METHODS
 function Bars:CreateDisplay(type)
@@ -26,7 +38,7 @@ function Bars:CreateDisplay(type)
 	if( anchorData.position ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", anchorData.position.x, anchorData.position.y)
 	end
-	
+
 	return group
 end
 
@@ -53,14 +65,6 @@ end
 
 -- Return an object to access our visual style
 function Bars:LoadVisual()
-	if( not GTBLib ) then
-		SML = Afflicted.SML
-		SML.RegisterCallback(Bars, "LibSharedMedia_Registered", "MediaRegistered")
-		
-		GTBLib = LibStub:GetLibrary("GTB-1.0")
-		Bars.GTB = GTBLib
-	end
-
 	local obj = {}
 	for _, func in pairs(methods) do
 		obj[func] = self[func]
