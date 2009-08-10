@@ -66,9 +66,6 @@ function Afflicted:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
 	self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
-	-- Load SML
-	self.SML = LibStub:GetLibrary("LibSharedMedia-3.0")
-
 	-- Load spell database
 	local spells = AfflictedSpells:GetData()
 	
@@ -112,13 +109,18 @@ function Afflicted:OnInitialize()
 				return false
 			end
 			
-			tbl[index] = loadstring("return " .. Afflicted.db.profile.spells[index])()
-			if( type(tbl[index]) == "table" ) then
-				tbl[index].cooldown = tbl[index].cooldown or 0
-				tbl[index].duration = tbl[index].duration or 0
+			local spell  = loadstring("return " .. Afflicted.db.profile.spells[index])()
+			if( type(spell) == "table" ) then
+				spell.cooldown = spell.cooldown or 0
+				spell.duration = spell.duration or 0
+				
+				spell.name = spell.name and L.spells[spell.name]
+				spell.cooldownName = spell.cooldownName and L.spells[spell.cooldownName]
+				spell.configName = spell.configName and L.spells[spell.configName]
 			end
 		
-			return tbl[index]
+			tbl[index] = spell
+			return spell
 		end
 	})
 
@@ -261,19 +263,19 @@ function Afflicted:AbilityTriggered(sourceGUID, sourceName, spellData, spellID)
 	
 	-- Start duration timer (if any)
 	if( not spellData.disabled and spellData.anchor and spellData.duration > 0 ) then
-		self:CreateTimer(sourceGUID, sourceName, spellData.anchor, spellData.repeating, false, spellData.duration, spellID, spellName, spellIcon)
+		self:CreateTimer(sourceGUID, sourceName, spellData.anchor, spellData.repeating, false, spellData.duration, spellID, spellData.name or spellName, spellIcon)
 		
 		-- Announce timer used
-		self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "startMessage", spellID, spellName, sourceName)
+		self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "startMessage", spellID, spellData.name or spellName, sourceName)
 	end
 	
 	-- Start CD timer
 	if( not spellData.cdDisabled and spellData.cdAnchor and spellData.cooldown > 0 ) then
-		self:CreateTimer(sourceGUID, sourceName, spellData.cdAnchor, false, true, spellData.cooldown, spellID, spellName, spellIcon)
+		self:CreateTimer(sourceGUID, sourceName, spellData.cdAnchor, false, true, spellData.cooldown, spellID, spellData.cooldownName or spellName, spellIcon)
 		
 		-- Only announce that a cooldown was used if we didn't announce a duration, it's implied that the cooldown started.
 		if( spellData.disabled or not spellData.anchor or spellData.duration == 0 ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "startMessage", spellID, spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "startMessage", spellID, spellData.cooldownName or spellName, sourceName)
 		end
 	end
 end
@@ -292,9 +294,9 @@ end
 function Afflicted:AbilityEnded(sourceGUID, sourceName, spellData, spellID, spellName, isCooldown)
 	if( spellData ) then
 		if( not isCooldown and not spellData.disabled ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellID, spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.anchor], "endMessage", spellID, spellData.name or spellName, sourceName)
 		elseif( isCooldown and not spellData.cdDisabled ) then
-			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "cooldownMessage", spellID, spellName, sourceName)
+			self:Announce(spellData, self.db.profile.anchors[spellData.cdAnchor], "cooldownMessage", spellID, spellData.cooldownName or spellName, sourceName)
 		end
 	end
 end
