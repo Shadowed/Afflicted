@@ -107,6 +107,9 @@ function AfflictedSpells:GetData()
 		-- Silence
 		[15487] = "{cooldown=45;cdAnchor='interrupts';class='PRIEST';}",
 		-- Psychic Scream
+		[8122] = 10890,
+		[8124] = 10890,
+		[10888] = 10890,
 		[10890] = "{cooldown=26;cdAnchor='spells';cdDisabled=true;class='PRIEST';}",
 		
 		-- Warlock
