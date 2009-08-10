@@ -135,7 +135,6 @@ AfflictedLocals = {
 	["You cannot delete a spell that is included with Afflicted by default, you will need to disable it if you don't want to use it."] = "You cannot delete a spell that is included with Afflicted by default, you will need to disable it if you don't want to use it.",
 	["You cannot delete anchors that are included with Afflicted by default, you will need to disable it if you don't want to use the anchor."] = "You cannot delete anchors that are included with Afflicted by default, you will need to disable it if you don't want to use the anchor.",
 	["You have to choose which anchor spells should be moved to when this one is deleted."] = "You have to choose which anchor spells should be moved to when this one is deleted.",
-
 	["classes"] = {
 		["DEATHKNIGHT"] = "Death Knight",
 		["DRUID"] = "Druid",
@@ -148,4 +147,11 @@ AfflictedLocals = {
 		["WARLOCK"] = "Warlock",
 		["WARRIOR"] = "Warrior",
 	},
+	["spells"] = {
+		["feral"] = "Feral Charge",
+		["fire"] = "Fire traps",
+		["frost"] = "Frost traps",
+		["nature"] = "Nature traps",
+	},
+
 }
