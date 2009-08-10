@@ -17,15 +17,7 @@ function Config:OnInitialize()
 	dialog = LibStub("AceConfigDialog-3.0")
 	registry = LibStub("AceConfigRegistry-3.0")
 
-	SML = Afflicted.SML
-	SML:Register(SML.MediaType.STATUSBAR, "BantoBar", "Interface\\Addons\\Afflicted\\images\\banto")
-	SML:Register(SML.MediaType.STATUSBAR, "Smooth",   "Interface\\Addons\\Afflicted\\images\\smooth")
-	SML:Register(SML.MediaType.STATUSBAR, "Perl",     "Interface\\Addons\\Afflicted\\images\\perl")
-	SML:Register(SML.MediaType.STATUSBAR, "Glaze",    "Interface\\Addons\\Afflicted\\images\\glaze")
-	SML:Register(SML.MediaType.STATUSBAR, "Charcoal", "Interface\\Addons\\Afflicted\\images\\Charcoal")
-	SML:Register(SML.MediaType.STATUSBAR, "Otravi",   "Interface\\Addons\\Afflicted\\images\\otravi")
-	SML:Register(SML.MediaType.STATUSBAR, "Striped",  "Interface\\Addons\\Afflicted\\images\\striped")
-	SML:Register(SML.MediaType.STATUSBAR, "LiteStep", "Interface\\Addons\\Afflicted\\images\\LiteStep")
+	SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 end
 
 -- Force deletes all modified default spells
@@ -1298,7 +1290,9 @@ local function loadOptions()
 		local spell = Afflicted.spells[id]
 		if( type(spell) == "table" ) then
 			local spellName = id
-			if( type(spellName) == "number" ) then
+			if( spell.configName ) then
+				spellName = spell.configName
+			elseif( type(spellName) == "number" ) then
 				spellName = GetSpellInfo(id)
 			end
 			
