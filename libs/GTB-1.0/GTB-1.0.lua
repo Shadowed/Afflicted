@@ -1,5 +1,5 @@
 local major = "GTB-1.0"
-local minor = 1500
+local minor = 1501
 assert(LibStub, string.format("%s requires LibStub.", major))
 
 local GTB = LibStub:NewLibrary(major, minor)
@@ -10,7 +10,6 @@ local L = {
 	["MUST_CALL"] = "You must call '%s' from a registered GTB object.",
 	["GROUP_EXISTS"] = "The group '%s' already exists.",
 	["BAD_FUNC"] = "You must pass an actual handler and function to '%s'.",
-	["ALT_DRAG"] = "ALT + Drag to move the frame anchor.",
 }
 
 -- Validation for passed arguments
@@ -121,7 +120,6 @@ local function fadeOnUpdate(self, elapsed)
 	-- Done fading, hide
 	if( self.fadeTime <= 0 ) then
 		groups[self.owner]:UnregisterBar(self.barID, true)
-		triggerFadeCallback(groups[self.originalOwner], self.barID)
 		return
 	end
 		
@@ -132,12 +130,11 @@ end
 local function fadeoutBar(self)
 	local group = groups[self.owner]
 	
+	triggerFadeCallback(groups[self.originalOwner], self.barID)
+
 	-- Don't fade at all, remove right now
 	if( group.fadeTime <= 0 ) then
-		group:UnregisterBar(self.barID, true)	
-		if( not self.removed ) then
-			triggerFadeCallback(groups[self.originalOwner])
-		end
+		group:UnregisterBar(self.barID, true)
 		return
 	end
 	
@@ -246,10 +243,8 @@ local backdrop = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 
 -- Dragging functions
 local function OnDragStart(self)
-	if( IsAltKeyDown() ) then
-		self.isMoving = true
-		self:StartMoving()
-	end
+	self.isMoving = true
+	self:StartMoving()
 end
 
 local function OnDragStop(self)
@@ -257,8 +252,6 @@ local function OnDragStop(self)
 		self.isMoving = nil
 		self:StopMovingOrSizing()
 
-		--local scale = self:GetEffectiveScale()
-		--local x, y = self:GetLeft() * scale, self:GetTop() * scale
 		local x, y = self:GetLeft(), self:GetTop()
 
 		local group = groups[self.name]
@@ -270,15 +263,6 @@ local function OnDragStop(self)
 			safecall(group.onMoveFunc, self, x, y)
 		end
 	end
-end
-
-local function OnEnter(self)
-	GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-	GameTooltip:SetText(L["ALT_DRAG"], nil, nil, nil, nil, 1)
-end
-
-local function OnLeave(self)
-	GameTooltip:Hide()
 end
 
 function GTB:RegisterGroup(name, texture)
@@ -309,8 +293,6 @@ function GTB:RegisterGroup(name, texture)
 	frame:SetScript("OnDragStart", OnDragStart)
 	frame:SetScript("OnDragStop", OnDragStop)
 	frame:SetScript("OnShow", OnShow)
-	frame:SetScript("OnEnter", OnEnter)
-	frame:SetScript("OnLeave", OnLeave)
 	frame.name = name
 	
 	-- Display name
@@ -831,5 +813,18 @@ function GTB.SetRepeatingTimer(group, id, flag)
 	local bar = group.bars[id]
 	if( bar ) then
 		bar.repeating = flag
+	end
+end
+
+-- Upgrade path
+for name, obj in pairs(groups) do
+	obj.frame:SetScript("OnEnter", nil)
+	obj.frame:SetScript("OnLeave", nil)
+	obj.frame:SetScript("OnDragStart", OnDragStart)
+	obj.frame:SetScript("OnDragStop", OnDragStop)
+	obj.frame:SetScript("OnShow", OnShow)
+
+	for _, func in pairs(methods) do
+		obj[func] = GTB[func]
 	end
 end

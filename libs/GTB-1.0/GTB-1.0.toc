@@ -1,4 +1,4 @@
-## Interface: 30100
+## Interface: 30200
 ## Title: Lib: Graphical Timer Bars - 1.0
 ## Notes: Graphical timer bars libray
 ## Author: Shadowed
