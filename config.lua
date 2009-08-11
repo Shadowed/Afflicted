@@ -3,7 +3,7 @@ if( not Afflicted ) then return end
 local Config = Afflicted:NewModule("Config")
 local L = AfflictedLocals
 
-local SML, registered, options, config, dialog, registry
+local SML, GTB, registered, options, config, dialog, registry
 local addedSpellIndex = 0
 local addedAnchorIndex = 0
 local spellIDToNames = {}
@@ -18,6 +18,7 @@ function Config:OnInitialize()
 	registry = LibStub("AceConfigRegistry-3.0")
 
 	SML = LibStub:GetLibrary("LibSharedMedia-3.0")
+	GTB = LibStub:GetLibrary("GTB-1.0")
 end
 
 -- Force deletes all modified default spells
@@ -60,7 +61,7 @@ function Config:GetGroups()
 	for k in pairs(groups) do groups[k] = nil end
 
 	groups[""] = L["None"]
-	for name, data in pairs(Afflicted.modules.Bars.GTB:GetGroups()) do
+	for name, data in pairs(GTB:GetGroups()) do
 		groups[name] = name
 	end
 	
