@@ -131,6 +131,7 @@ end
 
 -- Bar timer ran out
 function Bars:OnFade(barID)
+	if( not barData[barID] ) then return end
 	local sourceGUID, sourceName, spellID, spellName, timerType = string.split(",", barData[barID])
 	barData[barID] = nil
 	
