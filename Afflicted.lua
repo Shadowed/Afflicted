@@ -12,7 +12,7 @@ local summonedObjects = {}
 function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
-			showAnchors = false,
+			showAnchors = true,
 			showIcons = false,
 			targetOnly = false,
 			cooldownMessage = L["READY *spell (*target)"],
@@ -126,6 +126,8 @@ function Afflicted:OnInitialize()
 
 	-- So we know what spellIDs need to be updated when logging out
 	self.writeQueue = {}
+	
+	self:HelpFrame()
 
 	-- Load display libraries
 	self.bars = self.modules.Bars:LoadVisual()
@@ -438,6 +440,8 @@ function Afflicted:Reload()
 	if( self.bars ) then
 		self.bars:ReloadVisual()
 	end
+
+	self:HelpFrame()
 end
 
 -- Strips server name
@@ -536,4 +540,72 @@ end
 
 function Afflicted:Print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Afflicted3|r: " .. msg)
+end
+
+function Afflicted:HelpFrame()
+	if( self.helpFrame ) then
+		if( Afflicted.db.profile.showAnchors ) then
+			self.helpFrame:Show()
+		else
+			self.helpFrame:Hide()
+		end
+		return
+	elseif( not Afflicted.db.profile.showAnchors ) then
+		return
+	end
+	
+	local frame = CreateFrame("Frame", nil, UIParent)
+	frame:SetClampedToScreen(true)
+	frame:SetFrameStrata("LOW")
+	frame:SetWidth(300)
+	frame:SetHeight(100)
+	frame:RegisterForDrag("LeftButton")
+	frame:EnableMouse(true)
+	frame:SetMovable(true)
+	frame:SetScript("OnDragStart", function(self)
+		self:StartMoving()
+	end)
+	frame:SetScript("OnDragStop", function(self)
+		self:StopMovingOrSizing()
+	end)
+	frame:SetBackdrop({
+		  bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+		  edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+		  edgeSize = 26,
+		  insets = {left = 9, right = 9, top = 9, bottom = 9},
+	})
+	frame:SetBackdropColor(0, 0, 0, 0.85)
+	frame:SetPoint("CENTER", UIParent, "CENTER", 0, 225)
+
+	frame.titleBar = frame:CreateTexture(nil, "ARTWORK")
+	frame.titleBar:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
+	frame.titleBar:SetPoint("TOP", 0, 8)
+	frame.titleBar:SetWidth(200)
+	frame.titleBar:SetHeight(45)
+
+	frame.title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+	frame.title:SetPoint("TOP", 0, 0)
+	frame.title:SetText("Afflicted")
+
+	frame.text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	frame.text:SetText(L["The black anchor boxes are used to move timer anchors around for Afflicted. Type /afflicted ui and check \"Show timer anchors\" or click \"Hide anchors\" below to hide them."])
+	frame.text:SetPoint("TOPLEFT", 12, -22)
+	frame.text:SetWidth(frame:GetWidth() - 20)
+	frame.text:SetJustifyH("LEFT")
+
+	frame.lock = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	frame.lock:SetText(L["Hide anchors"])
+	frame.lock:SetHeight(20)
+	frame.lock:SetWidth(100)
+	frame.lock:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 6, 8)
+	frame.lock:SetScript("OnEnter", OnEnter)
+	frame.lock:SetScript("OnLeave", OnLeave)
+	frame.lock.tooltipText = L["Hides the drag anchors in Afflicted."]
+	frame.lock:SetScript("OnClick", function(self)
+		Afflicted.db.profile.showAnchors = false
+		Afflicted:Reload()
+		LibStub("AceConfigRegistry-3.0"):NotifyChange("Afflicted")
+	end)
+	
+	self.helpFrame = frame
 end
