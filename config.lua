@@ -556,7 +556,7 @@ local function createAnchorConfiguration(index, anchor)
 						order = 6,
 						type = "range",
 						name = L["Scale"],
-						min = 0, max = 2, step = 0.01,
+						min = 0.01, max = 2, step = 0.01,
 					},
 					maxRows = {
 						order = 7,
@@ -866,7 +866,7 @@ local function loadOptions()
 								order = 5,
 								type = "range",
 								name = L["Scale"],
-								min = 0, max = 2, step = 0.01,
+								min = 0.01, max = 2, step = 0.01,
 								get = getGlobalOption,
 								set = setGlobalOption,
 							},
@@ -1322,6 +1322,19 @@ local function loadOptions()
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(Afflicted.db)
 	options.args.profile.order = 5
 end
+
+
+CONFIGMODE_CALLBACKS = CONFIGMODE_CALLBACKS or {}
+CONFIGMODE_CALLBACKS["Afflicted"] = function(mode)
+	if( mode == "ON" ) then
+		Afflicted.db.profile.showAnchors = true
+		Afflicted:Reload()
+	elseif( mode == "OFF" ) then
+		Afflicted.db.profile.showAnchors = false
+		Afflicted:Reload()
+	end
+end
+
 
 -- Slash commands
 SLASH_AFFLICTED1 = "/afflicted3"
