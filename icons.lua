@@ -130,10 +130,8 @@ end
 
 -- Dragging functions
 local function OnDragStart(self)
-	if( IsAltKeyDown() ) then
-		self.isMoving = true
-		self:StartMoving()
-	end
+	self.isMoving = true
+	self:StartMoving()
 end
 
 local function OnDragStop(self)
@@ -165,7 +163,7 @@ end
 
 local function showTooltip(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-	GameTooltip:AddDoubleLine(self.name, AfflictedLocals["ALT + Drag to move the frame anchor."], nil, nil, nil, 0.90, 0.90, 0.90)
+	GameTooltip:AddDoubleLine(self.name, AfflictedLocals["Drag to move the frame anchor."], nil, nil, nil, 0.90, 0.90, 0.90)
 	GameTooltip:Show()
 end
 
