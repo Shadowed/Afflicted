@@ -19,6 +19,7 @@ function Bars:OnInitialize()
 end
 
 -- PUBLIC METHODS
+local total = 0
 function Bars:CreateDisplay(type)
 	local anchorData = Afflicted.db.profile.anchors[type]
 	local group = GTBLib:RegisterGroup(string.format("Afflicted (%s)", anchorData.text), SML:Fetch(SML.MediaType.STATUSBAR, Afflicted.db.profile.barName))
@@ -37,6 +38,9 @@ function Bars:CreateDisplay(type)
 
 	if( anchorData.position ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", anchorData.position.x, anchorData.position.y)
+	else
+		total = total + 1
+		group:SetPoint("CENTER", UIParent, "CENTER", 0, total * 20)
 	end
 
 	return group

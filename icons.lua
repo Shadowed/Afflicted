@@ -157,7 +157,7 @@ local function OnShow(self)
 		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", position.x / scale, position.y / scale)
 	else
 		self:ClearAllPoints()
-		self:SetPoint("CENTER", UIParent, "CENTER")
+		self:SetPoint("CENTER", UIParent, "CENTER", 0, self.createID * 25)
 	end
 end
 
@@ -174,11 +174,13 @@ end
 -- PUBLIC METHODS
 -- Create our main display frame
 local backdrop = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 0.80,
+		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1,
 		insets = {left = 1, right = 1, top = 1, bottom = 1}}
 
+local total = 0
 function Icons:CreateDisplay(type)
 	local anchorData = Afflicted.db.profile.anchors[type]
+	total = total + 1
 	
 	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:SetWidth(ICON_SIZE)
@@ -199,7 +201,8 @@ function Icons:CreateDisplay(type)
 	frame.active = {}
 	frame.type = type
 	frame.name = anchorData.text
-	
+	frame.createID = total
+		
 	-- Display name
 	frame.text = frame:CreateFontString(nil, "OVERLAY")
 	frame.text:SetPoint("CENTER", frame)
