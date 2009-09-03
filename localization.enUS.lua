@@ -1,4 +1,7 @@
 AfflictedLocals = {
+	["Hides the drag anchors in Afflicted."] = "Hides the drag anchors in Afflicted.",
+	["Hide anchors"] = "Hide anchors",
+	["The black anchor boxes are used to move timer anchors around for Afflicted. Type /afflicted ui and check \"Show timer anchors\" or click \"Hide anchors\" below to hide them."] = "The black anchor boxes are used to move timer anchors around for Afflicted. Type /afflicted ui and check \"Show timer anchors\" or click \"Hide anchors\" below to hide them.",
 	["- clear - Clears all running timers."] = "- clear - Clears all running timers.",
 	["- test - Shows test timers in Afflicted."] = "- test - Shows test timers in Afflicted.",
 	["- ui - Opens the configuration for Afflicted."] = "- ui - Opens the configuration for Afflicted.",
