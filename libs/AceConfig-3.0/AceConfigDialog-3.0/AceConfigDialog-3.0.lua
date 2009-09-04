@@ -1,10 +1,10 @@
 --- AceConfigDialog-3.0 generates AceGUI-3.0 based windows based on option tables.
 -- @class file
 -- @name AceConfigDialog-3.0
--- @release $Id: AceConfigDialog-3.0.lua 796 2009-04-07 15:48:54Z nevcairiel $
+-- @release $Id: AceConfigDialog-3.0.lua 834 2009-09-01 11:23:08Z nevcairiel $
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 34
+local MAJOR, MINOR = "AceConfigDialog-3.0", 36
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -185,6 +185,7 @@ local stringIsLiteral = {
 --Is Never a function or method
 local allIsLiteral = {
 	type = true,
+	descStyle = true,
 	imageWidth = true,
 	imageHeight = true,
 }
@@ -533,6 +534,9 @@ local function OptionOnMouseOver(widget, event)
 	local name = GetOptionsMemberValue("name", opt, options, path, appName)
 	local desc = GetOptionsMemberValue("desc", opt, options, path, appName)
 	local usage = GetOptionsMemberValue("usage", opt, options, path, appName)
+	local descStyle = opt.descStyle
+	
+	if descStyle and descStyle ~= "tooltip" then return end
 	
 	GameTooltip:SetText(name, 1, .82, 0, 1)
 	
@@ -691,6 +695,8 @@ local function ActivateControl(widget, event, ...)
 		--validate function returned a message to display
 		if rootframe.SetStatusText then
 			rootframe:SetStatusText(validated)
+		else
+			-- TODO: do something else.
 		end
 		PlaySound("igPlayerInviteDecline")
 		del(info)
@@ -707,6 +713,8 @@ local function ActivateControl(widget, event, ...)
 					rootframe:SetStatusText(name..": Invalid Value")
 				end
 			end
+		else
+			-- TODO: do something else
 		end
 		PlaySound("igPlayerInviteDecline")
 		del(info)
@@ -1128,6 +1136,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local value = GetOptionsMemberValue("get",v, options, path, appName)
 					control:SetValue(value)
 					control:SetCallback("OnValueChanged",ActivateControl)
+					
+					if v.descStyle == "inline" then
+						local desc = GetOptionsMemberValue("desc", v, options, path, appName)
+						control:SetDescription(desc)
+					end
 
 				elseif v.type == "range" then
 					control = gui:Create("Slider")

@@ -1,4 +1,4 @@
---[[ $Id: AceGUIWidget-DropDown.lua 815 2009-07-08 20:58:17Z nevcairiel $ ]]--
+--[[ $Id: AceGUIWidget-DropDown.lua 828 2009-08-28 08:47:06Z ammo $ ]]--
 local min, max, floor = math.min, math.max, math.floor
 
 local AceGUI = LibStub("AceGUI-3.0")
@@ -27,12 +27,12 @@ end
 
 do
 	local widgetType = "Dropdown-Pullout"
-	local widgetVersion = 2
+	local widgetVersion = 3
 	
 	--[[ Static data ]]--
 	
 	local backdrop = {
-		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 		edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
 		edgeSize = 32,
 		tileSize = 32,

@@ -39,8 +39,8 @@
 -- end
 -- @class file
 -- @name AceDB-3.0.lua
--- @release $Id: AceDB-3.0.lua 813 2009-07-06 21:36:37Z kaelten $
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 15
+-- @release $Id: AceDB-3.0.lua 830 2009-08-30 14:51:48Z nevcairiel $
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 16
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -131,6 +131,9 @@ end
 
 -- Called to remove all defaults in the default table from the database
 local function removeDefaults(db, defaults, blocker)
+	-- remove all metatables from the db, so we don't accidentally create new sub-tables through them
+	setmetatable(db, nil)
+	-- loop through the defaults and remove their content
 	for k,v in pairs(defaults) do
 		if k == "*" or k == "**" then
 			if type(v) == "table" then
@@ -171,8 +174,6 @@ local function removeDefaults(db, defaults, blocker)
 			end
 		end
 	end
-	-- remove all metatables from the db
-	setmetatable(db, nil)
 end
 
 -- This is called when a table section is first accessed, to set up the defaults
