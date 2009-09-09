@@ -1,5 +1,5 @@
 AfflictedSpells = {}
-AfflictedSpells.version = 3
+AfflictedSpells.version = 4
 
 function AfflictedSpells:GetData()
 	if( self.spells ) then
@@ -25,7 +25,7 @@ function AfflictedSpells:GetData()
 		-- Lichborne
 		[49039] = "{duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Vampiric Blood
-		[55233] = "{duration=20;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
+		[55233] = "{duration=10;anchor='defenses';cooldown=60;cdDisabled=true;cdAnchor='cooldowns';class='DEATHKNIGHT';}",
 		-- Leap (Ghoul)
 		[47482] = "{cooldown=20;cdDisabled=true;cdAnchor='spells';class='DEATHKNIGHT';}",
 		-- Gnaw (Ghoul)
@@ -145,7 +145,7 @@ function AfflictedSpells:GetData()
 		
 		-- Hunter
 		-- Bestial Wrath
-		[19574] = "{duration=18;anchor='damage';cdDisabled=true;cooldown=120;cdAnchor='cooldowns';class='HUNTER';}",
+		[19574] = "{duration=10;anchor='damage';cdDisabled=true;cooldown=120;cdAnchor='cooldowns';class='HUNTER';}",
 		-- Wyvern Sting
 		[27068] = 49012,
 		[49011] = 49012,
