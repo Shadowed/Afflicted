@@ -79,28 +79,9 @@ function Afflicted:OnInitialize()
 		self.db.profile.spellRevision = nil
 		self.db.profile.arenas = {[2] = {}, [3] = {}, [5] = {}}
 	end
-	
-	-- Spell database changed
-	if( self.db.profile.spellVersion < AfflictedSpells.version ) then
-		self.db.profile.spellVersion = AfflictedSpells.version
 		
-		-- Remove old spells
-		for spellID in pairs(self.db.profile.spells) do
-			if( type(spellID) == "number" and not spells[spellID] ) then
-				self.db.profile.spells[spellID] = nil
-			end
-		end
-
-		-- Load new or changed spells in
-		for spellID, data in pairs(spells) do
-			-- Do not add a spell if it doesn't exist
-			if( not self.db.profile.spells[spellID] or self.db.profile.spells[spellID] ~= data ) then
-				self.db.profile.spells[spellID] = data
-			end
-		end
-	end
-	
 	-- Setup our spell cache
+	self.writeQueue = {}
 	self.spells = setmetatable({}, {
 		__index = function(tbl, index)
 			-- No data found, don't try and load this index again
@@ -124,8 +105,34 @@ function Afflicted:OnInitialize()
 		end
 	})
 
-	-- So we know what spellIDs need to be updated when logging out
-	self.writeQueue = {}
+
+	-- Spell database changed
+	if( self.db.profile.spellVersion < AfflictedSpells.version ) then
+		self.db.profile.spellVersion = AfflictedSpells.version
+		
+		-- Remove old spells
+		for spellID in pairs(self.db.profile.spells) do
+			if( type(spellID) == "number" and spells[spellID] == false ) then
+				self.db.profile.spells[spellID] = nil
+			end
+		end
+
+		-- Load new or changed spells in
+		for spellID, data in pairs(spells) do
+			-- Do not add a spell if it doesn't exist
+			if( not self.db.profile.spells[spellID] or self.db.profile.spells[spellID] ~= data ) then
+				local spell = loadstring("return" .. data)()
+				local oldSpell = self.spells[spellID]
+				
+				oldSpell.duration = spell.duration
+				oldSpell.cooldown = spell.cooldown
+				oldSpell.type = spell.type
+				oldSpell.class = spell.class
+				
+				self.writeQueue[spellID] = true
+			end
+		end
+	end
 	
 	self:HelpFrame()
 
