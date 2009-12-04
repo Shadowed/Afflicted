@@ -1,11 +1,11 @@
 --- AceConfigDialog-3.0 generates AceGUI-3.0 based windows based on option tables.
 -- @class file
 -- @name AceConfigDialog-3.0
--- @release $Id: AceConfigDialog-3.0.lua 834 2009-09-01 11:23:08Z nevcairiel $
+-- @release $Id: AceConfigDialog-3.0.lua 882 2009-12-02 18:04:53Z nevcairiel $
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 36
-local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
+local MAJOR, MINOR = "AceConfigDialog-3.0", 39
+local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
 
@@ -19,19 +19,24 @@ AceConfigDialog.frame.closing = AceConfigDialog.frame.closing or {}
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local select = select
-local pairs = pairs
-local type = type
-local assert = assert
-local tinsert = tinsert
-local tremove = tremove
-local error = error
-local table = table
-local unpack = unpack
-local string = string
-local next = next
-local math = math
-local _
+-- Lua APIs
+local tconcat, tinsert, tsort, tremove = table.concat, table.insert, table.sort, table.remove
+local strmatch, format = string.match, string.format
+local assert, loadstring, error = assert, loadstring, error
+local pairs, next, select, type, unpack = pairs, next, select, type, unpack
+local rawset, tostring = rawset, tostring
+local math_min, math_max, math_floor = math.min, math.max, math.floor
+
+-- WoW APIs
+local geterrorhandler = geterrorhandler
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: NORMAL_FONT_COLOR, GameTooltip, StaticPopupDialogs, ACCEPT, CANCEL, StaticPopup_Show
+-- GLOBALS: PlaySound, GameFontHighlight, GameFontHighlightSmall, GameFontHighlightLarge
+-- GLOBALS: CloseSpecialWindows, InterfaceOptions_AddCategory
+
+local emptyTbl = {}
 
 --[[
 	 xpcall safecall implementation
@@ -60,7 +65,7 @@ local function CreateDispatcher(argCount)
 	
 	local ARGS = {}
 	for i = 1, argCount do ARGS[i] = "arg"..i end
-	code = code:gsub("ARGS", table.concat(ARGS, ", "))
+	code = code:gsub("ARGS", tconcat(ARGS, ", "))
 	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(xpcall, errorhandler)
 end
 
@@ -251,7 +256,7 @@ local function GetOptionsMemberValue(membername, option, options, path, appName,
 			if handler and handler[member] then
 				a,b,c,d = handler[member](handler, info, ...)
 			else
-				error(string.format("Method %s doesn't exist in handler for type %s", member, membername))
+				error(format("Method %s doesn't exist in handler for type %s", member, membername))
 			end
 		end
 		del(info)
@@ -372,7 +377,7 @@ local function BuildSortedOptionsTable(group, keySort, opts, options, path, appN
 		end
 	end
 
-	table.sort(keySort, compareOptions)
+	tsort(keySort, compareOptions)
 
 	del(tempOrders)
 	del(tempNames)
@@ -582,14 +587,14 @@ local function confirmPopup(appName, rootframe, basepath, info, message, func, .
 		if dialog and oldstrata then
 			dialog:SetFrameStrata(oldstrata)
 		end
-		AceConfigDialog:Open(appName, rootframe, basepath and unpack(basepath))
+		AceConfigDialog:Open(appName, rootframe, unpack(basepath or emptyTbl))
 		del(info)
 	end
 	t.OnCancel = function()
 		if dialog and oldstrata then
 			dialog:SetFrameStrata(oldstrata)
 		end
-		AceConfigDialog:Open(appName, rootframe, basepath and unpack(basepath))
+		AceConfigDialog:Open(appName, rootframe, unpack(basepath or emptyTbl))
 		del(info)
 	end
 	for i = 1, select('#', ...) do
@@ -682,7 +687,7 @@ local function ActivateControl(widget, event, ...)
 				success, validated = safecall(handler[validate], handler, info, ...)
 				if not success then validated = false end
 			else
-				error(string.format("Method %s doesn't exist in handler for type execute", validate))
+				error(format("Method %s doesn't exist in handler for type execute", validate))
 			end
 		elseif type(validate) == "function" then
 			success, validated = safecall(validate, info, ...)
@@ -733,7 +738,7 @@ local function ActivateControl(widget, event, ...)
 					confirm = false
 				end
 			else
-				error(string.format("Method %s doesn't exist in handler for type confirm", confirm))
+				error(format("Method %s doesn't exist in handler for type confirm", confirm))
 			end
 		elseif type(confirm) == "function" then
 			success, confirm = safecall(confirm, info, ...)
@@ -773,7 +778,7 @@ local function ActivateControl(widget, event, ...)
 					if handler and handler[func] then
 						confirmPopup(user.appName, rootframe, basepath, info, confirmText, handler[func], handler, info, ...)
 					else
-						error(string.format("Method %s doesn't exist in handler for type func", func))
+						error(format("Method %s doesn't exist in handler for type func", func))
 					end
 				elseif type(func) == "function" then
 					confirmPopup(user.appName, rootframe, basepath, info, confirmText, func, info, ...)
@@ -788,7 +793,7 @@ local function ActivateControl(widget, event, ...)
 			if handler and handler[func] then
 				safecall(handler[func],handler, info, ...)
 			else
-				error(string.format("Method %s doesn't exist in handler for type func", func))
+				error(format("Method %s doesn't exist in handler for type func", func))
 			end
 		elseif type(func) == "function" then
 			safecall(func,info, ...)
@@ -797,23 +802,23 @@ local function ActivateControl(widget, event, ...)
 
 
 		local iscustom = user.rootframe:GetUserData('iscustom')
-		local basepath = user.rootframe:GetUserData('basepath')
+		local basepath = user.rootframe:GetUserData('basepath') or emptyTbl
 		--full refresh of the frame, some controls dont cause this on all events
 		if option.type == "color" then
 			if event == "OnValueConfirmed" then
 				
 				if iscustom then
-					AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 				else
-					AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, unpack(basepath))
 				end
 			end
 		elseif option.type == "range" then
 			if event == "OnMouseUp" then
 				if iscustom then
-					AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 				else
-					AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, unpack(basepath))
 				end
 			end
 		--multiselects don't cause a refresh on 'OnValueChanged' only 'OnClosed'
@@ -821,9 +826,9 @@ local function ActivateControl(widget, event, ...)
 			user.valuechanged = true
 		else
 			if iscustom then
-				AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+				AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 			else
-				AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+				AceConfigDialog:Open(user.appName, unpack(basepath))
 			end
 		end
 
@@ -835,9 +840,9 @@ local function ActivateSlider(widget, event, value)
 	local option = widget:GetUserData('option')
 	local min, max, step = option.min or 0, option.max or 100, option.step
 	if step then
-		value = math.floor((value - min) / step + 0.5) * step + min
+		value = math_floor((value - min) / step + 0.5) * step + min
 	else
-		value = math.max(math.min(value,max),min)
+		value = math_max(math_min(value,max),min)
 	end
 	ActivateControl(widget,event,value)
 end
@@ -848,11 +853,11 @@ local function ActivateMultiControl(widget, event, ...)
 	ActivateControl(widget, event, widget:GetUserData('value'), ...)
 	local user = widget:GetUserDataTable()
 	local iscustom = user.rootframe:GetUserData('iscustom')
-	local basepath = user.rootframe:GetUserData('basepath')
+	local basepath = user.rootframe:GetUserData('basepath') or emptyTbl
 	if iscustom then
-		AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+		AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 	else
-		AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+		AceConfigDialog:Open(user.appName, unpack(basepath))
 	end
 end
 
@@ -860,11 +865,11 @@ local function MultiControlOnClosed(widget, event, ...)
 	local user = widget:GetUserDataTable()
 	if user.valuechanged then
 		local iscustom = user.rootframe:GetUserData('iscustom')
-		local basepath = user.rootframe:GetUserData('basepath')
+		local basepath = user.rootframe:GetUserData('basepath') or emptyTbl
 		if iscustom then
-			AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+			AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 		else
-			AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+			AceConfigDialog:Open(user.appName, unpack(basepath))
 		end
 	end
 end
@@ -1183,8 +1188,8 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 							tinsert(valuesort, value)
 						end
 					end
-					table.sort(valuesort)	
-						
+					tsort(valuesort)
+					
 					if controlType then
 						control = gui:Create(controlType)
 						if not control then
@@ -1363,7 +1368,7 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 		feedpath[i] = path[i]
 	end
 
-	BuildPath(feedpath, string.split("\001", uniquevalue))
+	BuildPath(feedpath, ("\001"):split(uniquevalue))
 	local group = options
 	for i = 1, #feedpath do
 		if not group then return end
@@ -1375,9 +1380,9 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 	
 	GameTooltip:SetOwner(button, "ANCHOR_NONE")
 	if widget.type == "TabGroup" then
-		GameTooltip:SetPoint("BOTTOM",button,"TOP")	
+		GameTooltip:SetPoint("BOTTOM",button,"TOP")
 	else
-		GameTooltip:SetPoint("LEFT",button,"RIGHT")	
+		GameTooltip:SetPoint("LEFT",button,"RIGHT")
 	end
 
 	GameTooltip:SetText(name, 1, .82, 0, 1)
@@ -1403,7 +1408,7 @@ local function GroupExists(appName, options, path, uniquevalue)
 		feedpath[i] = path[i]
 	end
 	
-	BuildPath(feedpath, string.split("\001", uniquevalue))
+	BuildPath(feedpath, ("\001"):split(uniquevalue))
 	
 	local group = options
 	for i = 1, #feedpath do
@@ -1436,7 +1441,7 @@ local function GroupSelected(widget, event, uniquevalue)
 		feedpath[i] = path[i]
 	end
 
-	BuildPath(feedpath, string.split("\001", uniquevalue))
+	BuildPath(feedpath, ("\001"):split(uniquevalue))
 	local group = options
 	for i = 1, #feedpath do
 		group = GetSubOption(group, feedpath[i])
@@ -1510,7 +1515,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 
 	--Add a scrollframe if we are not going to add a group control, this is the inverse of the conditions for that later on
 	if (not (hasChildGroups and not inline)) or (grouptype ~= "tab" and grouptype ~= "select" and (parenttype == "tree" and not isRoot)) then
-		if container.type ~= "InlineGroup" then
+		if container.type ~= "InlineGroup" and container.type ~= "SimpleGroup" then
 			scroll = gui:Create("ScrollFrame")
 			scroll:SetLayout("flow")
 			scroll.width = "fill"
@@ -1639,9 +1644,10 @@ local function RefreshOnUpdate(this)
 			AceConfigDialog.OpenFrames[appName]:Hide()
 		end
 		if AceConfigDialog.BlizOptions and AceConfigDialog.BlizOptions[appName] then
-			local widget = AceConfigDialog.BlizOptions[appName]
-			if not widget:IsVisible() then
-				widget:ReleaseChildren()
+			for key, widget in pairs(AceConfigDialog.BlizOptions[appName]) do
+				if not widget:IsVisible() then
+					widget:ReleaseChildren()
+				end
 			end
 		end
 		this.closing[appName] = nil
@@ -1657,13 +1663,14 @@ local function RefreshOnUpdate(this)
 	for appName in pairs(this.apps) do
 		if AceConfigDialog.OpenFrames[appName] then
 			local user = AceConfigDialog.OpenFrames[appName]:GetUserDataTable()
-			AceConfigDialog:Open(appName, user.basepath and unpack(user.basepath))
+			AceConfigDialog:Open(appName, unpack(user.basepath or emptyTbl))
 		end
 		if AceConfigDialog.BlizOptions and AceConfigDialog.BlizOptions[appName] then
-			local widget = AceConfigDialog.BlizOptions[appName]
-			local user = widget:GetUserDataTable()
-			if widget:IsVisible() then
-				AceConfigDialog:Open(widget:GetUserData('appName'), widget, user.basepath and unpack(user.basepath))
+			for key, widget in pairs(AceConfigDialog.BlizOptions[appName]) do
+				local user = widget:GetUserDataTable()
+				if widget:IsVisible() then
+					AceConfigDialog:Open(widget:GetUserData('appName'), widget, unpack(user.basepath or emptyTbl))
+				end
 			end
 		end
 		this.apps[appName] = nil
@@ -1765,6 +1772,9 @@ function AceConfigDialog:Open(appName, container, ...)
 		if f.SetStatusTable then
 			f:SetStatusTable(status)
 		end
+		if f.SetTitle then
+			f:SetTitle(name or "")
+		end
 	else
 		if not self.OpenFrames[appName] then
 			f = gui:Create("Frame")
@@ -1790,11 +1800,23 @@ function AceConfigDialog:Open(appName, container, ...)
 	del(path)
 end
 
-AceConfigDialog.BlizOptions = AceConfigDialog.BlizOptions or {}
+-- convert pre-39 BlizOptions structure to the new format
+if oldminor and oldminor < 39 and AceConfigDialog.BlizOptions then
+	local old = AceConfigDialog.BlizOptions
+	local new = {}
+	for key, widget in pairs(old) do
+		local appName = widget:GetUserData('appName')
+		if not new[appName] then new[appName] = {} end
+		new[appName][key] = widget
+	end
+	AceConfigDialog.BlizOptions = new
+else
+	AceConfigDialog.BlizOptions = AceConfigDialog.BlizOptions or {}
+end
 
 local function FeedToBlizPanel(widget, event)
 	local path = widget:GetUserData('path')
-	AceConfigDialog:Open(widget:GetUserData('appName'), widget, path and unpack(path))
+	AceConfigDialog:Open(widget:GetUserData('appName'), widget, unpack(path or emptyTbl))
 end
 
 local function ClearBlizPanel(widget, event)
@@ -1828,9 +1850,13 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 		key = key..'\001'..select(n, ...)
 	end
 	
-	if not BlizOptions[key] then
+	if not BlizOptions[appName] then
+		BlizOptions[appName] = {}
+	end
+	
+	if not BlizOptions[appName][key] then
 		local group = gui:Create("BlizOptionsGroup")
-		BlizOptions[key] = group
+		BlizOptions[appName][key] = group
 		group:SetName(name or appName, parent)
 
 		group:SetTitle(name or appName)

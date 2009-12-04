@@ -65,21 +65,7 @@ function Afflicted:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileCopied", "Reload")
 	self.db.RegisterCallback(self, "OnProfileReset", "Reload")
 	self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
-
-	-- Load spell database
-	local spells = AfflictedSpells:GetData()
 	
-	-- Found an old Afflicted2 install
-	if( self.db.profile.version ) then
-		self:Print(L["Reset Afflicted configuration as you were using Afflicted2."])
-		self.db:ResetDB()
-	-- Do a DB clean and reset the arena spells data
-	elseif( self.db.profile.spellRevision ) then
-		self.db.profile.revision = nil
-		self.db.profile.spellRevision = nil
-		self.db.profile.arenas = {[2] = {}, [3] = {}, [5] = {}}
-	end
-		
 	-- Setup our spell cache
 	self.writeQueue = {}
 	self.spells = setmetatable({}, {
@@ -105,9 +91,16 @@ function Afflicted:OnInitialize()
 		end
 	})
 
+	-- Load spell database
+	local spells = AfflictedSpells:GetData()
 
+	-- Fresh DB, copy it all in
+	if( self.db.profile.spellVersion == 0 ) then
+		self.db.profile.spellVersion = AfflictedSpells.version
+		self.db.profile.spells = CopyTable(spells)
+		
 	-- Spell database changed
-	if( self.db.profile.spellVersion < AfflictedSpells.version ) then
+	elseif( self.db.profile.spellVersion < AfflictedSpells.version ) then
 		self.db.profile.spellVersion = AfflictedSpells.version
 		
 		-- Remove old spells

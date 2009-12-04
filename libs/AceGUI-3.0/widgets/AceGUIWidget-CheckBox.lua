@@ -1,5 +1,12 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: SetDesaturation, GameFontHighlight
+
 --------------------------
 -- Check Box			--
 --------------------------
@@ -10,7 +17,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 9
+	local Version = 12
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -84,20 +91,14 @@ do
 		self.checked = value
 		if value then
 			SetDesaturation(self.check, false)
-			check:SetWidth(24)
-			check:SetHeight(24)
 			self.check:Show()
 		else
 			--Nil is the unknown tristate value
 			if self.tristate and value == nil then
 				SetDesaturation(self.check, true)
-				check:SetWidth(24)
-				check:SetHeight(24)
 				self.check:Show()
 			else
 				SetDesaturation(self.check, false)
-				check:SetWidth(24)
-				check:SetHeight(24)
 				self.check:Hide()
 			end
 		end
@@ -118,16 +119,24 @@ do
 		local highlight = self.highlight
 	
 		if type == "radio" then
+			checkbg:SetHeight(16)
+			checkbg:SetWidth(16)
 			checkbg:SetTexture("Interface\\Buttons\\UI-RadioButton")
 			checkbg:SetTexCoord(0,0.25,0,1)
+			check:SetHeight(16)
+			check:SetWidth(16)
 			check:SetTexture("Interface\\Buttons\\UI-RadioButton")
-			check:SetTexCoord(0.5,0.75,0,1)
+			check:SetTexCoord(0.25,0.5,0,1)
 			check:SetBlendMode("ADD")
 			highlight:SetTexture("Interface\\Buttons\\UI-RadioButton")
 			highlight:SetTexCoord(0.5,0.75,0,1)
 		else
+			checkbg:SetHeight(24)
+			checkbg:SetWidth(24)
 			checkbg:SetTexture("Interface\\Buttons\\UI-CheckBox-Up")
 			checkbg:SetTexCoord(0,1,0,1)
+			check:SetHeight(24)
+			check:SetWidth(24)
 			check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 			check:SetTexCoord(0,1,0,1)
 			check:SetBlendMode("BLEND")
@@ -162,7 +171,7 @@ do
 				local desc = self.frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 				desc:ClearAllPoints()
 				desc:SetPoint("TOPLEFT", self.check, "TOPRIGHT", 5, -20)
-				desc:SetWidth(self.frame.width - 25)
+				desc:SetWidth(self.frame.width - 30)
 				desc:SetJustifyH("LEFT")
 				desc:SetJustifyV("TOP")
 				self.desc = desc
@@ -183,7 +192,7 @@ do
 	
 	local function OnWidthSet(self, width)
 		if self.desc and self.desc:GetText() ~= "" then
-			self.desc:SetWidth(width - 25)
+			self.desc:SetWidth(width - 30)
 			self:SetHeight(24 + self.desc:GetHeight())
 		end
 	end
@@ -230,7 +239,7 @@ do
 		check:SetPoint("CENTER",checkbg,"CENTER",0,0)
 		check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 	
-		local highlight = frame:CreateTexture(nil, "BACKGROUND")
+		local highlight = frame:CreateTexture(nil, "OVERLAY")
 		self.highlight = highlight
 		highlight:SetTexture("Interface\\Buttons\\UI-CheckBox-Highlight")
 		highlight:SetBlendMode("ADD")
