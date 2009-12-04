@@ -1,5 +1,5 @@
 AfflictedSpells = {}
-AfflictedSpells.version = 4
+AfflictedSpells.version = 5
 
 function AfflictedSpells:GetData()
 	if( self.spells ) then
@@ -49,9 +49,9 @@ function AfflictedSpells:GetData()
 		-- Hand of Sacrifice
 		[6940] = "{disabled=true;type='buff';duration=12;anchor='defenses';cdDisabled=true;cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Aura Mastery
-		[31821] = "{duration=10;anchor='defenses';cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
+		[31821] = "{duration=6;anchor='defenses';cooldown=120;cdAnchor='cooldowns';class='PALADIN';}",
 		-- Divine Sacrifice
-		[64205] = "{type='buff';duration=10;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
+		[64205] = "{type='buff';duration=6;anchor='defenses';cooldown=120;cdDisabled=true;cdAnchor='cooldowns';class='PALADIN';}",
 		
 		-- Warrior
 		-- Shield Reflect

@@ -102,7 +102,6 @@ AfflictedLocals = {
 	["Raid warning"] = "Raid warning",
 	["Redirect bars to group"] = "Redirect bars to group",
 	["Redirection"] = "Redirection",
-	["Reset Afflicted configuration as you were using Afflicted2."] = "Reset Afflicted configuration as you were using Afflicted2.",
 	["Reset when this is used"] = "Reset when this is used",
 	["Right"] = "Right",
 	["Scale"] = "Scale",
