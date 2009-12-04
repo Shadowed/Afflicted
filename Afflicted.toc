@@ -1,7 +1,7 @@
-## Interface: 30200
+## Interface: 30300
 ## Title: Afflicted3
 ## Notes: PvP timer and cool down tracking mod
-## Author: Mayen
+## Author: Shadowed
 ## SavedVariables: AfflictedDB
 
 libs\LibStub-1.0\LibStub-1.0.xml
