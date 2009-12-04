@@ -112,8 +112,11 @@ function Afflicted:OnInitialize()
 
 		-- Load new or changed spells in
 		for spellID, data in pairs(spells) do
-			-- Do not add a spell if it doesn't exist
-			if( not self.db.profile.spells[spellID] or self.db.profile.spells[spellID] ~= data ) then
+			-- No spell of this type exists, add a new one
+			if( not self.db.profile.spells[spellID] ) then
+				self.db.profile.spells[spellID] = data
+			-- We already have this, so selective merge	
+			elseif( self.db.profile.spells[spellID] ~= data ) then
 				local spell = loadstring("return" .. data)()
 				local oldSpell = self.spells[spellID]
 				
