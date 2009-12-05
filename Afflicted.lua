@@ -116,7 +116,7 @@ function Afflicted:OnInitialize()
 			if( not self.db.profile.spells[spellID] ) then
 				self.db.profile.spells[spellID] = data
 			-- We already have this, so selective merge	
-			elseif( self.db.profile.spells[spellID] ~= data ) then
+			elseif( type(data) == "string" and self.db.profile.spells[spellID] ~= data ) then
 				local spell = loadstring("return" .. data)()
 				local oldSpell = self.spells[spellID]
 				
