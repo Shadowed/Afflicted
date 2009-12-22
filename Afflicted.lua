@@ -1,5 +1,5 @@
 --[[ 
-	Afflicted 3, Mayen of US-Mal'Ganis PvP
+	Afflicted 3, Shadow of US-Mal'Ganis
 ]]
 
 Afflicted = LibStub("AceAddon-3.0"):NewAddon("Afflicted", "AceEvent-3.0")
@@ -71,7 +71,7 @@ function Afflicted:OnInitialize()
 	self.spells = setmetatable({}, {
 		__index = function(tbl, index)
 			-- No data found, don't try and load this index again
-			if( not Afflicted.db.profile.spells[index] ) then
+			if( not index or not Afflicted.db.profile.spells[index] ) then
 				tbl[index] = false
 				return false
 			end
