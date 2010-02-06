@@ -70,8 +70,10 @@ function Afflicted:OnInitialize()
 	self.writeQueue = {}
 	self.spells = setmetatable({}, {
 		__index = function(tbl, index)
+			if( not index ) then return end
+			
 			-- No data found, don't try and load this index again
-			if( not index or not Afflicted.db.profile.spells[index] ) then
+			if( not Afflicted.db.profile.spells[index] ) then
 				tbl[index] = false
 				return false
 			end
