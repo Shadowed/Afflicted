@@ -1,10 +1,10 @@
 --- AceConfigDialog-3.0 generates AceGUI-3.0 based windows based on option tables.
 -- @class file
 -- @name AceConfigDialog-3.0
--- @release $Id: AceConfigDialog-3.0.lua 882 2009-12-02 18:04:53Z nevcairiel $
+-- @release $Id: AceConfigDialog-3.0.lua 902 2009-12-12 14:56:14Z nevcairiel $
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 39
+local MAJOR, MINOR = "AceConfigDialog-3.0", 43
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -27,14 +27,11 @@ local pairs, next, select, type, unpack = pairs, next, select, type, unpack
 local rawset, tostring = rawset, tostring
 local math_min, math_max, math_floor = math.min, math.max, math.floor
 
--- WoW APIs
-local geterrorhandler = geterrorhandler
-
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
 -- GLOBALS: NORMAL_FONT_COLOR, GameTooltip, StaticPopupDialogs, ACCEPT, CANCEL, StaticPopup_Show
 -- GLOBALS: PlaySound, GameFontHighlight, GameFontHighlightSmall, GameFontHighlightLarge
--- GLOBALS: CloseSpecialWindows, InterfaceOptions_AddCategory
+-- GLOBALS: CloseSpecialWindows, InterfaceOptions_AddCategory, geterrorhandler
 
 local emptyTbl = {}
 
@@ -1116,7 +1113,8 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local controlType = v.dialogControl or v.control or (v.multiline and "MultiLineEditBox") or "EditBox"
 					control = gui:Create(controlType)
 					if not control then
-						error(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+						geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+						control = gui:Create(v.multiline and "MultiLineEditBox" or "EditBox")
 					end
 					
 					if v.multiline then
@@ -1146,7 +1144,17 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						local desc = GetOptionsMemberValue("desc", v, options, path, appName)
 						control:SetDescription(desc)
 					end
-
+					
+					local image = GetOptionsMemberValue("image", v, options, path, appName)
+					local imageCoords = GetOptionsMemberValue("imageCoords", v, options, path, appName)
+					
+					if type(image) == 'string' then
+						if type(imageCoords) == 'table' then
+							control:SetImage(image, unpack(imageCoords))
+						else
+							control:SetImage(image)
+						end
+					end
 				elseif v.type == "range" then
 					control = gui:Create("Slider")
 					control:SetLabel(name)
@@ -1165,7 +1173,8 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local controlType = v.dialogControl or v.control or "Dropdown"
 					control = gui:Create(controlType)
 					if not control then
-						error(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+						geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+						control = gui:Create("Dropdown")
 					end
 					control:SetLabel(name)
 					control:SetList(values)
@@ -1193,8 +1202,10 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					if controlType then
 						control = gui:Create(controlType)
 						if not control then
-							error(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+							geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
 						end
+					end
+					if control then
 						control:SetMultiselect(true)
 						control:SetLabel(name)
 						control:SetList(values)
@@ -1538,7 +1549,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 	end
 
 	if hasChildGroups and not inline then
-
+		local name = GetOptionsMemberValue("name", group, options, path, appName)
 		if grouptype == "tab" then
 
 			local tab = gui:Create("TabGroup")
@@ -1572,6 +1583,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 		elseif grouptype == "select" then
 
 			local select = gui:Create("DropdownGroup")
+			select:SetTitle(name)
 			InjectInfo(select, options, group, path, rootframe, appName)
 			select:SetCallback("OnGroupSelected", GroupSelected)
 			local status = AceConfigDialog:GetStatusTable(appName, path)
@@ -1590,7 +1602,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 			end
 			
 			if firstgroup then
-				select:SetGroup( (GroupExists(appName, options, path,status.groups.selected) and status.groups.selected) or firstgroup)
+				select:SetGroup((GroupExists(appName, options, path,status.groups.selected) and status.groups.selected) or firstgroup)
 			end
 			
 			select.width = "fill"
@@ -1676,6 +1688,11 @@ local function RefreshOnUpdate(this)
 		this.apps[appName] = nil
 	end
 	this:SetScript("OnUpdate", nil)
+end
+
+-- Upgrade the OnUpdate script as well, if needed.
+if AceConfigDialog.frame:GetScript("OnUpdate") then
+	AceConfigDialog.frame:SetScript("OnUpdate", RefreshOnUpdate)
 end
 
 --- Close all open options windows

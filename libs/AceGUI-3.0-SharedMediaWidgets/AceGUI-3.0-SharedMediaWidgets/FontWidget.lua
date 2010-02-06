@@ -81,6 +81,7 @@ do
 
 			local clickscript = self.button:GetScript("OnClick")
 			self.button:SetScript("OnClick", function(...)
+				self.pullout:Clear()
 				ParseListItems(self)
 				clickscript(...)
 			end)

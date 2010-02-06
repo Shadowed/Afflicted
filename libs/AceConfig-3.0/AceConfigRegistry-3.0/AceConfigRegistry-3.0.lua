@@ -8,7 +8,7 @@
 -- :IterateOptionsTables() (and :GetOptionsTable() if only given one argument) return a function reference that the requesting config handling addon must call with valid "uiType", "uiName".
 -- @class file
 -- @name AceConfigRegistry-3.0
--- @release $Id: AceConfigRegistry-3.0.lua 877 2009-11-02 15:56:50Z nevcairiel $
+-- @release $Id: AceConfigRegistry-3.0.lua 890 2009-12-06 12:50:05Z nevcairiel $
 local MAJOR, MINOR = "AceConfigRegistry-3.0", 11
 local AceConfigRegistry = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -127,6 +127,8 @@ local typedkeys={
 	},
 	toggle={
 		tristate=optbool,
+		image=optstringfunc,
+		imageCoords=optmethodtable,
 	},
 	tristate={
 	},
